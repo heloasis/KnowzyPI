@@ -43,6 +43,8 @@ Descrever como testar o aplicativo (Expo, APK, etc.).
 - Amanda
 - Nicolly
 - Heloisa
+- Davi Eduardo
+- Gabriel Soares
 
 ## 🎤 Pitch
 Resumo do pitch de apresentação.
@@ -80,12 +82,32 @@ Essa funcionalidade permite que o usuário acompanhe seu desempenho e observe su
 Além disso, o aplicativo possui uma página de perfil, onde ficam registradas informações do usuário e seu histórico de utilização, incentivando o acompanhamento contínuo dos resultados.
 
 
+Gabriel:
+Além das funcionalidades principais, pensamos em recursos que tornam a experiência mais personalizada para o estudante.
+O usuário poderá favoritar quizzes para acessá-los novamente quando desejar revisar um conteúdo específico.
+Também planejamos implementar um sistema de conquistas e metas, incentivando a continuidade dos estudos por meio de recompensas dentro da plataforma.
+Esses recursos ajudam a manter o engajamento do usuário e tornam o processo de aprendizagem mais motivador.
+
+
+Davi:
+Pensando na evolução do projeto, temos algumas melhorias planejadas para versões futuras do Knowzy.
+Entre elas estão a adição de novas matérias, rankings de pontuação entre os usuários, estatísticas mais detalhadas de desempenho e recomendações de conteúdos com base nos resultados obtidos nos quizzes.
+Também pretendemos ampliar a quantidade de perguntas disponíveis, tornando a plataforma cada vez mais completa para estudantes de diferentes níveis de ensino.
+
+Dessa forma, o Knowzy poderá crescer continuamente e oferecer uma experiência de aprendizado ainda mais eficiente.
+
+
 Kevellin:
 Para o desenvolvimento do Knowzy, utilizamos diversas tecnologias modernas.
+
 O React Native foi utilizado para criar a interface do aplicativo, permitindo uma experiência agradável para o usuário.
+
 O Node.js foi utilizado no desenvolvimento do backend e das funcionalidades do sistema.
+
 O Firebase auxilia no gerenciamento e armazenamento de dados dos usuários.
+
 O GitHub foi utilizado para organização e controle de versões do projeto durante o desenvolvimento.
-E o Render foi escolhido para a hospedagem da aplicação.
+
 Com o Knowzy, buscamos oferecer uma ferramenta que incentive os estudantes a aprender de forma mais prática, divertida e eficiente.
+
 Acreditamos que a tecnologia pode ser uma grande aliada da educação e que nosso projeto contribui para tornar o estudo mais acessível e motivador.
