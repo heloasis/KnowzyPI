@@ -1,0 +1,1 @@
+//Controla Telas 7 e 8 (Perguntas e Resultados)
