@@ -1,0 +1,131 @@
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #090B1E 0%, #121033 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+  padding: 20px;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 900px; 
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+
+.user-card {
+  background: #2D3A82;
+  border-radius: 20px;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  background-color: #FFFFFF;
+  color: #2D3A82;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+.user-card h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.icon-btn {
+  color: #FFFFFF;
+  font-size: 24px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: rotate(45deg);
+}
+
+.menu-grid {
+  display: grid;
+ 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.menu-card {
+  background: #1D2A68;
+  border-radius: 20px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-decoration: none;
+  color: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.menu-card:hover {
+  transform: translateY(-6px);
+  background: #253685;
+  border-color: #4C62D6;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.card-icon {
+  font-size: 40px;
+}
+
+.menu-card span {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+ 
+/* responsivo */
+@media (max-width: 600px) {
+  .dashboard-container {
+    max-width: 100%;
+  }
+
+  .user-card {
+    padding: 16px 20px;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr; 
+  }
+
+  .menu-card {
+    padding: 24px 20px;
+    flex-direction: row; 
+    justify-content: flex-start;
+    padding-left: 32px;
+  }
+}
