@@ -11,9 +11,11 @@ app.set("views", path.join(__dirname, "views"));
 
 const routes = require('./src/routes/authRoutes');
 const loginRoutes = require('./src/routes/authRoutes'); 
+const homeRoutes = require('./src/routes/homeRoutes'); 
 
 app.use('/', routes);
 app.use('/login', loginRoutes);
+app.use('/home', homeRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
