@@ -2,11 +2,11 @@ const materiaModel = require('../models/materias');
 
 const listarMaterias = async (req, res) => {
   try {
-    const materias = await materiaModel.listarMaterias();
-    res.status(200).json(materias);
+    const materias = (await materiaModel.listarMaterias()) || [];
+    return res.render('materias', { materias });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ erro: 'Erro ao listar matérias.' });
+    return res.status(500).json({ erro: 'Erro ao listar matérias.' });
   }
 };
 

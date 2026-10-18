@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conquistas e Mascote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Jornada</p>
+          <h1>Conquistas</h1>
+          <p class="subtitle">Cada conquista é um passo na sua jornada</p>
+        </div>
+        <button class="profile-mini" type="button" id="profileTrigger" aria-label="Abrir perfil do usuário">
+          <span class="avatar-badge">U</span>
+          <div>
+            <strong id="userName">Usuário</strong>
+            <small id="userTag">#0001</small>
+          </div>
+        </button>
+      </header>
+
+      <section class="mascot-card">
+        <div class="mascot-copy">
+          <p class="label">Mascote</p>
+          <h2 id="levelName">Iniciante</h2>
+          <div class="level-meta">
+            <span id="xpTotal">0 XP</span>
+            <span class="divider">•</span>
+            <span id="nextLevelText">Próximo nível: Aventureiro</span>
+          </div>
+        </div>
+
+        <div class="mascot-visual-wrap">
+          <div class="mascot-visual" id="mascotVisual">🐾</div>
+        </div>
+
+        <div class="next-level-panel">
+          <span class="mini-label">Próximo nível</span>
+          <strong id="nextLevelName">Aventureiro</strong>
+          <small id="xpRange">500 XP</small>
+        </div>
+      </section>
+
+      <main class="content-grid">
+        <section class="quests-panel">
+          <div class="section-header">
+            <h3>Conquistas</h3>
+            <button class="ghost-btn" type="button">Ver tudo</button>
+          </div>
+
+          <div id="questsList" class="quests-list" aria-live="polite"></div>
+        </section>
+      </main>
+
+      <footer class="status-bar">
+        <div>
+          <span class="status-label">Conquistas desbloqueadas</span>
+          <strong id="counterText">0 / 0</strong>
+        </div>
+        <button class="return-btn" type="button" id="backButton">Voltar</button>
+      </footer>
+    </div>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

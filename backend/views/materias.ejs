@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matérias</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #060312;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 10;
+            transition: color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .back-btn:hover {
+            color: #ffffff;
+            opacity: 1;
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: #0b071e;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 40px 24px;
+        }
+
+        .header-title {
+            font-size: 2.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #00d2ff, #7928ca);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .materias-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .materia-card {
+            display: flex;
+            align-items: center;
+            background: #1b2a6b;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-decoration: none;
+            color: #ffffff;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+
+        .materia-card:hover {
+            background: #21327c;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .materia-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+        }
+
+        .materia-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .materia-name {
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" type="button" onclick="window.location.href='/home'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+        <span>Voltar</span>
+    </button>
+
+    <div class="container">
+        <h1 class="header-title">matérias</h1>
+        
+        <div class="materias-list">
+            <a href="/quiz/portugues" class="materia-card">
+                <span class="materia-icon">
+                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </span>
+                <span class="materia-name">Português</span>
+            </a>
+
+            <a href="/quiz/matematica" class="materia-card">
+                <span class="materia-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 12h4l3 9 4-17 3 8h4"></path></svg>
+                </span>
+                <span class="materia-name">Matemática</span>
+            </a>
+
+            <a href="/quiz/historia" class="materia-card">
+                <span class="materia-icon">
+                    <svg viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
+                </span>
+                <span class="materia-name">História</span>
+            </a>
+
+            <a href="/quiz/geografia" class="materia-card">
+                <span class="materia-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </span>
+                <span class="materia-name">Geografia</span>
+            </a>
+
+            <a href="/quiz/biologia" class="materia-card">
+                <span class="materia-icon">
+                    <svg viewBox="0 0 24 24"><path d="M2 15c6.667-6 13.333 0 20-6"></path><path d="M2 9c6.667 6 13.333 0 20 6"></path><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path><path d="M17 6l-2.5 2.5"></path><path d="M14 10l-4 4"></path><path d="M7 18l2.5-2.5"></path><path d="M3.5 14.5l2-2"></path><path d="M20.5 9.5l-2 2"></path></svg>
+                </span>
+                <span class="materia-name">Biologia</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

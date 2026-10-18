@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfil do Usuário</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="profile-shell">
+      <header class="profile-header">
+        <button class="back-link" type="button" id="backToConquistas">← Voltar</button>
+      </header>
+
+      <section class="profile-card">
+        <div class="avatar-wrap">
+          <div class="avatar-large" id="profileAvatar">U</div>
+        </div>
+
+        <div class="profile-summary">
+          <p class="eyebrow">Perfil</p>
+          <h1 id="profileName">Aluno Teste</h1>
+          <p id="profileTag" class="profile-tag">#A12</p>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <span class="label">XP total</span>
+          <strong id="profileXp">780 XP</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Nível</span>
+          <strong id="profileLevel">Iniciante</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Conquistas</span>
+          <strong id="profileWins">1 / 4</strong>
+        </article>
+        <article class="stat-card">
+          <span class="label">Mascote</span>
+          <strong id="profileMascot">🐾</strong>
+        </article>
+      </section>
+
+      <section class="info-panel">
+        <h2>Resumo da jornada</h2>
+        <ul>
+          <li><span>Estilo</span><strong id="profileStyle">Manto Azul</strong></li>
+          <li><span>Acessório</span><strong id="profileAccessory">Óculos</strong></li>
+          <li><span>Expressão</span><strong id="profileMood">Feliz</strong></li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
