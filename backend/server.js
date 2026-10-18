@@ -21,13 +21,37 @@ app.get('/cadastro', authController.cadastro);
 
 app.get('/home', homeController.index);
 app.get('/home/favoritos', homeController.favoritos);
-app.get('/home/conquistas', homeController.conquistas);
+app.get('/home/conquistas', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'conquistas', 'index.html'));
+});
 app.get('/home/configuracoes', homeController.configuracoes);
+app.get('/conquistas', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'conquistas', 'index.html'));
+});
+app.get('/perfil', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'perfil', 'index.html'));
+});
 
 app.get('/materias', materiaController.listarMaterias);
 app.get('/materias/:id', materiaController.buscarMateria);
 
-app.get('/quiz/:materiaId', quizController.iniciarQuiz);
+app.get('/quiz', materiaController.listarMaterias);
+app.get('/quiz/portugues', (req, res) => {
+  res.render('portugues');
+});
+app.get('/quiz/matematica', (req, res) => {
+  res.render('matematica');
+});
+app.get('/quiz/historia', (req, res) => {
+  res.render('historia');
+});
+app.get('/quiz/geografia', (req, res) => {
+  res.render('geografia');
+});
+app.get('/quiz/biologia', (req, res) => {
+  res.render('biologia');
+});
+app.get('/api/quiz/:materiaId', quizController.iniciarQuiz);
 app.post('/quiz/responder', quizController.responderPergunta);
 app.post('/quiz/finalizar', quizController.finalizarQuiz);
 

@@ -42,6 +42,31 @@ const makeDoc = (id, data) => ({
   ref: { id }
 });
 
+const getValueAtPath = (path) => {
+  const segments = path.split('/').filter(Boolean);
+  let value = state;
+
+  for (const segment of segments) {
+    if (!value || typeof value !== 'object' || !(segment in value)) {
+      return null;
+    }
+    value = value[segment];
+  }
+
+  return value;
+};
+
+const ref = (path) => {
+  const data = getValueAtPath(path);
+
+  return {
+    once: async () => ({
+      val: () => data
+    }),
+    child: (childPath) => ref(`${path}/${childPath}`)
+  };
+};
+
 const collection = (name) => {
   const data = state[name] || {};
 
@@ -96,4 +121,4 @@ const collection = (name) => {
   };
 };
 
-module.exports = { db: { collection } };
+module.exports = { db: { collection, ref } };
