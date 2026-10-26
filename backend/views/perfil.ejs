@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - Knowzy</title>
+  <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: #0a0d22;
+      color: #fff;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 24px 18px;
+    }
+
+    .profile-page {
+      width: min(100%, 560px);
+      background: rgba(18, 20, 38, 0.9);
+      border-radius: 20px;
+      padding: 18px 20px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .back-link {
+      background: transparent;
+      border: none;
+      color: #dfe8ff;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #9c7bff, #67a7ff);
+      display: grid;
+      place-items: center;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-name {
+      margin: 0;
+      font-size: clamp(1.7rem, 4vw, 2.2rem);
+      line-height: 1.2;
+    }
+
+    .profile-email {
+      margin: 6px 0 0;
+      color: #b5c3ed;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .info-item {
+      background: rgba(255,255,255,0.02);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .label {
+      display: block;
+      font-size: 0.75rem;
+      color: #9aa8ce;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      font-size: 1rem;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #b890ef 0%, #8d7ae1 100%);
+      color: #0a0d22;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .profile-card {
+        align-items: flex-start;
+      }
+
+      .profile-name {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="profile-page">
+    <header class="profile-header">
+      <a href="/home" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+    </header>
+
+    <section class="profile-card">
+      <div class="profile-avatar">
+        <% if (usuario.foto) { %>
+          <img src="<%= usuario.foto %>" alt="Foto de perfil de <%= usuario.nome %>">
+        <% } else { %>
+          <%= usuario.nome.charAt(0).toUpperCase() %>
+        <% } %>
+      </div>
+
+      <div>
+        <h1 class="profile-name"><%= usuario.nome %></h1>
+        <p class="profile-email"><%= usuario.email %></p>
+      </div>
+    </section>
+
+    <section class="info-list">
+      <div class="info-item">
+        <span class="label">Nome</span>
+        <span class="value"><%= usuario.nome %></span>
+      </div>
+
+      <div class="info-item">
+        <span class="label">E-mail</span>
+        <span class="value"><%= usuario.email %></span>
+      </div>
+
+      <div class="info-item">
+        <span class="label">Total de XP</span>
+        <span class="value">780 XP</span>
+      </div>
+    </section>
+
+    <button type="button" class="logout-btn" onclick="window.location.href='/logout'">Sair da conta</button>
+  </main>
+</body>
+</html>

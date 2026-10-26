@@ -1,11 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Knowzy | Login</title>
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
-    <p>Página de Login</p>
+    <div class="background">
+        <div class="arc arc1"></div>
+        <div class="arc arc2"></div>
+        <div class="arc arc3"></div>
+
+        <span class="star s1"></span>
+        <span class="star s2"></span>
+        <span class="star s3"></span>
+        <span class="star s4"></span>
+        <span class="star s5"></span>
+    </div>
+
+    <main class="auth-shell">
+        <section class="auth-card" aria-labelledby="titulo-login">
+            <div class="auth-header">
+                <img src="/imagens/image.png" alt="Logo Knowzy" class="auth-logo">
+                <h1 id="titulo-login" class="auth-title">Entrar</h1>
+                <p class="auth-subtitle">Continue sua evolução no aprendizado.</p>
+            </div>
+
+            <form class="auth-form" id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" placeholder="seuemail@exemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" placeholder="Digite sua senha" required>
+                </div>
+
+                <button type="submit" class="auth-button" id="btn-login">Entrar</button>
+                <div id="auth-message" class="auth-message" aria-live="polite"></div>
+            </form>
+
+            <p class="auth-link">
+                Ainda não tem conta? <a href="/cadastro">Cadastre-se</a>
+            </p>
+        </section>
+    </main>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const messageBox = document.getElementById('auth-message');
+        const loginButton = document.getElementById('btn-login');
+
+        const setMessage = (message, type = 'error') => {
+            messageBox.textContent = message;
+            messageBox.className = `auth-message ${type}`;
+        };
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+
+            if (!email || !senha) {
+                setMessage('Preencha e-mail e senha para continuar.', 'error');
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.textContent = 'Entrando...';
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.erro || 'Não foi possível entrar.');
+                }
+
+                setMessage(data.mensagem || 'Login realizado com sucesso!', 'success');
+                window.setTimeout(() => {
+                    window.location.href = '/home';
+                }, 900);
+            } catch (error) {
+                setMessage(error.message, 'error');
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'Entrar';
+            }
+        });
+    </script>
 </body>
 </html>

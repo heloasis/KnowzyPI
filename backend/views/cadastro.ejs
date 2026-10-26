@@ -1,11 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Knowzy | Cadastro</title>
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
-    <p>Página de Cadastro</p>
+    <div class="background">
+        <div class="arc arc1"></div>
+        <div class="arc arc2"></div>
+        <div class="arc arc3"></div>
+
+        <span class="star s1"></span>
+        <span class="star s2"></span>
+        <span class="star s3"></span>
+        <span class="star s4"></span>
+        <span class="star s5"></span>
+    </div>
+
+    <main class="auth-shell">
+        <section class="auth-card" aria-labelledby="titulo-cadastro">
+            <div class="auth-header">
+                <img src="/imagens/image.png" alt="Logo Knowzy" class="auth-logo">
+                <h1 id="titulo-cadastro" class="auth-title">Crie sua conta</h1>
+                <p class="auth-subtitle">Acompanhe sua jornada de aprendizado em um só lugar.</p>
+            </div>
+
+            <form class="auth-form" id="cadastro-form" novalidate>
+                <div class="form-group">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome" name="nome" type="text" placeholder="Digite seu nome completo" maxlength="120" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" placeholder="seuemail@exemplo.com" maxlength="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" placeholder="Crie uma senha segura" minlength="8" required>
+                    <small class="form-helper">Use no mínimo 8 caracteres, com letras, números e símbolo.</small>
+                </div>
+
+                <button type="submit" class="auth-button" id="btn-cadastrar">Cadastrar</button>
+                <div id="auth-message" class="auth-message" aria-live="polite"></div>
+            </form>
+
+            <p class="auth-link">
+                Já possui uma conta? <a href="/login">Entrar</a>
+            </p>
+        </section>
+    </main>
+
+    <script>
+        const cadastroForm = document.getElementById('cadastro-form');
+        const senhaInput = document.getElementById('senha');
+        const messageBox = document.getElementById('auth-message');
+        const button = document.getElementById('btn-cadastrar');
+
+        const setMessage = (message, type = 'error') => {
+            messageBox.textContent = message;
+            messageBox.className = `auth-message ${type}`;
+        };
+
+        const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const validarSenha = (senha) => senha.length >= 8 && /[A-Za-z]/.test(senha) && /\d/.test(senha) && /[^A-Za-z\d]/.test(senha);
+
+        cadastroForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const senha = senhaInput.value;
+
+            if (!nome || !email || !senha) {
+                setMessage('Preencha todos os campos obrigatórios.', 'error');
+                return;
+            }
+
+            if (!validarEmail(email)) {
+                setMessage('Informe um e-mail válido.', 'error');
+                return;
+            }
+
+            if (!validarSenha(senha)) {
+                setMessage('A senha deve ter pelo menos 8 caracteres, incluindo letras, números e símbolos.', 'error');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Cadastrando...';
+            setMessage('', 'success');
+
+            try {
+                const response = await fetch('/cadastro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.erro || 'Não foi possível concluir o cadastro.');
+                }
+
+                setMessage(data.mensagem || 'Cadastro realizado com sucesso!', 'success');
+                cadastroForm.reset();
+
+                window.setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1200);
+            } catch (error) {
+                setMessage(error.message, 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Cadastrar';
+            }
+        });
+    </script>
 </body>
 </html>

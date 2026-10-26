@@ -16,11 +16,10 @@
         <div class="avatar">
           <i class="fa-regular fa-user"></i>
         </div>
-        <h2>Olá, Usuário!</h2>
+        <h2>
+          <a href="/perfil" class="welcome-link">Olá, <%= usuario.nome %>!</a>
+        </h2>
       </div>
-      <a href="/settings" class="icon-btn" aria-label="Configurações">
-        <i class="fa-solid fa-gear"></i>
-      </a>
     </header>
 
     <section class="menu-grid">
@@ -32,7 +31,7 @@
         <span>Favoritos</span>
       </a>
 
-      <a href="/quiz" class="menu-card">
+      <a href="/materias" class="menu-card">
         <div class="card-icon">
           <i class="fa-solid fa-bullseye"></i>
         </div>
