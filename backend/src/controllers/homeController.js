@@ -1,29 +1,37 @@
 const homeController = {
   index: (req, res) => {
+    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+
     res.render('home', {
       titulo: 'Dashboard',
-      usuario: { nome: 'Usuário' }
+      usuario
     });
   },
 
   favoritos: (req, res) => {
+    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+
     res.render('home', {
       titulo: 'Meus Favoritos',
-      usuario: { nome: 'Usuário' }
+      usuario
     });
   },
 
   conquistas: (req, res) => {
+    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+
     res.render('home', {
       titulo: 'Minhas Conquistas',
-      usuario: { nome: 'Usuário' }
+      usuario
     });
   },
 
   configuracoes: (req, res) => {
+    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+
     res.render('home', {
       titulo: 'Configurações do Perfil',
-      usuario: { nome: 'Usuário' }
+      usuario
     });
   }
 };

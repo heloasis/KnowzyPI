@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
 const app = express();
 
@@ -10,14 +11,24 @@ const userController = require('./src/controllers/userController');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: 'knowzy-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 8
+  }
+}));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/', authController.index);
 app.get('/login', authController.login);
+app.post('/login', authController.loginUsuario);
 app.get('/cadastro', authController.cadastro);
+app.post('/cadastro', authController.cadastrarUsuario);
 
 app.get('/home', homeController.index);
 app.get('/home/favoritos', homeController.favoritos);
@@ -29,8 +40,24 @@ app.get('/conquistas', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'conquistas', 'index.html'));
 });
 app.get('/perfil', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'perfil', 'index.html'));
+  const usuario = req.session && req.session.user ? req.session.user : {
+    nome: 'Usuário',
+    email: 'usuario@email.com',
+    foto: ''
+  };
+
+  res.render('perfil', { usuario });
 });
+app.get('/perfil/', (req, res) => {
+  res.redirect('/perfil');
+});
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/materias', materiaController.listarMaterias);
 app.get('/materias/:id', materiaController.buscarMateria);

@@ -107,16 +107,20 @@ const collection = (name) => {
       docs: toArray()
     }),
     where: (field, operator, value) => ({
-      get: async () => ({
-        forEach: (callback) => {
-          Object.entries(data)
-            .filter(([, item]) => {
-              if (operator !== '==') return false;
-              return item[field] === value;
-            })
-            .forEach(([id, item]) => callback({ id, data: () => item }));
-        }
-      })
+      get: async () => {
+        const docs = Object.entries(data)
+          .filter(([, item]) => {
+            if (operator !== '==') return false;
+            return item[field] === value;
+          })
+          .map(([id, item]) => ({ id, data: () => item }));
+
+        return {
+          docs,
+          empty: docs.length === 0,
+          forEach: (callback) => docs.forEach((doc) => callback(doc))
+        };
+      }
     })
   };
 };
