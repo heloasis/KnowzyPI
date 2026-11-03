@@ -24,6 +24,8 @@ const authController = {
                 id: usuario.id,
                 nome: usuario.nome,
                 email: usuario.email,
+                xp: Number(usuario.xp || 0),
+                conquistas: usuario.conquistas || [],
                 foto: ''
             };
 
@@ -32,7 +34,9 @@ const authController = {
                 usuario: {
                     id: usuario.id,
                     nome: usuario.nome,
-                    email: usuario.email
+                    email: usuario.email,
+                    xp: Number(usuario.xp || 0),
+                    conquistas: usuario.conquistas || []
                 }
             });
         } catch (error) {
@@ -54,12 +58,20 @@ const authController = {
                 id: usuario.id,
                 nome: usuario.nome,
                 email: usuario.email,
+                xp: Number(usuario.xp || 0),
+                conquistas: usuario.conquistas || [],
                 foto: ''
             };
 
             return res.status(200).json({
                 mensagem: 'Login realizado com sucesso!',
-                usuario
+                usuario: {
+                    id: usuario.id,
+                    nome: usuario.nome,
+                    email: usuario.email,
+                    xp: Number(usuario.xp || 0),
+                    conquistas: usuario.conquistas || []
+                }
             });
         } catch (error) {
             const mensagem = error.message || 'Não foi possível autenticar o usuário.';

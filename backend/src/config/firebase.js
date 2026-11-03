@@ -5,32 +5,113 @@ const state = {
     u1: {
       nome: 'Aluno Teste',
       email: 'aluno@teste.com',
-      senha: '123456',
+      senha: '$2b$12$AuK34YNENfGlzae/veGNs.bUj2JrnHPPI393yxWjxS.5yuWBOu.f.',
       conquistas: ['Primeiro Acesso']
     }
   },
   materias: {
-    m1: { nome: 'Matemática', descricao: 'Operações e lógica' },
-    m2: { nome: 'Português', descricao: 'Interpretação e gramática' }
+    matematica: {
+      nome: 'Matemática',
+      descricao: 'Operações e lógica',
+      perguntas: {
+        q1: {
+          enunciado: 'Quanto é 2 + 2?',
+          alternativas: ['3', '4', '5', '6'],
+          respostaCorreta: '4'
+        },
+        q2: {
+          enunciado: 'Qual é a raiz quadrada de 9?',
+          alternativas: ['2', '3', '4', '5'],
+          respostaCorreta: '3'
+        }
+      }
+    },
+    portugues: {
+      nome: 'Português',
+      descricao: 'Interpretação e gramática',
+      perguntas: {
+        q3: {
+          enunciado: 'Qual palavra está corretamente grafada?',
+          alternativas: ['Acessorio', 'Acessório', 'Acessorio', 'Acessóro'],
+          respostaCorreta: 'Acessório'
+        },
+        q4: {
+          enunciado: 'Qual termo está em destaque em “Ele foi ao mercado e comprou pão”?',
+          alternativas: ['Verbo', 'Substantivo', 'Pronome', 'Adjetivo'],
+          respostaCorreta: 'Pronome'
+        }
+      }
+    },
+    historia: {
+      nome: 'História',
+      descricao: 'Fatos e civilizações',
+      perguntas: {
+        q5: {
+          enunciado: 'Quem foi o responsável pela chegada do homem à Lua?',
+          alternativas: ['Neil Armstrong', 'Yuri Gagarin', 'Buzz Aldrin', 'John Glenn'],
+          respostaCorreta: 'Neil Armstrong'
+        }
+      }
+    },
+    geografia: {
+      nome: 'Geografia',
+      descricao: 'Mapas e territórios',
+      perguntas: {
+        q6: {
+          enunciado: 'Qual é o maior oceano do planeta?',
+          alternativas: ['Atlântico', 'Índico', 'Pacífico', 'Ártico'],
+          respostaCorreta: 'Pacífico'
+        }
+      }
+    },
+    biologia: {
+      nome: 'Biologia',
+      descricao: 'Seres vivos e ecologia',
+      perguntas: {
+        q7: {
+          enunciado: 'Qual órgão do corpo humano bombeia o sangue?',
+          alternativas: ['Pulmão', 'Coração', 'Fígado', 'Rim'],
+          respostaCorreta: 'Coração'
+        }
+      }
+    }
   },
   perguntas: {
     p1: {
-      materiaId: 'm1',
+      materiaId: 'matematica',
       enunciado: 'Quanto é 2 + 2?',
       alternativas: ['3', '4', '5', '6'],
       respostaCorreta: '4'
     },
     p2: {
-      materiaId: 'm1',
+      materiaId: 'matematica',
       enunciado: 'Qual é a raiz quadrada de 9?',
       alternativas: ['2', '3', '4', '5'],
       respostaCorreta: '3'
     },
     p3: {
-      materiaId: 'm2',
+      materiaId: 'portugues',
       enunciado: 'Qual palavra está corretamente grafada?',
       alternativas: ['Acessorio', 'Acessório', 'Acessorio', 'Acessóro'],
       respostaCorreta: 'Acessório'
+    },
+    p4: {
+      materiaId: 'historia',
+      enunciado: 'Qual evento foi marcado em 1492?',
+      alternativas: ['Descoberta do Brasil', 'Chegada de Colombo à América', 'Revolução Francesa', 'Queda do Império Romano'],
+      respostaCorreta: 'Chegada de Colombo à América'
+    },
+    p5: {
+      materiaId: 'geografia',
+      enunciado: 'Qual é o maior oceano do planeta?',
+      alternativas: ['Atlântico', 'Índico', 'Pacífico', 'Ártico'],
+      respostaCorreta: 'Pacífico'
+    },
+    p6: {
+      materiaId: 'biologia',
+      enunciado: 'Qual órgão do corpo humano bombeia o sangue?',
+      alternativas: ['Pulmão', 'Coração', 'Fígado', 'Rim'],
+      respostaCorreta: 'Coração'
     }
   }
 };

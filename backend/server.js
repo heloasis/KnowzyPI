@@ -3,6 +3,8 @@ const session = require('express-session');
 const path = require('path');
 const app = express();
 
+const { normalizeUtf8Value } = require('./src/utils/utf8');
+
 const authController = require('./src/controllers/authController');
 const homeController = require('./src/controllers/homeController');
 const materiaController = require('./src/controllers/materiasController');
@@ -11,6 +13,12 @@ const userController = require('./src/controllers/userController');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = (body) => originalJson(normalizeUtf8Value(body));
+  res.charset = 'utf-8';
+  next();
+});
 app.use(session({
   secret: 'knowzy-secret-key',
   resave: false,
@@ -31,6 +39,7 @@ app.get('/cadastro', authController.cadastro);
 app.post('/cadastro', authController.cadastrarUsuario);
 
 app.get('/home', homeController.index);
+app.get('/favoritos', homeController.favoritos);
 app.get('/home/favoritos', homeController.favoritos);
 app.get('/home/conquistas', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'conquistas', 'index.html'));
@@ -61,6 +70,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/materias', materiaController.listarMaterias);
 app.get('/materias/:id', materiaController.buscarMateria);
+app.get('/api/materias', materiaController.listarMateriasApi);
+app.get('/api/materias/:id', materiaController.buscarMateriaApi);
 
 app.get('/quiz', materiaController.listarMaterias);
 app.get('/quiz/portugues', (req, res) => {

@@ -1,57 +1,66 @@
-import { Text, View, StyleSheet } from "react-native";
-import { Link } from "expo-router"; 
-import Button from "../components/Button"; // Caminho ajustado para achar a pasta components
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Link } from 'expo-router';
+import Button from '../src/components/Button';
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.texto}>
-        Tela inicial
-      </Text>
+    <View style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.logo}>Knowzy</Text>
+        <Text style={styles.subtitle}>Aprenda de forma leve e divertida.</Text>
 
-      <Link href="/login" asChild>
-        <Button
-          title="Login"
-          onPress={() => console.log("Indo para Login")}
-          style={styles.botaoLogin}
-        />
-      </Link>
-      
-      <Link href="/cadastro" asChild>
-        <Button
-          title="Cadastro"
-          onPress={() => console.log("Indo para Cadastro")}
-          style={styles.Cadastro} 
-          textStyle={styles.textoCadastro}
-        />
-      </Link>
+        <View style={styles.actions}>
+          <Link href="/login" asChild>
+            <Button title="Login" onPress={() => undefined} style={styles.primaryButton} />
+          </Link>
+
+          <Link href="/cadastro" asChild>
+            <Button
+              title="Cadastro"
+              onPress={() => undefined}
+              variant="secondary"
+              style={styles.secondaryButton}
+            />
+          </Link>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#000128",
+  safeArea: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
+    backgroundColor: '#060312',
   },
-  texto: {
-    color: "#ffffff",
-    fontSize: 18,
-    marginBottom: 20,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    backgroundColor: '#060312',
   },
-  botaoLogin: {
-    marginTop: 200, 
+  logo: {
+    color: '#fff',
+    fontSize: 38,
+    fontWeight: '800',
+    marginBottom: 12,
   },
-  Cadastro: {
-    backgroundColor: "#000128", 
-    borderRadius: 20,
-    borderColor: "#b890ef",
-    borderWidth: 2,
+  subtitle: {
+    color: '#dfe8ff',
+    fontSize: 16,
+    marginBottom: 32,
+    textAlign: 'center',
   },
-  textoCadastro: {
-    color: "#b890ef", 
+  actions: {
+    width: '100%',
+    gap: 14,
+  },
+  primaryButton: {
+    width: '100%',
+  },
+  secondaryButton: {
+    width: '100%',
   },
 });

@@ -88,34 +88,53 @@ const mascotVisualEl = document.getElementById('mascotVisual');
 const backButton = document.getElementById('backButton');
 const profileTrigger = document.getElementById('profileTrigger');
 
+const petStages = [
+  { key: 'iniciante', name: 'Iniciante', file: 'iniciante.png', min: 0, max: 499, next: 'Aventureiro' },
+  { key: 'aventureiro', name: 'Aventureiro', file: 'aventureiro.png', min: 500, max: 999, next: 'Sábio' },
+  { key: 'sabio', name: 'Sábio', file: 'sábio.png', min: 1000, max: 1499, next: 'Mestre' },
+  { key: 'mestre', name: 'Mestre', file: 'mestre.png', min: 1500, max: 2999, next: 'Lenda' },
+  { key: 'lenda', name: 'Lenda', file: 'lenda.png', min: 3000, max: Number.POSITIVE_INFINITY, next: 'Máximo' }
+];
+
+const resolvePetStage = (xp = 0) => {
+  const safeXp = Number(xp) || 0;
+  return petStages.find((stage) => safeXp >= stage.min && safeXp <= stage.max) || petStages[0];
+};
+
 const getLevelInfo = (xp) => {
-  if (xp >= 3000) return { name: 'Lenda', range: '3.000 XP+', next: 'Máximo' };
-  if (xp >= 1500) return { name: 'Mestre', range: '1.500 - 2.999 XP', next: 'Lenda' };
-  if (xp >= 1000) return { name: 'Sábio', range: '1.000 - 1.499 XP', next: 'Mestre' };
-  if (xp >= 500) return { name: 'Aventureiro', range: '500 - 999 XP', next: 'Sábio' };
-  return { name: 'Iniciante', range: '0 - 499 XP', next: 'Aventureiro' };
+  const stage = resolvePetStage(xp);
+  const range = stage.max === Number.POSITIVE_INFINITY
+    ? `${stage.min.toLocaleString('pt-BR')} XP+`
+    : `${stage.min.toLocaleString('pt-BR')} - ${stage.max.toLocaleString('pt-BR')} XP`;
+
+  return {
+    name: stage.name,
+    range,
+    next: stage.next,
+    file: stage.file
+  };
 };
 
-const resolveMascotEmoji = (mascote = {}) => {
-  const key = (mascote.roupa || '').toLowerCase();
-  if (key.includes('manto') || key.includes('roxo')) return '🦊';
-  if (key.includes('azul')) return '🐼';
-  if (key.includes('verde')) return '🦄';
-  return '🐾';
+const getPetImagePath = (fileName) => {
+  const safeName = String(fileName || '').trim();
+  return safeName ? `/imagens/${safeName}` : '/imagens/iniciante.png';
 };
 
-const setMascot = (mascote) => {
-  mascotVisualEl.textContent = resolveMascotEmoji(mascote);
+const setMascot = (mascote, xp = 0) => {
+  const pet = resolvePetStage(xp);
+  mascotVisualEl.innerHTML = `<img src="${getPetImagePath(pet.file)}" alt="${pet.name}" class="pet-image" />`;
 };
 
 const persistProfileData = (perfil = {}, mascote = {}) => {
+  const xp = Number(perfil.xpTotal || fallbackPerfil.xpTotal);
+  const level = getLevelInfo(xp);
   const nextData = {
     nome: perfil.nome || fallbackPerfil.nome,
     tag: perfil.tag || fallbackPerfil.tag,
-    xpTotal: Number(perfil.xpTotal || fallbackPerfil.xpTotal),
-    nivel: getLevelInfo(Number(perfil.xpTotal || fallbackPerfil.xpTotal)).name,
+    xpTotal: xp,
+    nivel: level.name,
     conquistas: `${counterTextEl.textContent || '0 / 0'}`,
-    mascote: resolveMascotEmoji(mascote),
+    mascote: level.name,
     style: mascote?.roupa || 'Manto Azul',
     accessory: mascote?.acessorio || 'Óculos',
     mood: mascote?.expressao || 'Feliz'
@@ -131,6 +150,20 @@ const normalizeQuest = (quest = {}) => ({
   xpRecompensa: Number.isFinite(Number(quest.xpRecompensa)) ? Number(quest.xpRecompensa) : 0,
   icone: typeof quest.icone === 'string' && quest.icone.trim() ? quest.icone : '🏅'
 });
+
+const renderQuestIcon = (icon) => {
+  const value = String(icon || '').trim();
+
+  if (!value) return '<i class="fa-solid fa-star"></i>';
+  if (/^[\p{Extended_Pictographic}\p{Emoji_Presentation}]$/u.test(value) || /[\u{1F300}-\u{1FAFF}]/u.test(value)) {
+    return value;
+  }
+  if (value.includes('<i') || value.includes('fa-')) {
+    return value.includes('<i') ? value : `<i class="${value}"></i>`;
+  }
+
+  return `<i class="fa-solid ${value}"></i>`;
+};
 
 const renderQuests = (catalog, progressMap) => {
   const entries = Object.entries(catalog || {});
@@ -158,7 +191,7 @@ const renderQuests = (catalog, progressMap) => {
 
     return `
       <article class="quest-card">
-        <div class="quest-icon" aria-hidden="true">${quest.icone}</div>
+        <div class="quest-icon" aria-hidden="true">${renderQuestIcon(quest.icone)}</div>
 
         <div class="quest-info">
           <div class="quest-title-row">
@@ -194,11 +227,11 @@ const renderProfile = ({ perfil = {}, mascote = {}, conquistas = {}, catalog = {
   userTagEl.textContent = perfil.tag || fallbackPerfil.tag;
   xpTotalEl.textContent = `${xp} XP`;
   levelNameEl.textContent = level.name;
-  nextLevelNameEl.textContent = nextLevel;
-  xpRangeEl.textContent = `${level.range}`;
-  nextLevelTextEl.textContent = `Próximo nível: ${nextLevel}`;
+  nextLevelNameEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo' : nextLevel;
+  xpRangeEl.textContent = level.range;
+  nextLevelTextEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo alcançado' : `Próximo nível: ${nextLevel}`;
 
-  setMascot(mascote);
+  setMascot(mascote, xp);
   renderQuests(catalog, conquistas);
   persistProfileData(perfil, mascote);
 };

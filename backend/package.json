@@ -12,8 +12,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "axios": "^1.20.0",
+    "bcrypt": "^6.0.0",
     "ejs": "^3.1.10",
+    "expo-secure-store": "^58.0.2",
     "express": "^5.2.1",
     "express-session": "^1.18.1",
     "firebase-admin": "^14.5.0"

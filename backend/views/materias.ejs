@@ -89,10 +89,12 @@
         .materia-card {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 12px;
             background: #1b2a6b;
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
-            padding: 16px 20px;
+            padding: 15px 16px;
             text-decoration: none;
             color: #ffffff;
             transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -103,6 +105,13 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
+        .materia-main {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex: 1;
+        }
+
         .materia-icon {
             width: 28px;
             height: 28px;
@@ -110,6 +119,7 @@
             align-items: center;
             justify-content: center;
             margin-right: 16px;
+            flex-shrink: 0;
         }
 
         .materia-icon svg {
@@ -125,6 +135,24 @@
         .materia-name {
             font-size: 1.05rem;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .favorite-toggle {
+            border: none;
+            background: transparent;
+            color: #ffb4d9;
+            font-size: 1.6rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .favorite-toggle.is-favorite {
+            color: #ff5aa5;
         }
     </style>
 </head>
@@ -136,44 +164,86 @@
 
     <div class="container">
         <h1 class="header-title">matérias</h1>
-        
-        <div class="materias-list">
-            <a href="/quiz/portugues" class="materia-card">
-                <span class="materia-icon">
-                    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                </span>
-                <span class="materia-name">Português</span>
-            </a>
 
-            <a href="/quiz/matematica" class="materia-card">
-                <span class="materia-icon">
-                    <svg viewBox="0 0 24 24"><path d="M3 12h4l3 9 4-17 3 8h4"></path></svg>
-                </span>
-                <span class="materia-name">Matemática</span>
-            </a>
+        <div class="materias-list" id="materiasList">
+            <% materias.forEach((materia) => { %>
+                <div class="materia-card" data-id="<%= materia.id %>">
+                    <a href="/quiz/<%= materia.slug || materia.id %>" class="materia-main" style="text-decoration:none;color:inherit;display:flex;align-items:center;flex:1;">
+                        <span class="materia-icon">
+                            <% if (materia.nome === 'Português') { %>
+                                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <% } else if (materia.nome === 'Matemática') { %>
+                                <svg viewBox="0 0 24 24"><path d="M3 12h4l3 9 4-17 3 8h4"></path></svg>
+                            <% } else if (materia.nome === 'História') { %>
+                                <svg viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
+                            <% } else if (materia.nome === 'Geografia') { %>
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                            <% } else { %>
+                                <svg viewBox="0 0 24 24"><path d="M2 15c6.667-6 13.333 0 20-6"></path><path d="M2 9c6.667 6 13.333 0 20 6"></path><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path><path d="M17 6l-2.5 2.5"></path><path d="M14 10l-4 4"></path><path d="M7 18l2.5-2.5"></path><path d="M3.5 14.5l2-2"></path><path d="M20.5 9.5l-2 2"></path></svg>
+                            <% } %>
+                        </span>
+                        <span class="materia-name"><%= materia.nome %></span>
+                    </a>
 
-            <a href="/quiz/historia" class="materia-card">
-                <span class="materia-icon">
-                    <svg viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
-                </span>
-                <span class="materia-name">História</span>
-            </a>
-
-            <a href="/quiz/geografia" class="materia-card">
-                <span class="materia-icon">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </span>
-                <span class="materia-name">Geografia</span>
-            </a>
-
-            <a href="/quiz/biologia" class="materia-card">
-                <span class="materia-icon">
-                    <svg viewBox="0 0 24 24"><path d="M2 15c6.667-6 13.333 0 20-6"></path><path d="M2 9c6.667 6 13.333 0 20 6"></path><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path><path d="M17 6l-2.5 2.5"></path><path d="M14 10l-4 4"></path><path d="M7 18l2.5-2.5"></path><path d="M3.5 14.5l2-2"></path><path d="M20.5 9.5l-2 2"></path></svg>
-                </span>
-                <span class="materia-name">Biologia</span>
-            </a>
+                    <button
+                        class="favorite-toggle"
+                        type="button"
+                        data-id="<%= materia.id %>"
+                        aria-label="Favoritar <%= materia.nome %>"
+                        title="Favoritar <%= materia.nome %>"
+                    >♡</button>
+                </div>
+            <% }); %>
         </div>
     </div>
 
+    <script>
+        const STORAGE_KEY = 'knowzyFavoritos';
+
+        const getFavorites = () => {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            } catch (error) {
+                return [];
+            }
+        };
+
+        const setFavorites = (items) => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        };
+
+        const toggleFavorite = (id) => {
+            const atual = getFavorites();
+            const existe = atual.includes(id);
+            const next = existe ? atual.filter((item) => item !== id) : [...atual, id];
+            setFavorites(next);
+
+            document.querySelectorAll('.favorite-toggle').forEach((button) => {
+                const isFavorite = next.includes(button.dataset.id);
+                button.textContent = isFavorite ? '♥' : '♡';
+                button.classList.toggle('is-favorite', isFavorite);
+                button.setAttribute('aria-label', isFavorite ? 'Remover favorito' : 'Favoritar matéria');
+            });
+        };
+
+        const renderInitial = () => {
+            const favoritos = getFavorites();
+            document.querySelectorAll('.favorite-toggle').forEach((button) => {
+                const isFavorite = favoritos.includes(button.dataset.id);
+                button.textContent = isFavorite ? '♥' : '♡';
+                button.classList.toggle('is-favorite', isFavorite);
+            });
+        };
+
+        document.querySelectorAll('.favorite-toggle').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                toggleFavorite(button.dataset.id);
+            });
+        });
+
+        renderInitial();
+    </script>
 </body>
 </html>

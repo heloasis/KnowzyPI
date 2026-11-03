@@ -27,6 +27,17 @@ test('userModel.criarUsuario armazena usuário com senha criptografada e email �
   );
 });
 
+test('userModel.verificarCredenciais aceita o usuário padrão em memória', async () => {
+  const usuario = await userModel.verificarCredenciais({
+    email: 'aluno@teste.com',
+    senha: '123456'
+  });
+
+  assert.ok(usuario);
+  assert.equal(usuario.email, 'aluno@teste.com');
+  assert.equal(usuario.nome, 'Aluno Teste');
+});
+
 test('userModel.criarUsuario rejeita dados inválidos', async () => {
   await assert.rejects(
     () => userModel.criarUsuario({

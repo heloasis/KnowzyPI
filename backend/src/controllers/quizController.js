@@ -1,4 +1,5 @@
 const quizModel = require('../models/perguntas');
+const userModel = require('../models/user');
 
 const iniciarQuiz = async (req, res) => {
   try {
@@ -41,7 +42,13 @@ const finalizarQuiz = async (req, res) => {
     }
 
     const resultado = await quizModel.calcularResultado(usuarioId, materiaId, respostas);
-    res.status(200).json(resultado);
+    const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0);
+
+    res.status(200).json({
+      ...resultado,
+      usuario: usuarioComXp,
+      xpGanho: resultado.xpGanho || 0
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ erro: 'Erro ao finalizar o quiz.' });

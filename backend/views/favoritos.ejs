@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #04031f;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+            position: relative;
+        }
+
+        /* FUNDO ESPACIAL DA HOME */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at top right, #2a0b63 0%, transparent 30%),
+                linear-gradient(180deg, #06052b 0%, #04031f 100%);
+        }
+
+        .arc {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(124, 98, 255, .12);
+        }
+
+        .arc1 {
+            width: 1800px;
+            height: 1800px;
+            top: -1000px;
+            right: -900px;
+        }
+
+        .arc2 {
+            width: 2600px;
+            height: 2600px;
+            top: -1450px;
+            right: -1300px;
+            opacity: .5;
+        }
+
+        .arc3 {
+            width: 2400px;
+            height: 2400px;
+            left: -1700px;
+            bottom: -1400px;
+            opacity: .35;
+        }
+
+        .star {
+            position: absolute;
+            background: #6b6dff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #6b6dff;
+        }
+
+        .s1 {
+            width: 6px;
+            height: 6px;
+            left: 120px;
+            top: 90px;
+        }
+
+        .s2 {
+            width: 3px;
+            height: 3px;
+            left: 260px;
+            top: 140px;
+        }
+
+        .s3 {
+            width: 5px;
+            height: 5px;
+            right: 220px;
+            top: 180px;
+        }
+
+        .s4 {
+            width: 4px;
+            height: 4px;
+            right: 320px;
+            bottom: 200px;
+        }
+
+        .s5 {
+            width: 3px;
+            height: 3px;
+            left: 420px;
+            bottom: 160px;
+        }
+
+        /* BOTÃO VOLTAR */
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            color: #b890ef;
+        }
+
+        /* CONTAINER */
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(9, 12, 36, 0.72);
+            border: 1px solid rgba(184, 144, 239, 0.22);
+            border-radius: 28px;
+            padding: 40px 24px;
+            box-shadow: 0 24px 60px rgba(4, 3, 31, 0.55);
+            backdrop-filter: blur(8px);
+        }
+
+        /* TÍTULO */
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #00d2ff, #7928ca);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        /* LISTA DE MATÉRIAS */
+
+        .materias-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .materia-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #1b2a6b;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px 18px;
+            text-decoration: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .materia-card:hover {
+            background: #253987;
+            transform: translateY(-2px);
+        }
+
+        .materia-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .materia-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .materia-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .materia-name {
+            font-size: 1.05rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* BOTÃO FAVORITAR */
+
+        .favorite-toggle {
+            border: none;
+            background: transparent;
+            color: #ffb4d9;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .favorite-toggle:hover {
+            transform: scale(1.2);
+        }
+
+        /* ESTADO VAZIO */
+
+        .empty-state {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 20px 18px;
+            text-align: center;
+            color: #dfe7ff;
+            line-height: 1.6;
+        }
+
+        /* RESPONSIVIDADE */
+
+        @media (max-width: 480px) {
+            body {
+                padding: 70px 14px 24px;
+            }
+
+            .container {
+                border-radius: 22px;
+                padding: 32px 20px;
+            }
+
+            .header-title {
+                font-size: 2.1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- FUNDO ESPACIAL -->
+
+    <div class="background">
+        <div class="arc arc1"></div>
+        <div class="arc arc2"></div>
+        <div class="arc arc3"></div>
+
+        <span class="star s1"></span>
+        <span class="star s2"></span>
+        <span class="star s3"></span>
+        <span class="star s4"></span>
+        <span class="star s5"></span>
+    </div>
+
+    <!-- BOTÃO VOLTAR -->
+
+    <button class="back-btn" type="button"
+        onclick="window.location.href='/home'">
+        ← Home
+    </button>
+
+    <!-- CONTEÚDO -->
+
+    <div class="container">
+
+        <h1 class="header-title">Favoritos</h1>
+
+        <div id="favoritesList" class="materias-list"></div>
+
+    </div>
+
+    <script>
+        const STORAGE_KEYS = ['favoritos', 'knowzyFavoritos'];
+
+        const materias = <%- JSON.stringify(materias || []) %>;
+
+        const list = document.getElementById('favoritesList');
+
+        const getFavorites = () => {
+            const valores = STORAGE_KEYS.map((key) => {
+                try {
+                    const item = localStorage.getItem(key);
+                    if (!item) return [];
+                    const parsed = JSON.parse(item);
+                    return Array.isArray(parsed) ? parsed : [];
+                } catch (error) {
+                    return [];
+                }
+            }).flat();
+
+            return [...new Set(valores.map(String))];
+        };
+
+        const setFavorites = (items) => {
+            STORAGE_KEYS.forEach((key) => {
+                localStorage.setItem(key, JSON.stringify(items));
+            });
+        };
+
+        const getIcon = (nome) => {
+            const icons = {
+                portugues: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>',
+
+                matematica: '<svg viewBox="0 0 24 24"><path d="M3 12h4l3 9 4-17 3 8h4"></path></svg>',
+
+                historia: '<svg viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>',
+
+                geografia: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>',
+
+                biologia: '<svg viewBox="0 0 24 24"><path d="M2 15c6.667-6 13.333 0 20-6"></path><path d="M2 9c6.667 6 13.333 0 20 6"></path><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path><path d="M17 6l-2.5 2.5"></path><path d="M14 10l-4 4"></path><path d="M7 18l2.5-2.5"></path><path d="M3.5 14.5l2-2"></path><path d="M20.5 9.5l-2 2"></path></svg>'
+            };
+
+            const key = String(nome || '')
+                .trim()
+                .toLowerCase();
+
+            return icons[key] || icons.portugues;
+        };
+
+        const renderFavorites = () => {
+
+            const favoritos = getFavorites();
+
+            const itens = materias.filter((materia) =>
+                favoritos.includes(
+                    String(materia.id || materia.nome)
+                )
+            );
+
+            if (!itens.length) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        Você ainda não tem matérias favoritas.
+                        Explore as matérias e salve as que mais gostar!
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = itens.map((materia) => `
+                <div
+                    class="materia-card"
+                    data-id="${materia.id}"
+                    data-route="/quiz/${materia.slug || materia.id}"
+                >
+                    <div class="materia-main">
+
+                        <span class="materia-icon">
+                            ${getIcon(materia.nome)}
+                        </span>
+
+                        <span class="materia-name">
+                            ${materia.nome}
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="favorite-toggle"
+                        type="button"
+                        data-id="${materia.id}"
+                        aria-label="Remover dos favoritos"
+                        title="Remover dos favoritos">
+                        ♥
+                    </button>
+                </div>
+            `).join('');
+
+            list.querySelectorAll('.materia-card')
+                .forEach((card) => {
+
+                    card.addEventListener('click', (event) => {
+
+                        if (event.target.closest('.favorite-toggle')) {
+                            return;
+                        }
+
+                        const route = card.dataset.route;
+
+                        if (route) {
+                            window.location.href = route;
+                        }
+                    });
+                });
+
+            list.querySelectorAll('.favorite-toggle')
+                .forEach((button) => {
+
+                    button.addEventListener('click', (event) => {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        const id = button.dataset.id;
+
+                        const atual = getFavorites();
+
+                        const novaLista = atual.filter(
+                            (item) => item !== id
+                        );
+
+                        setFavorites(novaLista);
+
+                        renderFavorites();
+                    });
+                });
+        };
+
+        renderFavorites();
+    </script>
+
+</body>
+</html>

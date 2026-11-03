@@ -114,12 +114,15 @@ const calcularResultado = async (usuarioId, materiaId, respostas) => {
     return pergunta && pergunta.respostaCorreta === resposta.resposta;
   }).length;
 
+  const xpGanho = Math.max(10, Math.round((acertos / Math.max(1, total)) * 20));
+
   return {
     usuarioId,
     materiaId,
     totalPerguntas: total,
     acertos,
     percentual: total > 0 ? Math.round((acertos / total) * 100) : 0,
+    xpGanho,
     mensagem: 'Quiz finalizado.'
   };
 };
