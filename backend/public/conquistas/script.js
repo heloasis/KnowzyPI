@@ -37,8 +37,8 @@ const DEFAULT_CATALOG = {
 };
 
 const FALLBACK_PROFILE = {
-  nome: 'Aluno Teste',
-  tag: '#A12',
+  nome: 'Usuário',
+  tag: '#0000',
   xpTotal: 0,
   id: null
 };
@@ -63,7 +63,8 @@ const readStoredUser = () => {
 
   try {
     const saved = JSON.parse(localStorage.getItem('profileData') || 'null');
-    if (saved && saved.id) {
+    const currentUserId = localStorage.getItem('currentUserId');
+    if (saved && saved.id && (!currentUserId || String(saved.id) === String(currentUserId))) {
       return saved;
     }
   } catch (error) {
@@ -136,13 +137,13 @@ const setMascot = (mascote, xp = 0) => {
 };
 
 const persistProfileData = (perfil = {}, mascote = {}) => {
-  const xp = Number(perfil.xpTotal || perfil.xp || FALLBACK_PROFILE.xpTotal || 0);
+  const xp = Number(perfil.xpTotal ?? perfil.xp ?? 0);
   const level = getLevelInfo(xp);
 
   const nextData = {
     id: perfil.id || getCurrentUserId(),
     nome: perfil.nome || FALLBACK_PROFILE.nome,
-    tag: perfil.tag || '#A12',
+    tag: perfil.tag || FALLBACK_PROFILE.tag,
     xpTotal: xp,
     nivel: level.name,
     conquistas: `${counterTextEl.textContent || '0 / 0'}`,
@@ -152,7 +153,11 @@ const persistProfileData = (perfil = {}, mascote = {}) => {
     mood: mascote?.expressao || FALLBACK_MASCOTE.expressao
   };
 
-  localStorage.setItem('profileData', JSON.stringify(nextData));
+  try {
+    localStorage.setItem('profileData', JSON.stringify(nextData));
+  } catch (error) {
+    // Ignora falhas de storage em navegadores restritivos.
+  }
 };
 
 const normalizeQuest = (quest = {}) => ({
@@ -245,12 +250,20 @@ const renderQuests = (catalog, progressMap) => {
 };
 
 const renderProfile = ({ perfil = {}, mascote = {}, conquistas = [], catalog = DEFAULT_CATALOG }) => {
-  const xp = Number(perfil.xpTotal ?? perfil.xp ?? 0);
+  const safePerfil = {
+    ...FALLBACK_PROFILE,
+    ...perfil,
+    nome: perfil.nome || FALLBACK_PROFILE.nome,
+    tag: perfil.tag || FALLBACK_PROFILE.tag,
+    xpTotal: Number(perfil.xpTotal ?? perfil.xp ?? 0)
+  };
+
+  const xp = Number(safePerfil.xpTotal || 0);
   const level = getLevelInfo(xp);
   const nextLevel = level.next;
 
-  userNameEl.textContent = perfil.nome || FALLBACK_PROFILE.nome;
-  userTagEl.textContent = perfil.tag || '#A12';
+  userNameEl.textContent = safePerfil.nome || FALLBACK_PROFILE.nome;
+  userTagEl.textContent = safePerfil.tag || FALLBACK_PROFILE.tag;
   xpTotalEl.textContent = `${xp} XP`;
   levelNameEl.textContent = level.name;
   nextLevelNameEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo' : nextLevel;
@@ -258,16 +271,21 @@ const renderProfile = ({ perfil = {}, mascote = {}, conquistas = [], catalog = D
   nextLevelTextEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo alcançado' : `Próximo nível: ${nextLevel}`;
 
   setMascot(mascote || FALLBACK_MASCOTE, xp);
-  renderQuests(catalog, toProgressMap(conquistas));
-  persistProfileData({ ...FALLBACK_PROFILE, ...perfil, xpTotal: xp }, mascote || FALLBACK_MASCOTE);
+  renderQuests(catalog, toProgressMap(conquistas || []));
+  persistProfileData(safePerfil, mascote || FALLBACK_MASCOTE);
 };
 
 const loadUserAchievements = async () => {
   const id = getCurrentUserId();
+  const storedUser = readStoredUser() || {};
 
   if (!id) {
     renderProfile({
-      perfil: FALLBACK_PROFILE,
+      perfil: {
+        ...FALLBACK_PROFILE,
+        id: null,
+        xpTotal: 0
+      },
       mascote: FALLBACK_MASCOTE,
       conquistas: [],
       catalog: DEFAULT_CATALOG
@@ -284,30 +302,37 @@ const loadUserAchievements = async () => {
       credentials: 'same-origin'
     });
 
+    if (!perfilResponse.ok && !conquistasResponse.ok) {
+      throw new Error('Usuário sem dados reais no backend.');
+    }
+
     const perfilData = perfilResponse.ok ? await perfilResponse.json() : null;
     const conquistasData = conquistasResponse.ok ? await conquistasResponse.json() : [];
 
-    const storedUser = readStoredUser() || {};
     const perfil = {
       ...FALLBACK_PROFILE,
       ...storedUser,
       ...perfilData,
       id,
       nome: perfilData?.nome || storedUser?.nome || 'Usuário',
-      tag: perfilData?.tag || storedUser?.tag || '#A12',
+      tag: perfilData?.tag || storedUser?.tag || FALLBACK_PROFILE.tag,
       xpTotal: Number(perfilData?.xp ?? perfilData?.perfil?.xpTotal ?? storedUser?.xp ?? 0)
     };
 
     renderProfile({
       perfil,
       mascote: perfilData?.mascote || FALLBACK_MASCOTE,
-      conquistas: conquistasData || [],
+      conquistas: Array.isArray(conquistasData) ? conquistasData : [],
       catalog: DEFAULT_CATALOG
     });
   } catch (error) {
-    console.warn('Falha ao carregar conquistas do usuário.', error);
+    console.warn('Falha ao carregar conquistas do usuário; exibindo estado zerado.', error);
     renderProfile({
-      perfil: { ...FALLBACK_PROFILE, id },
+      perfil: {
+        ...FALLBACK_PROFILE,
+        id,
+        xpTotal: 0
+      },
       mascote: FALLBACK_MASCOTE,
       conquistas: [],
       catalog: DEFAULT_CATALOG
