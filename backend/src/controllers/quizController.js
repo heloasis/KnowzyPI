@@ -35,14 +35,25 @@ const responderPergunta = async (req, res) => {
 
 const finalizarQuiz = async (req, res) => {
   try {
-    const { usuarioId, materiaId, respostas } = req.body;
+    const {
+      usuarioId,
+      materiaId,
+      respostas,
+      totalQuizzes,
+      materiasExploradas,
+      ultimaPontuacao
+    } = req.body;
 
     if (!usuarioId || !materiaId || !respostas) {
       return res.status(400).json({ erro: 'Dados do resultado incompletos.' });
     }
 
     const resultado = await quizModel.calcularResultado(usuarioId, materiaId, respostas);
-    const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0);
+    const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0, {
+      totalQuizzes,
+      materiasExploradas,
+      ultimaPontuacao
+    });
 
     res.status(200).json({
       ...resultado,

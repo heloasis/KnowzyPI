@@ -8,9 +8,28 @@ const validarSenha = (senha) => {
   return senha.length >= 8 && /[A-Za-z]/.test(senha) && /\d/.test(senha) && /[^A-Za-z\d]/.test(senha);
 };
 
+const ACHIEVEMENT_IDS = new Set([
+  'primeiro_login',
+  'cinquenta_quizzes',
+  'explorar_materias',
+  'cinco_quizzes',
+  'licao_perfeita'
+]);
+
 const normalizarConquistas = (conquistas = []) => {
   if (!Array.isArray(conquistas)) return [];
-  return [...new Set(conquistas.filter(Boolean).map(String))];
+  return [...new Set(
+    conquistas
+      .filter(Boolean)
+      .map(String)
+      .map((conquista) => conquista.trim())
+      .filter((conquista) => ACHIEVEMENT_IDS.has(conquista))
+  )];
+};
+
+const normalizarMateriasExploradas = (materiasExploradas = []) => {
+  if (!Array.isArray(materiasExploradas)) return [];
+  return [...new Set(materiasExploradas.filter(Boolean).map(String))];
 };
 
 const calcularConquistasDoUsuario = ({
@@ -23,51 +42,37 @@ const calcularConquistasDoUsuario = ({
   const xpTotal = Number(xp) || 0;
   const lista = normalizarConquistas(conquistas);
   const countQuizzes = Number(totalQuizzes) || 0;
-  const countMaterias = Array.isArray(materiasExploradas) ? materiasExploradas.filter(Boolean).length : 0;
+  const materias = normalizarMateriasExploradas(materiasExploradas);
   const score = Number(ultimaPontuacao) || 0;
 
   if (xpTotal >= 25) lista.push('primeiro_login');
   if (countQuizzes >= 50) lista.push('cinquenta_quizzes');
-  if (countMaterias >= 5) lista.push('explorar_materias');
+  if (materias.length >= 5) lista.push('explorar_materias');
   if (countQuizzes >= 5) lista.push('cinco_quizzes');
   if (score >= 100) lista.push('licao_perfeita');
 
   return {
     xp: xpTotal,
     totalQuizzes: countQuizzes,
-    materiasExploradas: Array.isArray(materiasExploradas) ? materiasExploradas.filter(Boolean) : [],
+    materiasExploradas: materias,
     ultimaPontuacao: score,
     conquistas: normalizarConquistas(lista)
   };
 };
 
 const aplicarPremioLogin = (usuario = {}) => {
-  const xpAtual = Number(usuario.xp || 0);
-  const progressoAtual = calcularConquistasDoUsuario({
-    xp: xpAtual,
-    conquistas: usuario.conquistas || [],
+  const dados = {
+    ...usuario,
+    xp: Number(usuario.xp || 0),
     totalQuizzes: Number(usuario.totalQuizzes || 0),
-    materiasExploradas: usuario.materiasExploradas || [],
-    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0)
-  });
-
-  const possuiPrimeiroLogin = progressoAtual.conquistas.includes('primeiro_login');
-  const proximoXp = possuiPrimeiroLogin ? xpAtual : Math.max(xpAtual, 25);
-  const resultado = calcularConquistasDoUsuario({
-    xp: proximoXp,
-    conquistas: progressoAtual.conquistas,
-    totalQuizzes: Number(usuario.totalQuizzes || 0),
-    materiasExploradas: usuario.materiasExploradas || [],
-    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0)
-  });
+    materiasExploradas: normalizarMateriasExploradas(usuario.materiasExploradas),
+    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
+    conquistas: normalizarConquistas(usuario.conquistas)
+  };
 
   return {
-    ...usuario,
-    xp: resultado.xp,
-    totalQuizzes: resultado.totalQuizzes,
-    materiasExploradas: resultado.materiasExploradas,
-    ultimaPontuacao: resultado.ultimaPontuacao,
-    conquistas: resultado.conquistas
+    ...dados,
+    ...calcularConquistasDoUsuario(dados)
   };
 };
 
@@ -77,6 +82,9 @@ const normalizarUsuario = (usuario = {}) => ({
   email: usuario.email,
   senha: usuario.senha,
   xp: Number(usuario.xp || 0),
+  totalQuizzes: Number(usuario.totalQuizzes || 0),
+  materiasExploradas: normalizarMateriasExploradas(usuario.materiasExploradas),
+  ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
   conquistas: normalizarConquistas(usuario.conquistas)
 });
 
@@ -144,6 +152,9 @@ const criarUsuario = async ({ nome, email, senha }) => {
     email: emailValido,
     senha: senhaHash,
     xp: 0,
+    totalQuizzes: 0,
+    materiasExploradas: [],
+    ultimaPontuacao: 0,
     conquistas: []
   };
 
@@ -151,7 +162,7 @@ const criarUsuario = async ({ nome, email, senha }) => {
   return normalizarUsuario({ id: resultado.id, ...usuario });
 };
 
-const atualizarXpUsuario = async (id, xpAdicional = 0) => {
+const atualizarXpUsuario = async (id, xpAdicional = 0, progressoExtra = {}) => {
   const usuarioAtual = await buscarPerfil(id);
 
   if (!usuarioAtual) {
@@ -159,20 +170,34 @@ const atualizarXpUsuario = async (id, xpAdicional = 0) => {
   }
 
   const xpAtual = Number(usuarioAtual.xp || 0);
+  const totalQuizzes = Number(progressoExtra.totalQuizzes ?? usuarioAtual.totalQuizzes ?? 0);
+  const materiasExploradas = normalizarMateriasExploradas(
+    progressoExtra.materiasExploradas ?? usuarioAtual.materiasExploradas ?? []
+  );
+  const ultimaPontuacao = Number(progressoExtra.ultimaPontuacao ?? usuarioAtual.ultimaPontuacao ?? 0);
   const proximoXp = Math.max(0, xpAtual + Number(xpAdicional || 0));
   const progresso = calcularConquistasDoUsuario({
     xp: proximoXp,
-    conquistas: usuarioAtual.conquistas || []
+    conquistas: usuarioAtual.conquistas || [],
+    totalQuizzes,
+    materiasExploradas,
+    ultimaPontuacao
   });
 
   await atualizarPerfil(id, {
     xp: progresso.xp,
+    totalQuizzes: progresso.totalQuizzes,
+    materiasExploradas: progresso.materiasExploradas,
+    ultimaPontuacao: progresso.ultimaPontuacao,
     conquistas: progresso.conquistas
   });
 
   return {
     ...usuarioAtual,
     xp: progresso.xp,
+    totalQuizzes: progresso.totalQuizzes,
+    materiasExploradas: progresso.materiasExploradas,
+    ultimaPontuacao: progresso.ultimaPontuacao,
     conquistas: progresso.conquistas
   };
 };
@@ -193,26 +218,47 @@ const verificarCredenciais = async ({ email, senha }) => {
   }
 
   const perfilAtual = await buscarPerfil(usuario.id);
-  const usuarioComPremio = aplicarPremioLogin({
+  const perfilNormalizado = {
     ...perfilAtual,
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
     xp: Number(perfilAtual?.xp || 0),
-    conquistas: perfilAtual?.conquistas || []
-  });
+    totalQuizzes: Number(perfilAtual?.totalQuizzes || 0),
+    materiasExploradas: normalizarMateriasExploradas(perfilAtual?.materiasExploradas),
+    ultimaPontuacao: Number(perfilAtual?.ultimaPontuacao || 0),
+    conquistas: normalizarConquistas(perfilAtual?.conquistas)
+  };
+
+  const usuarioComProgresso = {
+    ...perfilNormalizado,
+    id: usuario.id,
+    nome: usuario.nome,
+    email: usuario.email,
+    xp: Number(perfilNormalizado.xp || 0),
+    totalQuizzes: Number(perfilNormalizado.totalQuizzes || 0),
+    materiasExploradas: normalizarMateriasExploradas(perfilNormalizado.materiasExploradas),
+    ultimaPontuacao: Number(perfilNormalizado.ultimaPontuacao || 0),
+    conquistas: normalizarConquistas(perfilNormalizado.conquistas)
+  };
 
   await atualizarPerfil(usuario.id, {
-    xp: usuarioComPremio.xp,
-    conquistas: usuarioComPremio.conquistas
+    xp: usuarioComProgresso.xp,
+    totalQuizzes: usuarioComProgresso.totalQuizzes,
+    materiasExploradas: usuarioComProgresso.materiasExploradas,
+    ultimaPontuacao: usuarioComProgresso.ultimaPontuacao,
+    conquistas: usuarioComProgresso.conquistas
   });
 
   return {
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
-    xp: usuarioComPremio.xp,
-    conquistas: usuarioComPremio.conquistas
+    xp: usuarioComProgresso.xp,
+    totalQuizzes: usuarioComProgresso.totalQuizzes,
+    materiasExploradas: usuarioComProgresso.materiasExploradas,
+    ultimaPontuacao: usuarioComProgresso.ultimaPontuacao,
+    conquistas: usuarioComProgresso.conquistas
   };
 };
 
