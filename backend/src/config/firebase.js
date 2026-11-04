@@ -1,5 +1,14 @@
 
-const admin = require('firebase-admin');
+const {
+  initializeApp,
+  getApps,
+  getApp,
+  cert
+} = require('firebase-admin/app');
+
+const {
+  getDatabase
+} = require('firebase-admin/database');
 
 const DATABASE_URL =
   process.env.FIREBASE_DATABASE_URL ||
@@ -9,14 +18,22 @@ const readServiceAccount = () => {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
 
   if (!raw) {
-    return null;
+    throw new Error(
+      'FIREBASE_SERVICE_ACCOUNT não configurada.'
+    );
   }
 
   try {
     const parsed = JSON.parse(raw);
 
-    if (!parsed.project_id || !parsed.private_key || !parsed.client_email) {
-      throw new Error('Credenciais incompletas do Firebase.');
+    if (
+      !parsed.project_id ||
+      !parsed.private_key ||
+      !parsed.client_email
+    ) {
+      throw new Error(
+        'Credenciais incompletas do Firebase.'
+      );
     }
 
     return {
@@ -31,29 +48,26 @@ const readServiceAccount = () => {
 };
 
 const initializeFirebase = () => {
-  if (admin.apps.length > 0) {
-    return admin.app();
+  if (getApps().length > 0) {
+    return getApp();
   }
 
   const serviceAccount = readServiceAccount();
 
-  if (!serviceAccount) {
-    throw new Error(
-      'FIREBASE_SERVICE_ACCOUNT não configurada.'
-    );
-  }
-
-  return admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+  return initializeApp({
+    credential: cert(serviceAccount),
     databaseURL: DATABASE_URL
   });
 };
 
 const app = initializeFirebase();
-const db = admin.database(app);
+
+const db = getDatabase(app);
+
+const firebaseAdmin = require('firebase-admin');
 
 module.exports = {
   db,
-  firebaseAdmin: admin,
+  firebaseAdmin,
   isRealFirebase: true
 };
