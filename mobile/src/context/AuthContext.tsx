@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { Usuario } from '../types/auth';
 
@@ -27,10 +28,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isLoading = false;
 
   const signIn = async (nextUser: Usuario) => {
+    try {
+      await AsyncStorage.multiRemove(['favoritos', 'knowzyFavoritos']);
+    } catch (error) {
+      // Ignora falhas de storage em ambientes restritivos.
+    }
+
     setUserState(nextUser);
   };
 
   const signOut = async () => {
+    try {
+      await AsyncStorage.multiRemove(['favoritos', 'knowzyFavoritos']);
+    } catch (error) {
+      // Ignora falhas de storage em ambientes restritivos.
+    }
+
     setUserState(null);
   };
 

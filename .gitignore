@@ -10,3 +10,7 @@ yarn-debug.log*
 .env
 .env.*
 !.env.example
+
+# Firebase credentials
+backend/src/config/firebaseServiceAccount.json
+*.serviceAccount.json
