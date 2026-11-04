@@ -110,6 +110,14 @@
                 setMessage(data.mensagem || 'Cadastro realizado com sucesso!', 'success');
                 cadastroForm.reset();
 
+                try {
+                    localStorage.removeItem('profileData');
+                    localStorage.removeItem('knowzyFavoritos');
+                    localStorage.removeItem('favoritos');
+                } catch (error) {
+                    // Ignora falhas de storage em navegadores restritivos.
+                }
+
                 window.setTimeout(() => {
                     window.location.href = '/login';
                 }, 1200);

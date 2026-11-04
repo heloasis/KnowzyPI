@@ -170,7 +170,6 @@
                 );
             }
 
-            // Valida novamente o destino retornado pela API.
             const nextPage = isSafeRedirect(data.redirectTo)
                 ? data.redirectTo
                 : returnTo;
@@ -179,6 +178,14 @@
                 data.mensagem || 'Login realizado com sucesso!',
                 'success'
             );
+
+            try {
+                localStorage.removeItem('profileData');
+                localStorage.removeItem('knowzyFavoritos');
+                localStorage.removeItem('favoritos');
+            } catch (error) {
+                // Ignora falhas de storage em navegadores restritivos.
+            }
 
             // Redireciona após autenticação.
             window.setTimeout(() => {

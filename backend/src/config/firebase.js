@@ -1,4 +1,10 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const admin = require('firebase-admin');
+const { getDatabase } = require('firebase-admin/database');
+
+const DATABASE_URL = process.env.FIREBASE_DATABASE_URL || 'https://knowzypi-default-rtdb.firebaseio.com';
 
 const state = {
   usuarios: {
@@ -6,7 +12,11 @@ const state = {
       nome: 'Aluno Teste',
       email: 'aluno@teste.com',
       senha: '$2b$12$AuK34YNENfGlzae/veGNs.bUj2JrnHPPI393yxWjxS.5yuWBOu.f.',
-      conquistas: ['Primeiro Acesso']
+      xp: 0,
+      totalQuizzes: 0,
+      materiasExploradas: [],
+      ultimaPontuacao: 0,
+      conquistas: []
     }
   },
   materias: {
@@ -116,121 +126,129 @@ const state = {
   }
 };
 
-const makeDoc = (id, data) => ({
-  id,
-  exists: !!data,
-  data: () => data,
-  ref: { id }
-});
+const getMockDb = () => {
+  const getValueAtPath = (pathValue) => {
+    const segments = pathValue.split('/').filter(Boolean);
+    let value = state;
 
-const getValueAtPath = (path) => {
-  const segments = path.split('/').filter(Boolean);
-  let value = state;
-
-  for (const segment of segments) {
-    if (!value || typeof value !== 'object' || !(segment in value)) {
-      return null;
+    for (const segment of segments) {
+      if (!value || typeof value !== 'object' || !(segment in value)) {
+        return null;
+      }
+      value = value[segment];
     }
-    value = value[segment];
+
+    return value;
+  };
+
+  const ref = (pathValue) => {
+    const data = getValueAtPath(pathValue);
+
+    const setAtPath = (value) => {
+      const segments = pathValue.split('/').filter(Boolean);
+      if (segments.length === 0) {
+        return;
+      }
+
+      let current = state;
+      for (let i = 0; i < segments.length - 1; i += 1) {
+        const segment = segments[i];
+        if (!current[segment] || typeof current[segment] !== 'object') {
+          current[segment] = {};
+        }
+        current = current[segment];
+      }
+
+      current[segments[segments.length - 1]] = value;
+    };
+
+    return {
+      key: pathValue.split('/').filter(Boolean).pop() || null,
+      once: async () => ({
+        val: () => data
+      }),
+      child: (childPath) => ref(`${pathValue}/${childPath}`),
+      set: async (value) => {
+        setAtPath(value);
+        return true;
+      },
+      update: async (value) => {
+        const nextValue = typeof data === 'object' && data !== null ? { ...data, ...value } : value;
+        setAtPath(nextValue);
+        return true;
+      },
+      push: (value) => {
+        const id = crypto.randomUUID();
+        const nextPath = `${pathValue}/${id}`;
+        const childRef = ref(nextPath);
+        if (value !== undefined) {
+          childRef.set(value);
+        }
+        return childRef;
+      }
+    };
+  };
+
+  return { ref };
+};
+
+const readServiceAccount = () => {
+  const candidates = [
+    path.join(__dirname, 'firebaseServiceAccount.json'),
+    path.join(process.cwd(), 'src', 'config', 'firebaseServiceAccount.json'),
+    path.join(process.cwd(), 'backend', 'src', 'config', 'firebaseServiceAccount.json')
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      const raw = fs.readFileSync(candidate, 'utf8');
+      const trimmed = raw.trim();
+      if (!trimmed) continue;
+      const parsed = JSON.parse(trimmed);
+      if (parsed && parsed.project_id) {
+        return parsed;
+      }
+    } catch (error) {
+      // Ignora arquivos inexistentes ou vazios.
+    }
   }
 
-  return value;
+  const envValue = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (envValue) {
+    try {
+      const parsed = JSON.parse(envValue);
+      if (parsed && parsed.project_id) {
+        return parsed;
+      }
+    } catch (error) {
+      // Ignora JSON inválido em ambiente e usa fallback local.
+    }
+  }
+
+  return null;
 };
 
-const ref = (path) => {
-  const data = getValueAtPath(path);
+const initializeRealDatabase = () => {
+  const serviceAccount = readServiceAccount();
+  const appConfig = { databaseURL: DATABASE_URL };
 
-  const setAtPath = (value) => {
-    const segments = path.split('/').filter(Boolean);
-    if (segments.length === 0) {
-      return;
-    }
+  if (serviceAccount) {
+    appConfig.credential = admin.cert(serviceAccount);
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GCLOUD_PROJECT) {
+    appConfig.credential = admin.applicationDefault();
+  } else {
+    return null;
+  }
 
-    let current = state;
-    for (let i = 0; i < segments.length - 1; i += 1) {
-      const segment = segments[i];
-      if (!current[segment] || typeof current[segment] !== 'object') {
-        current[segment] = {};
-      }
-      current = current[segment];
-    }
+  const existingApps = typeof admin.getApps === 'function' ? admin.getApps() : [];
+  if (existingApps.length === 0) {
+    admin.initializeApp(appConfig);
+  }
 
-    current[segments[segments.length - 1]] = value;
-  };
-
-  return {
-    once: async () => ({
-      val: () => data
-    }),
-    child: (childPath) => ref(`${path}/${childPath}`),
-    set: async (value) => {
-      setAtPath(value);
-      return true;
-    },
-    update: async (value) => {
-      const nextValue = typeof data === 'object' && data !== null ? { ...data, ...value } : value;
-      setAtPath(nextValue);
-      return true;
-    }
-  };
+  return getDatabase();
 };
 
-const collection = (name) => {
-  const data = state[name] || {};
+const db = initializeRealDatabase() || getMockDb();
+const isRealFirebase = typeof admin.getApps === 'function' ? admin.getApps().length > 0 : Array.isArray(admin.apps) && admin.apps.length > 0;
 
-  const toArray = () => Object.entries(data).map(([id, value]) => ({
-    id,
-    data: () => value
-  }));
-
-  return {
-    doc: (id) => ({
-      get: async () => {
-        if (!data[id]) {
-          return { exists: false, id, data: () => undefined };
-        }
-        return { exists: true, id, data: () => data[id] };
-      },
-      update: async (payload) => {
-        if (!data[id]) {
-          data[id] = {};
-        }
-        data[id] = { ...data[id], ...payload };
-        return { id };
-      },
-      delete: async () => {
-        delete data[id];
-        return { id };
-      }
-    }),
-    add: async (payload) => {
-      const id = crypto.randomUUID();
-      data[id] = payload;
-      return { id };
-    },
-    get: async () => ({
-      forEach: (callback) => {
-        toArray().forEach((doc) => callback(doc));
-      },
-      docs: toArray()
-    }),
-    where: (field, operator, value) => ({
-      get: async () => {
-        const docs = Object.entries(data)
-          .filter(([, item]) => {
-            if (operator !== '==') return false;
-            return item[field] === value;
-          })
-          .map(([id, item]) => ({ id, data: () => item }));
-
-        return {
-          docs,
-          empty: docs.length === 0,
-          forEach: (callback) => docs.forEach((doc) => callback(doc))
-        };
-      }
-    })
-  };
-};
-
-module.exports = { db: { collection, ref } };
+module.exports = { db, firebaseAdmin: admin, isRealFirebase };

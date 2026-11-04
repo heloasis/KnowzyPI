@@ -96,7 +96,7 @@ const buscarPerfil = async (id) => {
     return null;
   }
 
-  return { id, ...usuario };
+  return normalizarUsuario({ id, ...usuario });
 };
 
 const atualizarPerfil = async (id, dados) => {
@@ -107,22 +107,27 @@ const atualizarPerfil = async (id, dados) => {
 const buscarConquistas = async (id) => {
   const snapshot = await db.ref(`usuarios/${id}/conquistas`).once('value');
   const conquistas = snapshot.val();
-  return conquistas || [];
+  return normalizarConquistas(conquistas || []);
+};
+
+const listarUsuarios = async () => {
+  const snapshot = await db.ref('usuarios').once('value');
+  const usuarios = snapshot.val() || {};
+  return Object.entries(usuarios).map(([id, usuario]) => ({ id, ...usuario }));
 };
 
 const buscarPorEmail = async (email) => {
   const emailNormalizado = String(email || '').trim().toLowerCase();
   if (!emailNormalizado) return null;
 
-  const snapshot = await db.collection('usuarios').where('email', '==', emailNormalizado).get();
-  const docs = snapshot.docs || [];
+  const usuarios = await listarUsuarios();
+  const usuario = usuarios.find((item) => String(item.email || '').trim().toLowerCase() === emailNormalizado);
 
-  if (docs.length === 0) {
+  if (!usuario) {
     return null;
   }
 
-  const usuario = docs[0].data();
-  return { id: docs[0].id, ...usuario };
+  return normalizarUsuario(usuario);
 };
 
 const criarUsuario = async ({ nome, email, senha }) => {
@@ -158,8 +163,10 @@ const criarUsuario = async ({ nome, email, senha }) => {
     conquistas: []
   };
 
-  const resultado = await db.collection('usuarios').add(usuario);
-  return normalizarUsuario({ id: resultado.id, ...usuario });
+  const ref = db.ref('usuarios').push();
+  const id = ref.key;
+  await ref.set(usuario);
+  return normalizarUsuario({ id, ...usuario });
 };
 
 const atualizarXpUsuario = async (id, xpAdicional = 0, progressoExtra = {}) => {

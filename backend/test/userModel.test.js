@@ -26,6 +26,12 @@ test('verificarCredenciais não concede XP ou conquista automaticamente no prime
   assert.deepEqual(usuario.conquistas, []);
 });
 
+test('buscarPerfil remove conquistas legadas e mantém apenas os IDs válidos do sistema', async () => {
+  const perfil = await userModel.buscarPerfil('u1');
+
+  assert.deepEqual(perfil.conquistas, []);
+});
+
 test('calcularConquistasDoUsuario desbloqueia apenas quando o critério real é alcançado', () => {
   const semProgresso = userModel.calcularConquistasDoUsuario({ xp: 0, conquistas: [], totalQuizzes: 0, materiasExploradas: [], ultimaPontuacao: 0 });
   const comProgresso = userModel.calcularConquistasDoUsuario({
