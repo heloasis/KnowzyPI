@@ -48,3 +48,19 @@ test('calcularConquistasDoUsuario desbloqueia apenas quando o critério real é 
   assert.ok(comProgresso.conquistas.includes('explorar_materias'));
   assert.ok(comProgresso.conquistas.includes('licao_perfeita'));
 });
+
+test('atualizarXpUsuario incrementa o progresso do quiz mesmo sem contador explícito', async () => {
+  const user = await userModel.criarUsuario({
+    nome: 'Aluno Teste',
+    email: `quiz.${Date.now()}@teste.com`,
+    senha: 'Senha@123'
+  });
+
+  const atualizado = await userModel.atualizarXpUsuario(user.id, 20, {
+    materiasExploradas: ['matematica']
+  });
+
+  assert.equal(atualizado.totalQuizzes, 1);
+  assert.deepEqual(atualizado.materiasExploradas, ['matematica']);
+  assert.equal(atualizado.xp, 20);
+});

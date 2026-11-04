@@ -182,19 +182,52 @@ const renderQuestIcon = (icon) => {
   return `<i class="fa-solid ${value}"></i>`;
 };
 
-const toProgressMap = (ids = []) => {
+const toProgressMap = ({
+  xp = 0,
+  totalQuizzes = 0,
+  materiasExploradas = [],
+  ultimaPontuacao = 0,
+  conquistas = []
+} = {}) => {
   const unlocked = new Set(
-    Array.isArray(ids)
-      ? ids.filter(Boolean).map((item) => String(item).trim())
+    Array.isArray(conquistas)
+      ? conquistas.filter(Boolean).map((item) => String(item).trim())
       : []
   );
 
-  return Object.entries(DEFAULT_CATALOG).reduce((accumulator, [id, quest]) => {
-    accumulator[id] = {
-      progressoAtual: unlocked.has(id) ? Number(quest.meta || 1) : 0,
-      concluida: unlocked.has(id)
-    };
+  const materias = Array.isArray(materiasExploradas) ? materiasExploradas.filter(Boolean) : [];
 
+  const progressById = {
+    primeiro_login: {
+      progressoAtual: Number(xp || 0),
+      concluida: unlocked.has('primeiro_login') || Number(xp || 0) >= 25
+    },
+    cinco_quizzes: {
+      progressoAtual: Number(totalQuizzes || 0),
+      concluida: unlocked.has('cinco_quizzes') || Number(totalQuizzes || 0) >= 5
+    },
+    explorar_materias: {
+      progressoAtual: Number(materias.length || 0),
+      concluida: unlocked.has('explorar_materias') || Number(materias.length || 0) >= 5
+    },
+    cinquenta_quizzes: {
+      progressoAtual: Number(totalQuizzes || 0),
+      concluida: unlocked.has('cinquenta_quizzes') || Number(totalQuizzes || 0) >= 50
+    },
+    licao_perfeita: {
+      progressoAtual: Number(ultimaPontuacao || 0),
+      concluida: unlocked.has('licao_perfeita') || Number(ultimaPontuacao || 0) >= 100
+    }
+  };
+
+  return Object.entries(DEFAULT_CATALOG).reduce((accumulator, [id, quest]) => {
+    const item = progressById[id] || { progressoAtual: 0, concluida: false };
+    const meta = Number(quest.meta || 1);
+    const progressoAtual = Math.min(Number(item.progressoAtual || 0), meta);
+    accumulator[id] = {
+      progressoAtual,
+      concluida: Boolean(item.concluida)
+    };
     return accumulator;
   }, {});
 };
@@ -271,7 +304,13 @@ const renderProfile = ({ perfil = {}, mascote = {}, conquistas = [], catalog = D
   nextLevelTextEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo alcançado' : `Próximo nível: ${nextLevel}`;
 
   setMascot(mascote || FALLBACK_MASCOTE, xp);
-  renderQuests(catalog, toProgressMap(conquistas || []));
+  renderQuests(catalog, toProgressMap({
+    xp: safePerfil.xpTotal,
+    totalQuizzes: perfil.totalQuizzes ?? 0,
+    materiasExploradas: perfil.materiasExploradas ?? [],
+    ultimaPontuacao: perfil.ultimaPontuacao ?? 0,
+    conquistas: Array.isArray(conquistas) ? conquistas : []
+  }));
   persistProfileData(safePerfil, mascote || FALLBACK_MASCOTE);
 };
 
@@ -309,19 +348,26 @@ const loadUserAchievements = async () => {
     const perfilData = perfilResponse.ok ? await perfilResponse.json() : null;
     const conquistasData = conquistasResponse.ok ? await conquistasResponse.json() : [];
 
-    const perfil = {
+      const perfil = {
       ...FALLBACK_PROFILE,
-      ...storedUser,
-      ...perfilData,
+      ...(perfilData || {}),
+      ...(storedUser && !perfilData ? storedUser : {}),
       id,
-      nome: perfilData?.nome || storedUser?.nome || 'Usuário',
+      nome: perfilData?.nome || perfilData?.perfil?.nome || storedUser?.nome || 'Usuário',
       tag: perfilData?.tag || storedUser?.tag || FALLBACK_PROFILE.tag,
-      xpTotal: Number(perfilData?.xp ?? perfilData?.perfil?.xpTotal ?? storedUser?.xp ?? 0)
+      xpTotal: Number(perfilData?.xp ?? perfilData?.perfil?.xpTotal ?? storedUser?.xp ?? 0),
+      totalQuizzes: Number(perfilData?.totalQuizzes ?? storedUser?.totalQuizzes ?? 0),
+      materiasExploradas: Array.isArray(perfilData?.materiasExploradas)
+        ? perfilData.materiasExploradas
+        : Array.isArray(storedUser?.materiasExploradas)
+          ? storedUser.materiasExploradas
+          : [],
+      ultimaPontuacao: Number(perfilData?.ultimaPontuacao ?? storedUser?.ultimaPontuacao ?? 0)
     };
 
     renderProfile({
       perfil,
-      mascote: perfilData?.mascote || FALLBACK_MASCOTE,
+      mascote: perfilData?.mascote || storedUser?.mascote || FALLBACK_MASCOTE,
       conquistas: Array.isArray(conquistasData) ? conquistasData : [],
       catalog: DEFAULT_CATALOG
     });

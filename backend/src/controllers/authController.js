@@ -79,8 +79,23 @@ cadastrarUsuario: async (req, res) => {
             nome: usuario.nome,
             email: usuario.email,
             xp: Number(usuario.xp || 0),
+            totalQuizzes: Number(usuario.totalQuizzes || 0),
+            materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
+            ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
             conquistas: usuario.conquistas || [],
-            foto: ''
+            foto: '',
+            perfil: usuario.perfil || {
+                nome: usuario.nome,
+                xpTotal: Number(usuario.xp || 0),
+                nivelAtual: 'Iniciante'
+            },
+            mascote: usuario.mascote || {
+                roupa: 'casaco_roto',
+                acessorio: 'fone_ouvido',
+                expressao: 'piscada',
+                efeito: 'galaxia',
+                cor: 'roxo'
+            }
         };
 
         delete req.session.returnTo;
@@ -99,7 +114,22 @@ cadastrarUsuario: async (req, res) => {
                     nome: usuario.nome,
                     email: usuario.email,
                     xp: Number(usuario.xp || 0),
-                    conquistas: usuario.conquistas || []
+                    totalQuizzes: Number(usuario.totalQuizzes || 0),
+                    materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
+                    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
+                    conquistas: usuario.conquistas || [],
+                    perfil: usuario.perfil || {
+                        nome: usuario.nome,
+                        xpTotal: Number(usuario.xp || 0),
+                        nivelAtual: 'Iniciante'
+                    },
+                    mascote: usuario.mascote || {
+                        roupa: 'casaco_roto',
+                        acessorio: 'fone_ouvido',
+                        expressao: 'piscada',
+                        efeito: 'galaxia',
+                        cor: 'roxo'
+                    }
                 },
                 redirectTo
             });
@@ -134,8 +164,23 @@ loginUsuario: async (req, res) => {
             nome: usuario.nome,
             email: usuario.email,
             xp: Number(usuario.xp || 0),
+            totalQuizzes: Number(usuario.totalQuizzes || 0),
+            materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
+            ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
             conquistas: usuario.conquistas || [],
-            foto: ''
+            foto: '',
+            perfil: usuario.perfil || {
+                nome: usuario.nome,
+                xpTotal: Number(usuario.xp || 0),
+                nivelAtual: 'Iniciante'
+            },
+            mascote: usuario.mascote || {
+                roupa: 'casaco_roto',
+                acessorio: 'fone_ouvido',
+                expressao: 'piscada',
+                efeito: 'galaxia',
+                cor: 'roxo'
+            }
         };
 
         delete req.session.returnTo;
@@ -154,7 +199,22 @@ loginUsuario: async (req, res) => {
                     nome: usuario.nome,
                     email: usuario.email,
                     xp: Number(usuario.xp || 0),
-                    conquistas: usuario.conquistas || []
+                    totalQuizzes: Number(usuario.totalQuizzes || 0),
+                    materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
+                    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
+                    conquistas: usuario.conquistas || [],
+                    perfil: usuario.perfil || {
+                        nome: usuario.nome,
+                        xpTotal: Number(usuario.xp || 0),
+                        nivelAtual: 'Iniciante'
+                    },
+                    mascote: usuario.mascote || {
+                        roupa: 'casaco_roto',
+                        acessorio: 'fone_ouvido',
+                        expressao: 'piscada',
+                        efeito: 'galaxia',
+                        cor: 'roxo'
+                    }
                 },
                 redirectTo
             });

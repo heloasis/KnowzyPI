@@ -268,18 +268,34 @@ const atualizarXpUsuario = async (
     xpAtual + Number(xpAdicional || 0)
   );
 
+  const totalQuizzesAtual = Number(usuarioAtual.totalQuizzes || 0);
+  const totalQuizzesFinal =
+    progressoExtra.totalQuizzes !== undefined
+      ? Number(progressoExtra.totalQuizzes || 0)
+      : totalQuizzesAtual + 1;
+
+  const materiasBase = normalizarMateriasExploradas(usuarioAtual.materiasExploradas);
+  const materiasNovas = normalizarMateriasExploradas(progressoExtra.materiasExploradas);
+  const materiasFinal = normalizarMateriasExploradas([
+    ...materiasBase,
+    ...materiasNovas
+  ]);
+
+  const ultimaPontuacaoAtual = Number(usuarioAtual.ultimaPontuacao || 0);
+  const ultimaPontuacaoFinal =
+    progressoExtra.ultimaPontuacao !== undefined
+      ? Math.max(
+          ultimaPontuacaoAtual,
+          Number(progressoExtra.ultimaPontuacao || 0)
+        )
+      : ultimaPontuacaoAtual;
+
   const progresso = calcularConquistasDoUsuario({
     xp: proximoXp,
     conquistas: usuarioAtual.conquistas,
-    totalQuizzes:
-      progressoExtra.totalQuizzes ??
-      usuarioAtual.totalQuizzes,
-    materiasExploradas:
-      progressoExtra.materiasExploradas ??
-      usuarioAtual.materiasExploradas,
-    ultimaPontuacao:
-      progressoExtra.ultimaPontuacao ??
-      usuarioAtual.ultimaPontuacao
+    totalQuizzes: totalQuizzesFinal,
+    materiasExploradas: materiasFinal,
+    ultimaPontuacao: ultimaPontuacaoFinal
   });
 
   const nivelAtual =

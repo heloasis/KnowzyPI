@@ -48,11 +48,26 @@ const finalizarQuiz = async (req, res) => {
       return res.status(400).json({ erro: 'Dados do resultado incompletos.' });
     }
 
+    const usuarioAtual = await userModel.buscarPerfil(usuarioId);
+    const totalQuizzesFinal =
+      totalQuizzes !== undefined
+        ? Number(totalQuizzes || 0)
+        : Number(usuarioAtual?.totalQuizzes || 0) + 1;
+    const materiasFinal = Array.isArray(materiasExploradas)
+      ? materiasExploradas
+      : Array.isArray(usuarioAtual?.materiasExploradas)
+        ? usuarioAtual.materiasExploradas
+        : [];
+    const ultimaPontuacaoFinal =
+      ultimaPontuacao !== undefined
+        ? Number(ultimaPontuacao || 0)
+        : Number(usuarioAtual?.ultimaPontuacao || 0);
+
     const resultado = await quizModel.calcularResultado(usuarioId, materiaId, respostas);
     const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0, {
-      totalQuizzes,
-      materiasExploradas,
-      ultimaPontuacao
+      totalQuizzes: totalQuizzesFinal,
+      materiasExploradas: materiasFinal,
+      ultimaPontuacao: ultimaPontuacaoFinal
     });
 
     res.status(200).json({

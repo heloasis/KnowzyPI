@@ -23,7 +23,7 @@ const buildConquistasDoUsuario = (
 ) => {
   const lista = Array.from(new Set((conquistas || []).filter(Boolean)));
 
-  if (Number(xp || 0) >= 50) lista.push('primeiro_login');
+  if (Number(xp || 0) >= 25) lista.push('primeiro_login');
   if (Number(totalQuizzes || 0) >= 50) lista.push('cinquenta_quizzes');
   if (Number(materiasExploradas?.length || 0) >= 5) lista.push('explorar_materias');
   if (Number(totalQuizzes || 0) >= 5) lista.push('cinco_quizzes');
