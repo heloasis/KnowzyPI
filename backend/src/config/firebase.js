@@ -140,11 +140,38 @@ const getValueAtPath = (path) => {
 const ref = (path) => {
   const data = getValueAtPath(path);
 
+  const setAtPath = (value) => {
+    const segments = path.split('/').filter(Boolean);
+    if (segments.length === 0) {
+      return;
+    }
+
+    let current = state;
+    for (let i = 0; i < segments.length - 1; i += 1) {
+      const segment = segments[i];
+      if (!current[segment] || typeof current[segment] !== 'object') {
+        current[segment] = {};
+      }
+      current = current[segment];
+    }
+
+    current[segments[segments.length - 1]] = value;
+  };
+
   return {
     once: async () => ({
       val: () => data
     }),
-    child: (childPath) => ref(`${path}/${childPath}`)
+    child: (childPath) => ref(`${path}/${childPath}`),
+    set: async (value) => {
+      setAtPath(value);
+      return true;
+    },
+    update: async (value) => {
+      const nextValue = typeof data === 'object' && data !== null ? { ...data, ...value } : value;
+      setAtPath(nextValue);
+      return true;
+    }
   };
 };
 
