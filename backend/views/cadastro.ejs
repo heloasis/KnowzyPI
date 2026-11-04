@@ -111,6 +111,10 @@
                 cadastroForm.reset();
 
                 try {
+                    if (data && data.usuario) {
+                        localStorage.setItem('currentUser', JSON.stringify(data.usuario));
+                        localStorage.setItem('currentUserId', String(data.usuario.id || ''));
+                    }
                     localStorage.removeItem('profileData');
                     localStorage.removeItem('knowzyFavoritos');
                     localStorage.removeItem('favoritos');

@@ -1,79 +1,89 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getDatabase, ref, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
-
-const firebaseConfig = {
-  apiKey: 'AIzaSyDemoKnowzyPI',
-  authDomain: 'knowzypi-default-rtdb.firebaseapp.com',
-  databaseURL: 'https://knowzypi-default-rtdb.firebaseio.com',
-  projectId: 'knowzypi-default-rtdb',
-  storageBucket: 'knowzypi-default-rtdb.appspot.com',
-  messagingSenderId: '000000000000',
-  appId: '1:000000000000:web:demo-knowledge-platform'
-};
-
-const USER_ID = 'ID_USUARIO_EXEMPLO';
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const fallbackPerfil = {
-  nome: 'Aluno Teste',
-  tag: '#A12',
-  xpTotal: 780
-};
-
-const fallbackConquistas = {
-  quest1: {
-    titulo: 'Primeiros Passos',
-    descricao: 'Faça seu primeiro login ou acesse a plataforma.',
+const DEFAULT_CATALOG = {
+  primeiro_login: {
+    titulo: 'Primeiro Login',
+    descricao: 'Acesse o sistema pela primeira vez.',
     meta: 1,
-    xpRecompensa: 50,
+    xpRecompensa: 25,
     icone: '🚀'
   },
-  quest2: {
-    titulo: 'Mestre dos Quiz',
+  cinco_quizzes: {
+    titulo: 'Cinco Quizzes',
+    descricao: 'Responda 5 quizzes com sucesso.',
+    meta: 5,
+    xpRecompensa: 100,
+    icone: '🎯'
+  },
+  explorar_materias: {
+    titulo: 'Explorador',
+    descricao: 'Explore pelo menos 5 matérias.',
+    meta: 5,
+    xpRecompensa: 200,
+    icone: '🧭'
+  },
+  cinquenta_quizzes: {
+    titulo: 'Mestre dos Quizzes',
     descricao: 'Complete 50 quizzes.',
     meta: 50,
     xpRecompensa: 500,
     icone: '🏆'
   },
-  quest3: {
-    titulo: 'Explorador das Matérias',
-    descricao: 'Explore todas as matérias.',
-    meta: 5,
-    xpRecompensa: 200,
-    icone: '🧭'
-  },
-  quest4: {
-    titulo: 'Foco Total',
-    descricao: 'Complete 5 quizzes.',
-    meta: 5,
-    xpRecompensa: 100,
-    icone: '🎯'
-  },
-  quest5: {
+  licao_perfeita: {
     titulo: 'Lição Perfeita',
-    descricao: 'Faça uma lição perfeita.',
+    descricao: 'Alcance 100 pontos em uma lição.',
     meta: 1,
     xpRecompensa: 50,
     icone: '✨'
   }
 };
 
-const fallbackUserProgress = {
-  quest1: { progressoAtual: 1, concluida: true },
-  quest2: { progressoAtual: 23, concluida: false },
-  quest3: { progressoAtual: 5, concluida: true },
-  quest4: { progressoAtual: 3, concluida: false },
-  quest5: { progressoAtual: 1, concluida: false }
+const FALLBACK_PROFILE = {
+  nome: 'Aluno Teste',
+  tag: '#A12',
+  xpTotal: 0,
+  id: null
 };
 
-const fallbackMascote = {
-  roupa: 'Manto Azul',
-  acessorio: 'Óculos',
-  expressao: 'Feliz',
-  efeito: 'Brilho',
-  cor: 'Roxo'
+const FALLBACK_MASCOTE = {
+  roupa: 'casaco_roto',
+  acessorio: 'fone_ouvido',
+  expressao: 'piscada',
+  efeito: 'galaxia',
+  cor: 'roxo'
 };
+
+const readStoredUser = () => {
+  try {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (currentUser && currentUser.id) {
+      return currentUser;
+    }
+  } catch (error) {
+    // Ignora falhas de parsing do storage.
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem('profileData') || 'null');
+    if (saved && saved.id) {
+      return saved;
+    }
+  } catch (error) {
+    // Ignora falhas de parsing do storage.
+  }
+
+  return null;
+};
+
+const getCurrentUserId = () => {
+  const user = readStoredUser();
+  if (user && user.id) {
+    return String(user.id);
+  }
+
+  const storedId = localStorage.getItem('currentUserId');
+  return storedId ? String(storedId) : null;
+};
+
+const USER_ID = getCurrentUserId();
 
 const userNameEl = document.getElementById('userName');
 const userTagEl = document.getElementById('userTag');
@@ -126,18 +136,20 @@ const setMascot = (mascote, xp = 0) => {
 };
 
 const persistProfileData = (perfil = {}, mascote = {}) => {
-  const xp = Number(perfil.xpTotal || fallbackPerfil.xpTotal);
+  const xp = Number(perfil.xpTotal || perfil.xp || FALLBACK_PROFILE.xpTotal || 0);
   const level = getLevelInfo(xp);
+
   const nextData = {
-    nome: perfil.nome || fallbackPerfil.nome,
-    tag: perfil.tag || fallbackPerfil.tag,
+    id: perfil.id || getCurrentUserId(),
+    nome: perfil.nome || FALLBACK_PROFILE.nome,
+    tag: perfil.tag || '#A12',
     xpTotal: xp,
     nivel: level.name,
     conquistas: `${counterTextEl.textContent || '0 / 0'}`,
     mascote: level.name,
-    style: mascote?.roupa || 'Manto Azul',
-    accessory: mascote?.acessorio || 'Óculos',
-    mood: mascote?.expressao || 'Feliz'
+    style: mascote?.roupa || FALLBACK_MASCOTE.roupa,
+    accessory: mascote?.acessorio || FALLBACK_MASCOTE.acessorio,
+    mood: mascote?.expressao || FALLBACK_MASCOTE.expressao
   };
 
   localStorage.setItem('profileData', JSON.stringify(nextData));
@@ -165,21 +177,35 @@ const renderQuestIcon = (icon) => {
   return `<i class="fa-solid ${value}"></i>`;
 };
 
-const renderQuests = (catalog, progressMap) => {
-  const entries = Object.entries(catalog || {});
-  const completedCount = entries.filter(([id]) => {
-    const item = progressMap?.[id] || {};
-    return Boolean(item.concluida);
-  }).length;
+const toProgressMap = (ids = []) => {
+  const unlocked = new Set(
+    Array.isArray(ids)
+      ? ids.filter(Boolean).map((item) => String(item).trim())
+      : []
+  );
 
+  return Object.entries(DEFAULT_CATALOG).reduce((accumulator, [id, quest]) => {
+    accumulator[id] = {
+      progressoAtual: unlocked.has(id) ? Number(quest.meta || 1) : 0,
+      concluida: unlocked.has(id)
+    };
+
+    return accumulator;
+  }, {});
+};
+
+const renderQuests = (catalog, progressMap) => {
+  const entries = Object.entries(catalog || DEFAULT_CATALOG);
+  const completedCount = entries.filter(([id]) => Boolean(progressMap?.[id]?.concluida)).length;
   const total = entries.length;
+
   counterTextEl.textContent = `${completedCount} / ${total}`;
 
   questsListEl.innerHTML = entries.map(([id, rawQuest]) => {
     const quest = normalizeQuest(rawQuest);
     const userQuest = progressMap?.[id] || { progressoAtual: 0, concluida: false };
     const progressValue = Number(userQuest.progressoAtual || 0);
-    const safeMeta = Math.max(1, quest.meta || 1);
+    const safeMeta = Math.max(1, Number(quest.meta || 1));
     const progress = Math.min(progressValue, safeMeta);
     const percent = Math.min(100, (progress / safeMeta) * 100);
     const isComplete = Boolean(userQuest.concluida);
@@ -218,51 +244,73 @@ const renderQuests = (catalog, progressMap) => {
   }).join('');
 };
 
-const renderProfile = ({ perfil = {}, mascote = {}, conquistas = {}, catalog = {} }) => {
-  const xp = Number(perfil.xpTotal || 0);
+const renderProfile = ({ perfil = {}, mascote = {}, conquistas = [], catalog = DEFAULT_CATALOG }) => {
+  const xp = Number(perfil.xpTotal ?? perfil.xp ?? 0);
   const level = getLevelInfo(xp);
   const nextLevel = level.next;
 
-  userNameEl.textContent = perfil.nome || fallbackPerfil.nome;
-  userTagEl.textContent = perfil.tag || fallbackPerfil.tag;
+  userNameEl.textContent = perfil.nome || FALLBACK_PROFILE.nome;
+  userTagEl.textContent = perfil.tag || '#A12';
   xpTotalEl.textContent = `${xp} XP`;
   levelNameEl.textContent = level.name;
   nextLevelNameEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo' : nextLevel;
   xpRangeEl.textContent = level.range;
   nextLevelTextEl.textContent = nextLevel === 'Máximo' ? 'Nível máximo alcançado' : `Próximo nível: ${nextLevel}`;
 
-  setMascot(mascote, xp);
-  renderQuests(catalog, conquistas);
-  persistProfileData(perfil, mascote);
+  setMascot(mascote || FALLBACK_MASCOTE, xp);
+  renderQuests(catalog, toProgressMap(conquistas));
+  persistProfileData({ ...FALLBACK_PROFILE, ...perfil, xpTotal: xp }, mascote || FALLBACK_MASCOTE);
 };
 
-const loadFromFirebase = async () => {
+const loadUserAchievements = async () => {
+  const id = getCurrentUserId();
+
+  if (!id) {
+    renderProfile({
+      perfil: FALLBACK_PROFILE,
+      mascote: FALLBACK_MASCOTE,
+      conquistas: [],
+      catalog: DEFAULT_CATALOG
+    });
+    return;
+  }
+
   try {
-    const perfilSnap = await get(ref(db, `usuarios/${USER_ID}/perfil`));
-    const conquistasSnap = await get(ref(db, `usuarios/${USER_ID}/conquistas`));
-    const mascoteSnap = await get(ref(db, `usuarios/${USER_ID}/mascote`));
-    const catalogSnap = await get(ref(db, 'conquistas_disponiveis'));
+    const perfilResponse = await fetch(`/users/${encodeURIComponent(id)}`, {
+      credentials: 'same-origin'
+    });
 
-    const perfil = perfilSnap.exists() ? perfilSnap.val() : fallbackPerfil;
-    const catalog = catalogSnap.exists() ? catalogSnap.val() : fallbackConquistas;
-    const conquistas = conquistasSnap.exists() ? conquistasSnap.val() : fallbackUserProgress;
-    const mascote = mascoteSnap.exists() ? mascoteSnap.val() : fallbackMascote;
+    const conquistasResponse = await fetch(`/users/${encodeURIComponent(id)}/conquistas`, {
+      credentials: 'same-origin'
+    });
 
-    renderProfile({ perfil, mascote, conquistas, catalog });
+    const perfilData = perfilResponse.ok ? await perfilResponse.json() : null;
+    const conquistasData = conquistasResponse.ok ? await conquistasResponse.json() : [];
 
-    onValue(ref(db, `usuarios/${USER_ID}/perfil`), (snapshot) => {
-      const data = snapshot.val() || fallbackPerfil;
-      if (data) {
-        renderProfile({ perfil: data, mascote: mascoteSnap.val() || fallbackMascote, conquistas: conquistasSnap.val() || fallbackUserProgress, catalog: catalogSnap.val() || fallbackConquistas });
-      }
+    const storedUser = readStoredUser() || {};
+    const perfil = {
+      ...FALLBACK_PROFILE,
+      ...storedUser,
+      ...perfilData,
+      id,
+      nome: perfilData?.nome || storedUser?.nome || 'Usuário',
+      tag: perfilData?.tag || storedUser?.tag || '#A12',
+      xpTotal: Number(perfilData?.xp ?? perfilData?.perfil?.xpTotal ?? storedUser?.xp ?? 0)
+    };
+
+    renderProfile({
+      perfil,
+      mascote: perfilData?.mascote || FALLBACK_MASCOTE,
+      conquistas: conquistasData || [],
+      catalog: DEFAULT_CATALOG
     });
   } catch (error) {
-    console.warn('Falha ao carregar Firebase, usando dados de fallback.', error);
+    console.warn('Falha ao carregar conquistas do usuário.', error);
     renderProfile({
-      perfil: fallbackPerfil,
-      mascote: fallbackMascote,
-      conquistas: fallbackUserProgress,
-      catalog: fallbackConquistas
+      perfil: { ...FALLBACK_PROFILE, id },
+      mascote: FALLBACK_MASCOTE,
+      conquistas: [],
+      catalog: DEFAULT_CATALOG
     });
   }
 };
@@ -272,9 +320,8 @@ const openProfilePage = () => {
 };
 
 profileTrigger?.addEventListener('click', openProfilePage);
-
-backButton.addEventListener('click', () => {
+backButton?.addEventListener('click', () => {
   window.history.back();
 });
 
-loadFromFirebase();
+loadUserAchievements();

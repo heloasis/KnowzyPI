@@ -10,6 +10,7 @@ const homeController = require('./src/controllers/homeController');
 const materiaController = require('./src/controllers/materiasController');
 const quizController = require('./src/controllers/quizController');
 const userController = require('./src/controllers/userController');
+const userRoutes = require('./src/routes/userRoutes');
 const {
   requireAuth,
   requireGuest,
@@ -102,9 +103,7 @@ app.get('/api/quiz/:materiaId', quizController.iniciarQuiz);
 app.post('/quiz/responder', quizController.responderPergunta);
 app.post('/quiz/finalizar', quizController.finalizarQuiz);
 
-app.get('/users/:id', requireOwnership('id'), userController.buscarPerfil);
-app.put('/users/:id', requireOwnership('id'), userController.atualizarPerfil);
-app.get('/users/:id/conquistas', requireOwnership('id'), userController.buscarConquistas);
+app.use('/users', userRoutes);
 
 module.exports = app;
 
@@ -114,3 +113,5 @@ if (require.main === module) {
     console.log(`Servidor rodando com sucesso na porta ${PORT}`);
   });
 }
+
+app.use('/users', userRoutes);
