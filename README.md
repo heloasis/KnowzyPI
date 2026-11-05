@@ -111,18 +111,18 @@ Os conteúdos didáticos novos ficam em `backend/src/data/conteudosEstudo.json`;
 A fonte autoritativa do XP compartilhado entre dispositivos é o backend com Firebase conectado. O modo local é destinado a desenvolvimento/preview.
 
 ## 👥 Integrantes
-Amanda Xavier de Almeida Costa
-Davi Eduardo Dutra de Carvalho
-Gabriel de Carvalho Soares
-Heloisa Ferreira Gomes 
-Maria Heloisa Rodrigues
-Nicolly Freitas Bizerra
+- Amanda Xavier de Almeida Costa
+- Davi Eduardo Dutra de Carvalho
+- Gabriel de Carvalho Soares
+- Heloisa Ferreira Gomes 
+- Maria Heloisa Rodrigues
+- Nicolly Freitas Bizerra
 
 ## 🎤 Pitch
 O Knowzy é um aplicativo desenvolvido para facilitar o aprendizado dos estudantes por meio de quizzes interativos. A plataforma permite criar uma conta, escolher matérias, responder perguntas com tempo determinado e acompanhar o desempenho. Também conta com perfil, histórico e favoritos, além de futuras funcionalidades, como conquistas, rankings e estatísticas. Desenvolvido com React Native, Node.js e Firebase, o objetivo do Knowzy é tornar os estudos mais práticos, dinâmicos e eficientes.
 
 ## 📎 Links Importantes
-knowzypi.onrender.com  
+knowzypi.onrender.com
 https://github.com/heloasis/KnowzyPI.git 
 https://youtu.be/yxxp8rGxZ64?si=qJJBJ1Pbi_t5Z-rc
 
