@@ -1,14 +1,37 @@
-# KnowzyPI — Web + Mobile
+# KnowzyPI
 
-Projeto de estudos com backend Node.js/Express/EJS, banco Firebase Realtime Database opcional no preview e aplicativo React Native com Expo Router.
+## 📌 Descrição
+Desenvolver um aplicativo de quizzes educacionais para auxiliar estudantes no aprendizado de diferentes matérias de forma prática e acessível.
 
-## Estrutura
 
+## 🎯 Objetivo
+Criar uma interface intuitiva aonde o usuário pode escolher quizzes separados por matérias, favoritar um quiz específico, exibir desempenho e conquistas do usuário.
+
+
+## 🧩 Tecnologias Utilizadas
+### Backend 
+- Node.js
+- Firebase
+
+### Mobile
+- React Native
+
+## 🚀 Funcionalidades
+Login/Cadastro
+Lista das matérias disponíveis.
+Sistema de quizzes.
+Pontuação e desempenho.
+Página de conquistas
+Área onde o usuário poderá visualizar medalhas, níveis e conquistas desbloqueadas conforme seu desempenho nos quizzes e participação na plataforma.
+
+
+
+## 📂 Estrutura do Projeto
 - `backend/`: servidor Express, autenticação, controllers, models, rotas, páginas EJS, assets, testes e dados de fallback.
 - `mobile/`: aplicativo Expo/React Native, telas, componentes, serviços HTTP, contexto de autenticação e assets.
 - `docs/README-pitch-original.md`: cópia preservada do README anterior, incluindo o texto original do pitch e integrantes.
 
-## Requisitos
+## ▶️ Como Executar
 
 - Node.js 20 ou superior.
 - npm.
@@ -31,12 +54,6 @@ npm start
 
 O servidor utiliza `PORT` do ambiente ou `3000` localmente.
 
-### Deploy no Render
-
-- Root Directory: `backend`
-- Build Command: `npm install`
-- Start Command: `npm start`
-- Configure as variáveis de ambiente listadas em `backend/.env.example` no painel do Render. Não envie `.env` ou chaves para o GitHub.
 
 ## 2. Firebase original
 
@@ -93,24 +110,18 @@ Os conteúdos didáticos novos ficam em `backend/src/data/conteudosEstudo.json`;
 
 A fonte autoritativa do XP compartilhado entre dispositivos é o backend com Firebase conectado. O modo local é destinado a desenvolvimento/preview.
 
-## 6. Tutor IA
+## 👥 Integrantes
+Amanda Xavier de Almeida Costa
+Davi Eduardo Dutra de Carvalho
+Gabriel de Carvalho Soares
+Heloisa Ferreira Gomes 
+Maria Heloisa Rodrigues
+Nicolly Freitas Bizerra
 
-O Tutor IA está sendo preparado para um lançamento futuro. As telas do site e do aplicativo informam que a funcionalidade chegará em breve; o serviço de perguntas ainda não está disponível.
+## 🎤 Pitch
+O Knowzy é um aplicativo desenvolvido para facilitar o aprendizado dos estudantes por meio de quizzes interativos. A plataforma permite criar uma conta, escolher matérias, responder perguntas com tempo determinado e acompanhar o desempenho. Também conta com perfil, histórico e favoritos, além de futuras funcionalidades, como conquistas, rankings e estatísticas. Desenvolvido com React Native, Node.js e Firebase, o objetivo do Knowzy é tornar os estudos mais práticos, dinâmicos e eficientes.
 
-## 7. Testes
+## 📎 Links Importantes
 
-Backend:
-
-```bash
-cd backend
-npm test
-```
-
-Mobile:
-
-```bash
-cd mobile
-npx tsc --noEmit
-```
-
-O relatório `RELATORIO_FINAL.md` descreve os testes executados e as integrações que ainda dependem de credenciais externas.
+- Repositório GitHub
+- Deploy Vercel
