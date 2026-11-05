@@ -1,0 +1,134 @@
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/check-routes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/debug.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/conquistas/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/conquistas/script.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/conquistas/style.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/css/home.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/css/index.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/perfil/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/perfil/script.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/public/perfil/style.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/server.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/config/firebase.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/controllers/authController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/controllers/homeController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/controllers/materiasController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/controllers/quizController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/controllers/userController.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/middlewares/authMiddleware.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/models/materias.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/models/perguntas.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/models/user.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/authRoutes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/homeRoutes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/materiaRoutes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/quizRoutes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/routes/userRoutes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/src/utils/utf8.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/authProtection.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/loginRedirectCheck.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/materiasController.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/userAuth.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/test/userModel.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/biologia.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/cadastro.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/favoritos.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/geografia.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/historia.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/home.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/index.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/login.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/matematica.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/materias.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/perfil.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/views/portugues.ejs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/.claude/settings.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/AGENTS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/_layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/cadastro.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/configuracoes.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/conquistas.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/favoritos.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/home.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/login.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/materias.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/perfil.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/app/quiz.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/Button.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/Themed.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/useClientOnlyValue.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/useClientOnlyValue.web.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/useColorScheme.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/components/useColorScheme.web.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/constants/Colors.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/package-lock.json.backup', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/package.json.backup', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/api/api.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/components/Button.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/components/Input.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/context/AuthContext.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/services/authService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/services/materiaService.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/types/auth.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/types/quiz.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/src/utils/text.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'mobile/tsconfig.json', LF will be replaced by CRLF the next time Git touches it
+ .gitignore                                    |   13 [32m+[m[31m-[m
+ README.md                                     |  140 [32m++[m[31m-[m
+ backend/package-lock.json                     |   19 [32m+[m
+ backend/package.json                          |    4 [32m+[m
+ backend/public/conquistas/script.js           |  520 [32m++++++[m[31m---[m
+ backend/public/css/home.css                   |  885 [32m++++++++++++[m[31m---[m
+ backend/public/perfil/index.html              |   16 [32m+[m[31m-[m
+ backend/public/perfil/script.js               |   54 [32m+[m[31m-[m
+ backend/server.js                             |   34 [32m+[m[31m-[m
+ backend/src/config/firebase.js                |  117 [32m+[m[31m-[m
+ backend/src/controllers/authController.js     |   75 [32m+[m[31m-[m
+ backend/src/controllers/homeController.js     |   14 [32m+[m[31m-[m
+ backend/src/controllers/materiasController.js |   31 [32m+[m[31m-[m
+ backend/src/controllers/quizController.js     |  159 [32m++[m[31m-[m
+ backend/src/middlewares/authMiddleware.js     |    7 [32m+[m
+ backend/src/models/materias.js                |   52 [32m+[m[31m-[m
+ backend/src/models/perguntas.js               |  209 [32m++[m[31m--[m
+ backend/src/models/user.js                    |  114 [32m+[m[31m-[m
+ backend/src/routes/quizRoutes.js              |    8 [32m+[m
+ backend/test/authProtection.test.js           |   18 [32m+[m[31m-[m
+ backend/test/userAuth.test.js                 |   15 [32m+[m[31m-[m
+ backend/test/userModel.test.js                |   33 [32m+[m[31m-[m
+ backend/views/biologia.ejs                    |  918 [32m+++++++++++++[m[31m---[m
+ backend/views/favoritos.ejs                   |    5 [32m+[m[31m-[m
+ backend/views/geografia.ejs                   |  920 [32m+++++++++++++[m[31m---[m
+ backend/views/historia.ejs                    |  945 [32m+++++++++++++[m[31m---[m
+ backend/views/home.ejs                        |  379 [32m++++++[m[31m-[m
+ backend/views/matematica.ejs                  | 1328 [32m++++++++++++++[m[31m---------[m
+ backend/views/materias.ejs                    |  188 [32m+++[m[31m-[m
+ backend/views/perfil.ejs                      |   10 [32m+[m[31m-[m
+ backend/views/portugues.ejs                   | 1426 [32m++++++++++++++++[m[31m---------[m
+ mobile/app/_layout.tsx                        |    1 [32m+[m
+ mobile/app/cadastro.tsx                       |  444 [32m++++++[m[31m--[m
+ mobile/app/conquistas.tsx                     |  972 [32m+++++++++[m[31m--------[m
+ mobile/app/favoritos.tsx                      |  195 [32m+[m[31m---[m
+ mobile/app/home.tsx                           | 1160 [32m++++++++++++++++[m[31m----[m
+ mobile/app/index.tsx                          |  165 [32m++[m[31m-[m
+ mobile/app/login.tsx                          |  408 [32m+++++[m[31m--[m
+ mobile/app/materias.tsx                       |  166 [32m++[m[31m-[m
+ mobile/app/quiz.tsx                           | 1108 [32m+++++++++++++++[m[31m----[m
+ mobile/package-lock.json                      |   12 [32m+[m
+ mobile/package.json                           |    1 [32m+[m
+ mobile/src/api/api.ts                         |   11 [32m+[m[31m-[m
+ mobile/src/context/AuthContext.tsx            |   25 [32m+[m[31m-[m
+ mobile/src/services/authService.ts            |    5 [32m+[m[31m-[m
+ mobile/src/services/materiaService.ts         |  172 [32m++[m[31m-[m
+ mobile/src/types/auth.ts                      |    1 [32m+[m
+ mobile/src/types/quiz.ts                      |    3 [32m+[m[31m-[m
+ mobile/src/utils/text.ts                      |   28 [32m+[m[31m-[m
+ 49 files changed, 9863 insertions(+), 3670 deletions(-)

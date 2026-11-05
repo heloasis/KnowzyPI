@@ -74,11 +74,13 @@ test('login bem-sucedido preserva redirect seguro e mantém acesso após autenti
     const loginPage = await fetch(`${baseUrl}/login?redirect=/perfil`, { redirect: 'manual', headers: { Accept: 'text/html' } });
     const loginHtml = await loginPage.text();
     assert.match(loginHtml, /\/perfil/);
+    const email = `auth.${Date.now()}@teste.com`;
+    await fetch(`${baseUrl}/cadastro`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: 'Aluno Teste', email, senha: 'Senha@123' }), redirect: 'manual' });
 
     const login = await fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'aluno@teste.com', senha: '123456' }),
+      body: JSON.stringify({ email, senha: 'Senha@123' }),
       redirect: 'manual'
     });
 
@@ -132,12 +134,18 @@ test('usuário autenticado pode acessar suas próprias informações, mas não a
   const { server, baseUrl } = await startServer();
 
   try {
-    const cookie = await login(baseUrl);
+    const email = `ownership.${Date.now()}@teste.com`;
+    await fetch(`${baseUrl}/cadastro`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: 'Conta Teste', email, senha: 'Senha@123' }), redirect: 'manual' });
+    const responseLogin = await fetch(`${baseUrl}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, senha: 'Senha@123' }), redirect: 'manual' });
+    const cookieHeader = responseLogin.headers.get('set-cookie');
+    const cookie = cookieHeader ? cookieHeader.split(';')[0] : '';
+    const payloadLogin = await responseLogin.json();
+    const userId = payloadLogin.usuario.id;
 
-    const allowed = await requestWithCookie(baseUrl, '/users/u1', cookie);
+    const allowed = await requestWithCookie(baseUrl, `/users/${userId}`, cookie);
     assert.equal(allowed.status, 200);
 
-    const forbidden = await requestWithCookie(baseUrl, '/users/u2', cookie);
+    const forbidden = await requestWithCookie(baseUrl, '/users/another-user', cookie);
     assert.equal(forbidden.status, 403);
     const payload = await forbidden.json();
     assert.match(String(payload.erro || payload.mensagem || ''), /permiss|acesso|recurso/i);

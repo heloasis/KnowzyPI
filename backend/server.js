@@ -1,3 +1,4 @@
+﻿require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -9,8 +10,8 @@ const authController = require('./src/controllers/authController');
 const homeController = require('./src/controllers/homeController');
 const materiaController = require('./src/controllers/materiasController');
 const quizController = require('./src/controllers/quizController');
-const userController = require('./src/controllers/userController');
 const userRoutes = require('./src/routes/userRoutes');
+const quizRoutes = require('./src/routes/quizRoutes');
 const {
   requireAuth,
   requireGuest,
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'knowzy-secret-key',
+  secret: process.env.SESSION_SECRET || 'dev-only-change-this-session-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -35,6 +36,11 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 8
   }
 }));
+
+app.use((req, res, next) => {
+  res.locals.usuario = req.session?.user || null;
+  next();
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -58,13 +64,8 @@ app.get('/conquistas', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'conquistas', 'index.html'));
 });
 app.get('/perfil', (req, res) => {
-  const usuario = req.session && req.session.user ? req.session.user : {
-    nome: 'Usuário',
-    email: 'usuario@email.com',
-    foto: ''
-  };
-
-  res.render('perfil', { usuario });
+  if (!req.session?.user) return res.redirect('/login');
+  res.render('perfil', { usuario: req.session.user });
 });
 app.get('/perfil/', (req, res) => {
   res.redirect('/perfil');
@@ -81,9 +82,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/materias', materiaController.listarMaterias);
 app.get('/materias/:id', materiaController.buscarMateria);
 app.get('/api/materias', materiaController.listarMateriasApi);
+app.get('/api/materias/:id/conteudos', materiaController.listarConteudosApi);
 app.get('/api/materias/:id', materiaController.buscarMateriaApi);
 
-app.get('/quiz', materiaController.listarMaterias);
+app.get('/tutor-ia', (req, res) => res.render('tutor'));
+app.get('/quiz', materiaController.listarQuizzes);
 app.get('/quiz/portugues', (req, res) => {
   res.render('portugues');
 });
@@ -99,11 +102,21 @@ app.get('/quiz/geografia', (req, res) => {
 app.get('/quiz/biologia', (req, res) => {
   res.render('biologia');
 });
+app.use('/api/quiz', quizRoutes);
 app.get('/api/quiz/:materiaId', quizController.iniciarQuiz);
 app.post('/quiz/responder', quizController.responderPergunta);
 app.post('/quiz/finalizar', quizController.finalizarQuiz);
 
+
+
+
+
 app.use('/users', userRoutes);
+
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) return res.status(404).json({ erro: 'Endpoint nÃ£o encontrado.' });
+  return res.status(404).send('PÃ¡gina nÃ£o encontrada.');
+});
 
 module.exports = app;
 
@@ -114,4 +127,3 @@ if (require.main === module) {
   });
 }
 
-app.use('/users', userRoutes);

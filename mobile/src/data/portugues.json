@@ -1,0 +1,122 @@
+﻿{
+    "p1":  {
+               "alternativas":  [
+                                    "Irmãos",
+                                    "Eles (oculto)",
+                                    "Os encomendados livros",
+                                    "Inexistente"
+                                ],
+               "enunciado":  "Qual é o sujeito da frase: \u0027Chegaram os encomendados livros ontem\u0027?",
+               "resposta_correta":  2
+           },
+    "p10":  {
+                "alternativas":  [
+                                     "Causa",
+                                     "Oposição",
+                                     "Conclusão",
+                                     "Condição"
+                                 ],
+                "enunciado":  "O conector \u0027portanto\u0027 estabelece uma relação de:",
+                "resposta_correta":  2
+            },
+    "p11":  {
+                "alternativas":  [
+                                     "Eterno",
+                                     "Passageiro",
+                                     "Duradouro",
+                                     "Forte"
+                                 ],
+                "enunciado":  "Qual sinônimo substitui adequadamente a palavra \u0027efêmero\u0027?",
+                "resposta_correta":  1
+            },
+    "p12":  {
+                "alternativas":  [
+                                     "Adjetivo",
+                                     "Substantivo",
+                                     "Adverbio",
+                                     "Pronome"
+                                 ],
+                "enunciado":  "Na frase \u0027Ele trabalha muito\u0027, a palavra \u0027muito\u0027 pertence a qual classe gramatical?",
+                "resposta_correta":  2
+            },
+    "p2":  {
+               "alternativas":  [
+                                    "Café",
+                                    "História",
+                                    "Lâmpada",
+                                    "Baú"
+                                ],
+               "enunciado":  "Qual das palavras abaixo é acentuada por ser uma paroxítona terminada em ditongo?",
+               "resposta_correta":  1
+           },
+    "p3":  {
+               "alternativas":  [
+                                    "Fui à pé.",
+                                    "Entreguei o livro à ela.",
+                                    "Vou à Bahia no fim do ano.",
+                                    "Ele vendeu o carro à prazo."
+                                ],
+               "enunciado":  "Assinale a opção em que a crase está empregada CORRETAMENTE:",
+               "resposta_correta":  2
+           },
+    "p4":  {
+               "alternativas":  [
+                                    "Objeto Direto",
+                                    "Objeto Indireto",
+                                    "Sujeito",
+                                    "Predicativo do Sujeito"
+                                ],
+               "enunciado":  "Qual é a função sintática de \u0027um bom livro\u0027 na frase: \u0027João comprou um bom livro\u0027?",
+               "resposta_correta":  0
+           },
+    "p5":  {
+               "alternativas":  [
+                                    "Metáfora",
+                                    "Prosopopeia (Personificação)",
+                                    "Hipérbole",
+                                    "Eufemismo"
+                                ],
+               "enunciado":  "Identifique a figura de linguagem na frase: \u0027O jardim olhava as crianças brincando\u0027.",
+               "resposta_correta":  1
+           },
+    "p6":  {
+               "alternativas":  [
+                                    "Cidadões",
+                                    "Cidadãos",
+                                    "Cidadães",
+                                    "Cidadanoses"
+                                ],
+               "enunciado":  "Qual é o plural da palavra \u0027cidadão\u0027?",
+               "resposta_correta":  1
+           },
+    "p7":  {
+               "alternativas":  [
+                                    "Exceção, xícara, pesquisa",
+                                    "Esseção, xícara, pezquisa",
+                                    "Exceção, chícara, pesquisa",
+                                    "Exseção, xícara, pesquisa"
+                                ],
+               "enunciado":  "Assinale a alternativa em que todas as palavras estão grafadas corretamente:",
+               "resposta_correta":  0
+           },
+    "p8":  {
+               "alternativas":  [
+                                    "Adjunto adnominal",
+                                    "Predicativo do sujeito",
+                                    "Objeto direto",
+                                    "Adjunto adverbial"
+                                ],
+               "enunciado":  "Em \u0027A menina ficou feliz\u0027, o termo \u0027feliz\u0027 funciona como:",
+               "resposta_correta":  1
+           },
+    "p9":  {
+               "alternativas":  [
+                                    "Faz três anos que não o vejo.",
+                                    "Houve muitos problemas na reunião.",
+                                    "Fazem cinco meses que mudei de casa.",
+                                    "Sobrou apenas um pedaço de bolo."
+                                ],
+               "enunciado":  "Qual das frases apresenta concordância verbal INCORRETA?",
+               "resposta_correta":  2
+           }
+}

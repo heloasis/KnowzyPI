@@ -1,4 +1,4 @@
-
+﻿
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Constants from 'expo-constants';
 const getBaseUrl = (): string => {
@@ -6,7 +6,7 @@ const getBaseUrl = (): string => {
     const hostUri = Constants.expoConfig?.hostUri ?? 'localhost:3000';
     const host = hostUri.split(':')[0];
 
-    return process.env.EXPO_PUBLIC_API_URL || `http://${host}:3000`;
+    return process.env.EXPO_PUBLIC_API_URL || `http://${host}:3001`;
   }
 
   return process.env.EXPO_PUBLIC_API_URL || 'https://api.seudominio.com';
@@ -58,12 +58,13 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     console.log('========= ERRO API =========');
-    console.log('URL:', error.config?.baseURL + error.config?.url);
+    console.log('URL:', (error.config?.baseURL || '') + (error.config?.url || ''));
     console.log('STATUS:', error.response?.status);
     console.log('RESPOSTA:', error.response?.data);
-    console.log('MÉTODO:', error.config?.method);
+    console.log('MÃ‰TODO:', error.config?.method);
     console.log('============================');
 
     return Promise.reject(error);
   }
 );
+

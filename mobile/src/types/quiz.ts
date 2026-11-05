@@ -9,7 +9,8 @@ export type Pergunta = {
   id: string;
   enunciado: string;
   alternativas: string[];
-  respostaCorreta?: string;
+  respostaCorreta?: string | number;
+  resposta_correta?: string | number;
   materiaId?: string;
 };
 

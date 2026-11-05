@@ -1,12 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matérias</title>
+    <title><%= isQuiz ? "Quizzes" : "Matérias" %> | KnowzyPI</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -76,6 +79,7 @@
             margin-bottom: 32px;
             background: linear-gradient(135deg, #00d2ff, #7928ca);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
         }
@@ -156,33 +160,89 @@
         }
     </style>
 </head>
+
 <body>
     <button class="back-btn" type="button" onclick="window.location.href='/home'">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+        </svg>
         <span>Voltar</span>
     </button>
 
-    <div class="container">
-        <h1 class="header-title">matérias</h1>
+    <div
+        class="container"
+        data-user-key="<%= usuario?.id || 'preview' %>"
+    >
+        <h1 class="header-title">
+            <%= isQuiz ? "quizzes" : "matérias" %>
+        </h1>
 
         <div class="materias-list" id="materiasList">
+
             <% materias.forEach((materia) => { %>
+
                 <div class="materia-card" data-id="<%= materia.id %>">
-                    <a href="/quiz/<%= materia.slug || materia.id %>" class="materia-main" style="text-decoration:none;color:inherit;display:flex;align-items:center;flex:1;">
+
+                    <a
+                        href="<%= isQuiz ? '/quiz/' : '/materias/' %><%= materia.slug || materia.id %>"
+                        class="materia-main"
+                        style="text-decoration:none;color:inherit;display:flex;align-items:center;flex:1;"
+                    >
+
                         <span class="materia-icon">
+
                             <% if (materia.nome === 'Português') { %>
-                                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                </svg>
+
                             <% } else if (materia.nome === 'Matemática') { %>
-                                <svg viewBox="0 0 24 24"><path d="M3 12h4l3 9 4-17 3 8h4"></path></svg>
+
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M3 12h4l3 9 4-17 3 8h4"></path>
+                                </svg>
+
                             <% } else if (materia.nome === 'História') { %>
-                                <svg viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>
+
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 22h14"></path>
+                                    <path d="M5 2h14"></path>
+                                    <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path>
+                                    <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path>
+                                </svg>
+
                             <% } else if (materia.nome === 'Geografia') { %>
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                </svg>
+
                             <% } else { %>
-                                <svg viewBox="0 0 24 24"><path d="M2 15c6.667-6 13.333 0 20-6"></path><path d="M2 9c6.667 6 13.333 0 20 6"></path><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path><path d="M17 6l-2.5 2.5"></path><path d="M14 10l-4 4"></path><path d="M7 18l2.5-2.5"></path><path d="M3.5 14.5l2-2"></path><path d="M20.5 9.5l-2 2"></path></svg>
+
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M2 15c6.667-6 13.333 0 20-6"></path>
+                                    <path d="M2 9c6.667 6 13.333 0 20 6"></path>
+                                    <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
+                                    <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path>
+                                    <path d="M17 6l-2.5 2.5"></path>
+                                    <path d="M14 10l-4 4"></path>
+                                    <path d="M7 18l2.5-2.5"></path>
+                                    <path d="M3.5 14.5l2-2"></path>
+                                    <path d="M20.5 9.5l-2 2"></path>
+                                </svg>
+
                             <% } %>
+
                         </span>
-                        <span class="materia-name"><%= materia.nome %></span>
+
+                        <span class="materia-name">
+                            <%= materia.nome %>
+                        </span>
+
                     </a>
 
                     <button
@@ -192,54 +252,130 @@
                         aria-label="Favoritar <%= materia.nome %>"
                         title="Favoritar <%= materia.nome %>"
                     >♡</button>
+
                 </div>
+
             <% }); %>
+
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'knowzyFavoritos';
+        const USER_KEY =
+            document.querySelector('.container').dataset.userKey || 'preview';
+
+        const FAVORITES_KEY = `knowzy:${USER_KEY}:favoritos`;
+        const ACTIVITIES_KEY = 'knowzyHomeActivities';
 
         const getFavorites = () => {
             try {
-                return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                const favorites = JSON.parse(
+                    localStorage.getItem(FAVORITES_KEY) || '[]'
+                );
+
+                return Array.isArray(favorites) ? favorites : [];
+
             } catch (error) {
+                console.error('Erro ao carregar favoritos:', error);
                 return [];
             }
         };
 
         const setFavorites = (items) => {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+            try {
+                localStorage.setItem(
+                    FAVORITES_KEY,
+                    JSON.stringify(items)
+                );
+            } catch (error) {
+                console.error('Erro ao salvar favoritos:', error);
+            }
+        };
+
+        const saveActivity = (name, url) => {
+            try {
+                const activities = JSON.parse(
+                    localStorage.getItem(ACTIVITIES_KEY) || '[]'
+                );
+
+                const lista = Array.isArray(activities)
+                    ? activities
+                    : [];
+
+                const updated = [
+                    {
+                        name,
+                        url,
+                        date: new Date().toISOString()
+                    },
+                    ...lista.filter(item => item.url !== url)
+                ].slice(0, 5);
+
+                localStorage.setItem(
+                    ACTIVITIES_KEY,
+                    JSON.stringify(updated)
+                );
+
+            } catch (error) {
+                console.error('Erro ao salvar atividade:', error);
+            }
         };
 
         const toggleFavorite = (id) => {
             const atual = getFavorites();
             const existe = atual.includes(id);
-            const next = existe ? atual.filter((item) => item !== id) : [...atual, id];
-            setFavorites(next);
 
-            document.querySelectorAll('.favorite-toggle').forEach((button) => {
-                const isFavorite = next.includes(button.dataset.id);
-                button.textContent = isFavorite ? '♥' : '♡';
-                button.classList.toggle('is-favorite', isFavorite);
-                button.setAttribute('aria-label', isFavorite ? 'Remover favorito' : 'Favoritar matéria');
-            });
+            const next = existe
+                ? atual.filter(item => item !== id)
+                : [...atual, id];
+
+            setFavorites(next);
+            renderInitial();
         };
 
         const renderInitial = () => {
             const favoritos = getFavorites();
-            document.querySelectorAll('.favorite-toggle').forEach((button) => {
+
+            document.querySelectorAll('.favorite-toggle').forEach(button => {
                 const isFavorite = favoritos.includes(button.dataset.id);
+
                 button.textContent = isFavorite ? '♥' : '♡';
-                button.classList.toggle('is-favorite', isFavorite);
+
+                button.classList.toggle(
+                    'is-favorite',
+                    isFavorite
+                );
+
+                button.setAttribute(
+                    'aria-label',
+                    isFavorite ? 'Remover favorito' : 'Favoritar matéria'
+                );
+
+                button.setAttribute(
+                    'title',
+                    isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'
+                );
             });
         };
 
-        document.querySelectorAll('.favorite-toggle').forEach((button) => {
+        document.querySelectorAll('.favorite-toggle').forEach(button => {
             button.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
+
                 toggleFavorite(button.dataset.id);
+            });
+        });
+
+        document.querySelectorAll('.materia-main').forEach(link => {
+            link.addEventListener('click', () => {
+                const nome = link
+                    .querySelector('.materia-name')
+                    ?.textContent.trim();
+
+                if (nome) {
+                    saveActivity(nome, link.href);
+                }
             });
         });
 

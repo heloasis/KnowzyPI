@@ -14,3 +14,14 @@ yarn-debug.log*
 # Firebase credentials
 backend/src/config/firebaseServiceAccount.json
 *.serviceAccount.json
+# Preview local (contas criadas no modo sem Firebase)
+backend/.local-preview-users.json
+.local-preview-users.json
+# Credenciais privadas
+**/firebaseServiceAccount.json
+**/*.serviceAccount.json
+
+# Expo / build artifacts
+.expo/
+dist/
+web-build/

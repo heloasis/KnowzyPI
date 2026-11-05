@@ -1,73 +1,52 @@
+// Firebase opcional no ambiente de desenvolvimento/preview.
+// Quando as credenciais estiverem presentes, utiliza o projeto original indicado por FIREBASE_DATABASE_URL.
+let db = null;
+let firebaseAdmin = null;
+let firebaseReady = false;
+let firebaseError = null;
 
-const {
-  initializeApp,
-  getApps,
-  getApp,
-  cert
-} = require('firebase-admin/app');
-
-const {
-  getDatabase
-} = require('firebase-admin/database');
-
-const DATABASE_URL =
-  process.env.FIREBASE_DATABASE_URL ||
-  'https://knowzypi-default-rtdb.firebaseio.com';
-
-const readServiceAccount = () => {
+try {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-
-  if (!raw) {
-    throw new Error(
-      'FIREBASE_SERVICE_ACCOUNT não configurada.'
-    );
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-
-    if (
-      !parsed.project_id ||
-      !parsed.private_key ||
-      !parsed.client_email
-    ) {
-      throw new Error(
-        'Credenciais incompletas do Firebase.'
-      );
+  if (raw) {
+    const adminApp = require('firebase-admin/app');
+    const { getDatabase } = require('firebase-admin/database');
+    const account = JSON.parse(raw);
+    if (!account.project_id || !account.private_key || !account.client_email) {
+      throw new Error('Credenciais incompletas em FIREBASE_SERVICE_ACCOUNT.');
     }
-
-    return {
-      ...parsed,
-      private_key: parsed.private_key.replace(/\\n/g, '\n')
-    };
-  } catch (error) {
-    throw new Error(
-      `FIREBASE_SERVICE_ACCOUNT inválida: ${error.message}`
-    );
+    const app = adminApp.getApps().length
+      ? adminApp.getApp()
+      : adminApp.initializeApp({
+          credential: adminApp.cert({ ...account, private_key: account.private_key.replace(/\\n/g, '\n') }),
+          databaseURL: process.env.FIREBASE_DATABASE_URL || 'https://knowzypi-default-rtdb.firebaseio.com'
+        });
+    db = getDatabase(app);
+    firebaseAdmin = require('firebase-admin');
+    firebaseReady = true;
   }
-};
+} catch (error) {
+  firebaseError = error;
+  console.warn('[Firebase] Integração não inicializada:', error.message);
+}
 
-const initializeFirebase = () => {
-  if (getApps().length > 0) {
-    return getApp();
-  }
+const unavailable = () => Promise.reject(new Error(
+  'Firebase indisponível neste ambiente. Configure FIREBASE_SERVICE_ACCOUNT e FIREBASE_DATABASE_URL para habilitar a sincronização.'
+));
 
-  const serviceAccount = readServiceAccount();
+// Mantém a interface db.ref(...) esperada pelos models, sem fingir que houve gravação.
+if (!db) {
+  db = {
+    ref() {
+      return {
+        once: unavailable,
+        set: unavailable,
+        update: unavailable,
+        remove: unavailable,
+        transaction: unavailable,
+        push() { return { key: `local-${Date.now()}`, set: unavailable }; }
+      };
+    }
+  };
+}
 
-  return initializeApp({
-    credential: cert(serviceAccount),
-    databaseURL: DATABASE_URL
-  });
-};
-
-const app = initializeFirebase();
-
-const db = getDatabase(app);
-
-const firebaseAdmin = require('firebase-admin');
-
-module.exports = {
-  db,
-  firebaseAdmin,
-  isRealFirebase: true
-};
+module.exports = { db, firebaseAdmin, isRealFirebase: firebaseReady, firebaseError };

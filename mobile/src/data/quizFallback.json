@@ -1,0 +1,177 @@
+{
+  "portugues": [
+    {
+      "id": "q1",
+      "enunciado": "Qual palavra está corretamente grafada?",
+      "alternativas": [
+        "Acessorio",
+        "Acessório",
+        "Acessorio",
+        "Acessóro"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q2",
+      "enunciado": "Qual frase está correta?",
+      "alternativas": [
+        "Eu fui ao mercado.",
+        "Eu fui no mercado.",
+        "Eu fui a mercado.",
+        "Eu fui em mercado."
+      ],
+      "resposta_correta": 0
+    },
+    {
+      "id": "q3",
+      "enunciado": "Qual opção apresenta somente verbos no passado?",
+      "alternativas": [
+        "Corri, falei, cheguei",
+        "Corro, falo, chego",
+        "Correr, falar, chegar",
+        "Corra, fale, chegue"
+      ],
+      "resposta_correta": 0
+    }
+  ],
+  "matematica": [
+    {
+      "id": "q1",
+      "enunciado": "Quanto é 7 × 8?",
+      "alternativas": [
+        "42",
+        "48",
+        "56",
+        "64"
+      ],
+      "resposta_correta": 2
+    },
+    {
+      "id": "q2",
+      "enunciado": "Qual é o valor de 15 + 27?",
+      "alternativas": [
+        "32",
+        "38",
+        "42",
+        "40"
+      ],
+      "resposta_correta": 2
+    },
+    {
+      "id": "q3",
+      "enunciado": "Qual é a raiz quadrada de 81?",
+      "alternativas": [
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "resposta_correta": 2
+    }
+  ],
+  "historia": [
+    {
+      "id": "q1",
+      "enunciado": "Quem foi o primeiro presidente do Brasil?",
+      "alternativas": [
+        "Getúlio Vargas",
+        "Deodoro da Fonseca",
+        "Dom Pedro II",
+        "Juscelino Kubitschek"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q2",
+      "enunciado": "Em que ano o Brasil foi descoberto pelos portugueses?",
+      "alternativas": [
+        "1498",
+        "1500",
+        "1502",
+        "1492"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q3",
+      "enunciado": "Qual evento marcou o início da República no Brasil?",
+      "alternativas": [
+        "Proclamação da Independência",
+        "Golpe de 1964",
+        "Proclamação da República",
+        "Copa de 1950"
+      ],
+      "resposta_correta": 2
+    }
+  ],
+  "geografia": [
+    {
+      "id": "q1",
+      "enunciado": "Qual é o maior oceano do planeta?",
+      "alternativas": [
+        "Atlântico",
+        "Índico",
+        "Pacífico",
+        "Ártico"
+      ],
+      "resposta_correta": 2
+    },
+    {
+      "id": "q2",
+      "enunciado": "Qual país é conhecido como o país do Sol nascente?",
+      "alternativas": [
+        "China",
+        "Japão",
+        "Coreia do Sul",
+        "Tailândia"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q3",
+      "enunciado": "Qual é a capital do Brasil?",
+      "alternativas": [
+        "Rio de Janeiro",
+        "Brasília",
+        "São Paulo",
+        "Salvador"
+      ],
+      "resposta_correta": 1
+    }
+  ],
+  "biologia": [
+    {
+      "id": "q1",
+      "enunciado": "Qual órgão do corpo humano bombeia o sangue?",
+      "alternativas": [
+        "Pulmão",
+        "Coração",
+        "Fígado",
+        "Rim"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q2",
+      "enunciado": "Qual processo permite as plantas produzirem seu próprio alimento?",
+      "alternativas": [
+        "Respiração",
+        "Fotossíntese",
+        "Digestão",
+        "Transpiração"
+      ],
+      "resposta_correta": 1
+    },
+    {
+      "id": "q3",
+      "enunciado": "Qual é a unidade básica da vida?",
+      "alternativas": [
+        "Tecido",
+        "Órgão",
+        "Célula",
+        "Molécula"
+      ],
+      "resposta_correta": 2
+    }
+  ]
+}

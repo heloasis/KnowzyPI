@@ -2,7 +2,8 @@ const materiaModel = require('../models/materias');
 
 const homeController = {
   index: (req, res) => {
-    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+    const usuario = req.session?.user;
+    if (!usuario) return res.redirect('/login');
 
     res.render('home', {
       titulo: 'Dashboard',
@@ -12,7 +13,8 @@ const homeController = {
 
   favoritos: async (req, res) => {
     try {
-      const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+      const usuario = req.session?.user;
+    if (!usuario) return res.redirect('/login');
       const materias = (await materiaModel.listarMaterias()) || [];
 
       res.render('favoritos', {
@@ -24,14 +26,15 @@ const homeController = {
       console.error(error);
       res.status(500).render('favoritos', {
         titulo: 'Meus Favoritos',
-        usuario: { nome: 'Usuário' },
+        usuario: req.session?.user || null,
         materias: []
       });
     }
   },
 
   conquistas: (req, res) => {
-    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+    const usuario = req.session?.user;
+    if (!usuario) return res.redirect('/login');
 
     res.render('home', {
       titulo: 'Minhas Conquistas',
@@ -40,7 +43,8 @@ const homeController = {
   },
 
   configuracoes: (req, res) => {
-    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+    const usuario = req.session?.user;
+    if (!usuario) return res.redirect('/login');
 
     res.render('home', {
       titulo: 'Configurações do Perfil',

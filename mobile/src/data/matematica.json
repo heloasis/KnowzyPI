@@ -1,0 +1,122 @@
+﻿{
+    "p1":  {
+               "alternativas":  [
+                                    "10",
+                                    "11",
+                                    "12",
+                                    "14"
+                                ],
+               "enunciado":  "Qual é a raiz quadrada de 144?",
+               "resposta_correta":  2
+           },
+    "p10":  {
+                "alternativas":  [
+                                     "1/2",
+                                     "1/5",
+                                     "1/6",
+                                     "5/6"
+                                 ],
+                "enunciado":  "Qual é a probabilidade de tirar o número 5 ao lançar um dado comum de 6 lados?",
+                "resposta_correta":  2
+            },
+    "p11":  {
+                "alternativas":  [
+                                     "14 cm",
+                                     "21 cm",
+                                     "28 cm",
+                                     "49 cm"
+                                 ],
+                "enunciado":  "Qual é o perímetro de um quadrado de lado igual a 7 cm?",
+                "resposta_correta":  2
+            },
+    "p12":  {
+                "alternativas":  [
+                                     "6",
+                                     "8",
+                                     "4",
+                                     "12"
+                                 ],
+                "enunciado":  "O resultado da expressão (10 - 2) * 3 / 4 é:",
+                "resposta_correta":  0
+            },
+    "p2":  {
+               "alternativas":  [
+                                    "4",
+                                    "6",
+                                    "8",
+                                    "10"
+                                ],
+               "enunciado":  "Qual é o valor de x na equação 2x + 8 = 20?",
+               "resposta_correta":  1
+           },
+    "p3":  {
+               "alternativas":  [
+                                    "20",
+                                    "25",
+                                    "30",
+                                    "35"
+                                ],
+               "enunciado":  "Quanto é 15% de 200?",
+               "resposta_correta":  2
+           },
+    "p4":  {
+               "alternativas":  [
+                                    "60 cm²",
+                                    "30 cm²",
+                                    "15 cm²",
+                                    "45 cm²"
+                                ],
+               "enunciado":  "Qual é a área de um triângulo com base de 10 cm e altura de 6 cm?",
+               "resposta_correta":  1
+           },
+    "p5":  {
+               "alternativas":  [
+                                    "0",
+                                    "1",
+                                    "2",
+                                    "3"
+                                ],
+               "enunciado":  "Qual é o menor número primo par?",
+               "resposta_correta":  2
+           },
+    "p6":  {
+               "alternativas":  [
+                                    "5 cm",
+                                    "10 cm",
+                                    "20 cm",
+                                    "2,5 cm"
+                                ],
+               "enunciado":  "Se o diâmetro de um círculo é 10 cm, qual é o seu raio?",
+               "resposta_correta":  0
+           },
+    "p7":  {
+               "alternativas":  [
+                                    "90°",
+                                    "180°",
+                                    "270°",
+                                    "360°"
+                                ],
+               "enunciado":  "Qual é a soma dos ângulos internos de um triângulo?",
+               "resposta_correta":  1
+           },
+    "p8":  {
+               "alternativas":  [
+                                    "9",
+                                    "18",
+                                    "27",
+                                    "81"
+                                ],
+               "enunciado":  "Qual é o resultado de 3 ao cubo (3³)?",
+               "resposta_correta":  2
+           },
+    "p9":  {
+               "alternativas":  [
+                                    "8",
+                                    "11",
+                                    "14",
+                                    "17"
+                                ],
+               "enunciado":  "Em uma progressão aritmética (PA) onde a1 = 2 e r = 3, qual é o 4º termo?",
+               "resposta_correta":  1
+           }
+}

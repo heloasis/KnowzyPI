@@ -1,156 +1,143 @@
-const https = require('https');
-const { db } = require('../config/firebase');
 
-const FIREBASE_BASE_URL = 'https://knowzypi-default-rtdb.firebaseio.com';
+const biologia = require('../data/biologia.json');
+const geografia = require('../data/geografia.json');
+const historia = require('../data/historia.json');
+const matematica = require('../data/matematica.json');
+const portugues = require('../data/portugues.json');
 
-const buscarDadosFirebase = async (path) => {
-  return new Promise((resolve, reject) => {
-    const url = `${FIREBASE_BASE_URL}/${path}.json`;
+const { isCorrectAnswer } = require('../services/answerNormalizer');
 
-    https
-      .get(url, (response) => {
-        let data = '';
-
-        response.on('data', (chunk) => {
-          data += chunk;
-        });
-
-        response.on('end', () => {
-          if (response.statusCode >= 400) {
-            reject(new Error(`Firebase retornou status ${response.statusCode}`));
-            return;
-          }
-
-          try {
-            resolve(data ? JSON.parse(data) : null);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      })
-      .on('error', reject);
-  });
+const bancoLocal = {
+  biologia,
+  geografia,
+  historia,
+  matematica,
+  portugues
 };
 
-const buscarPerguntas = async () => {
-  try {
-    const materias = await buscarDadosFirebase('materias');
-    if (materias && typeof materias === 'object') {
-      const perguntas = Object.values(materias)
-        .flatMap((materia) => {
-          const listaPerguntas = materia?.perguntas || {};
-          return Object.entries(listaPerguntas).map(([id, value]) => ({ id, ...value }));
-        });
+const normalizarPergunta = (id, value = {}) => ({
+  ...value,
+  id: String(id),
+  respostaCorreta:
+    value.respostaCorreta ??
+    value.resposta_correta ??
+    value.correctAnswer ??
+    value.correct_answer
+});
 
-      if (perguntas.length) {
-        return perguntas;
-      }
-    }
-  } catch (error) {
-    console.warn('Falha ao buscar perguntas do Firebase:', error.message);
+const converterParaLista = (dados) => {
+  if (Array.isArray(dados)) {
+    return dados.map((pergunta, index) =>
+      normalizarPergunta(pergunta.id || `p${index + 1}`, pergunta)
+    );
   }
 
-  const snapshot = await db.ref('perguntas').once('value');
-  const perguntas = snapshot.val() || {};
-
-  return Object.entries(perguntas).map(([id, value]) => ({ id, ...value }));
-};
-
-const buscarPergunta = async (id) => {
-  const snapshot = await db.ref(`perguntas/${id}`).once('value');
-  const pergunta = snapshot.val();
-
-  if (!pergunta) {
-    return null;
+  if (!dados || typeof dados !== 'object') {
+    return [];
   }
 
-  return { id, ...pergunta };
+  return Object.entries(dados).map(([id, pergunta]) =>
+    normalizarPergunta(id, pergunta)
+  );
 };
 
 const buscarPerguntasPorMateria = async (materiaId) => {
-  const materiaKey = materiaId === 'matematica' ? 'matematica' : materiaId;
+  const materia = String(materiaId || '').toLowerCase();
 
-  try {
-    const perguntas = await buscarDadosFirebase(`materias/${materiaKey}/perguntas`);
-
-    if (perguntas && typeof perguntas === 'object') {
-      return Object.entries(perguntas).map(([id, value]) => ({ id, ...value }));
-    }
-  } catch (error) {
-    console.warn(`Falha ao buscar perguntas da matéria ${materiaKey}:`, error.message);
-  }
-
-  const snapshot = await db.ref('perguntas').once('value');
-  const perguntas = snapshot.val() || {};
-
-  return Object.entries(perguntas)
-    .filter(([, value]) => value.materiaId === materiaId)
-    .map(([id, value]) => ({ id, ...value }));
+  return converterParaLista(bancoLocal[materia]);
 };
 
-const verificarResposta = async (perguntaId, resposta) => {
-  const pergunta = await buscarPergunta(perguntaId);
+const buscarPerguntas = async () => {
+  return Object.entries(bancoLocal).flatMap(([materiaId, dados]) =>
+    converterParaLista(dados).map((pergunta) => ({
+      ...pergunta,
+      materiaId
+    }))
+  );
+};
 
-  if (!pergunta) {
-    return { correta: false, mensagem: 'Pergunta não encontrada.' };
+const buscarPergunta = async (id, materiaId) => {
+  if (materiaId) {
+    const perguntas = await buscarPerguntasPorMateria(materiaId);
+
+    return perguntas.find(
+      (pergunta) => String(pergunta.id) === String(id)
+    ) || null;
   }
 
-  const correta = pergunta.respostaCorreta === resposta;
+  const todas = await buscarPerguntas();
+
+  return todas.find(
+    (pergunta) => String(pergunta.id) === String(id)
+  ) || null;
+};
+
+const verificarResposta = async (perguntaId, resposta, materiaId) => {
+  const pergunta = await buscarPergunta(perguntaId, materiaId);
+
+  if (!pergunta) {
+    return {
+      correta: false,
+      mensagem: 'Pergunta não encontrada.'
+    };
+  }
+
+  const correta = isCorrectAnswer(pergunta, resposta);
 
   return {
     correta,
     perguntaId,
-    respostaSelecionada: resposta,
-    respostaCorreta: pergunta.respostaCorreta,
-    mensagem: correta ? 'Resposta correta!' : 'Resposta incorreta.'
+    mensagem: correta
+      ? 'Resposta correta!'
+      : 'Resposta incorreta.'
   };
 };
 
 const calcularResultado = async (usuarioId, materiaId, respostas) => {
   const perguntas = await buscarPerguntasPorMateria(materiaId);
-  const total = perguntas.length;
-  const acertos = respostas.filter((resposta) => {
-    const pergunta = perguntas.find((item) => item.id === resposta.perguntaId);
-    return pergunta && pergunta.respostaCorreta === resposta.resposta;
-  }).length;
+  const respostasUnicas = new Map();
 
-  const xpGanho = Math.max(10, Math.round((acertos / Math.max(1, total)) * 20));
+  for (const resposta of respostas || []) {
+    if (
+      resposta?.perguntaId &&
+      !respostasUnicas.has(String(resposta.perguntaId))
+    ) {
+      respostasUnicas.set(String(resposta.perguntaId), resposta);
+    }
+  }
+
+  let acertos = 0;
+
+  for (const [perguntaId, resposta] of respostasUnicas) {
+    const pergunta = perguntas.find(
+      (item) => String(item.id) === perguntaId
+    );
+
+    if (
+      pergunta &&
+      isCorrectAnswer(pergunta, resposta.resposta)
+    ) {
+      acertos++;
+    }
+  }
 
   return {
     usuarioId,
     materiaId,
-    totalPerguntas: total,
+    totalPerguntas: perguntas.length,
     acertos,
-    percentual: total > 0 ? Math.round((acertos / total) * 100) : 0,
-    xpGanho,
+    percentual: perguntas.length
+      ? Math.round((acertos / perguntas.length) * 100)
+      : 0,
+    xpGanho: acertos * 5,
     mensagem: 'Quiz finalizado.'
   };
 };
 
-const criarPergunta = async (dados) => {
-  const ref = db.ref('perguntas').push();
-  const id = ref.key;
-  await ref.set(dados);
-  return { id, ...dados };
-};
-
-const atualizarPergunta = async (id, dados) => {
-  await db.ref(`perguntas/${id}`).update(dados);
-  return buscarPergunta(id);
-};
-
-const excluirPergunta = async (id) => {
-  await db.ref(`perguntas/${id}`).remove();
-  return { mensagem: 'Pergunta excluída com sucesso.' };
-};
-
 module.exports = {
+  buscarPerguntasPorMateria,
   buscarPerguntas,
   buscarPergunta,
-  buscarPerguntasPorMateria,
   verificarResposta,
-  calcularResultado,
-  criarPergunta,
-  atualizarPergunta,
-  excluirPergunta
+  calcularResultado
 };

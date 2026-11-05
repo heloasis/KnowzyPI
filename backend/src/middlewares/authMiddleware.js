@@ -1,3 +1,5 @@
+const { verifyToken } = require('../utils/authToken');
+
 const isSafeInternalRedirect = (value) => {
   if (typeof value !== 'string') {
     return false;
@@ -30,7 +32,12 @@ const normalizeRedirectTarget = (req) => {
 };
 
 const requireAuth = (req, res, next) => {
+  if ((!req.session || !req.session.user) && req.headers.authorization?.startsWith('Bearer ')) {
+    const tokenUser = verifyToken(req.headers.authorization.slice(7));
+    if (tokenUser) { req.session = req.session || {}; req.session.user = tokenUser; }
+  }
   if (req.session && req.session.user) {
+    res.locals.usuario = req.session.user;
     return next();
   }
 

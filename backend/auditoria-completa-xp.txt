@@ -1,0 +1,3304 @@
+﻿ AUDITORIA COMPLETA DO SISTEMA DE XP - KNOWZY 
+
+
+==============================
+ARQUIVO: .\views\biologia.ejs
+==============================
+
+<script>
+      const firebaseUrl = 'https://knowzypi-default-rtdb.firebaseio.com/materias/biologia/perguntas.json';
+
+      const fallbackQuestions = [
+        {
+          id: 'q1',
+          enunciado: 'Qual Ã³rgÃ£o do corpo humano bombeia o sangue?',
+          alternativas: ['PulmÃ£o', 'CoraÃ§Ã£o', 'FÃ­gado', 'Rim'],
+          resposta_correta: 1
+        },
+        {
+          id: 'q2',
+          enunciado: 'Qual processo permite as plantas produzirem seu prÃ³prio alimento?',
+          alternativas: ['RespiraÃ§Ã£o', 'FotossÃ­ntese', 'DigestÃ£o', 'TranspiraÃ§Ã£o'],
+          resposta_correta: 1
+        },
+        {
+          id: 'q3',
+          enunciado: 'Qual Ã© a unidade bÃ¡sica da vida?',
+          alternativas: ['Tecido', 'Ã“rgÃ£o', 'CÃ©lula', 'MolÃ©cula'],
+          resposta_correta: 2
+        }
+      ];
+
+      const quizScreen = document.getElementById('quizScreen');
+      const resultScreen = document.getElementById('resultScreen');
+      const questionText = document.getElementById('questionText');
+      const answers = document.getElementById('answers');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const progressText = document.getElementById('progressText');
+      const progressFill = document.getElementById('progressFill');
+      const scoreValue = document.getElementById('scoreValue');
+      const materiaTitle = document.getElementById('materiaTitle');
+
+      let perguntas = [];
+      let currentIndex = 0;
+      let selectedIndex = null;
+      let acertos = 0;
+      let resultadoSalvo = false;
+
+      function normalizarPergunta(item, index) {
+        const respostaCorreta =
+          typeof item.resposta_correta === 'number'
+            ? item.resposta_correta
+            : Number(item.respostaCorreta ?? 0);
+
+        return {
+          id: item.id || `q${index + 1}`,
+          enunciado: item.enunciado || 'Pergunta sem enunciado.',
+          alternativas: Array.isArray(item.alternativas)
+            ? item.alternativas
+            : [],
+          resposta_correta: Number.isInteger(respostaCorreta)
+            ? respostaCorreta
+            : 0
+        };
+      }
+
+      function setScreen(screen) {
+        quizScreen.classList.toggle('hidden', screen !== 'quiz');
+        resultScreen.classList.toggle('hidden', screen !== 'result');
+      }
+
+      function updateProgress() {
+        const total = perguntas.length || 1;
+        const atual = currentIndex + 1;
+
+        progressText.textContent = `Pergunta ${atual} de ${total}`;
+        progressFill.style.width = `${(atual / total) * 100}%`;
+      }
+
+      function renderQuestion() {
+        const perguntaAtual = perguntas[currentIndex];
+
+        if (!perguntaAtual) {
+          finishQuiz();
+          return;
+        }
+
+        selectedIndex = null;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = confirmarResposta;
+
+        questionText.textContent = perguntaAtual.enunciado;
+        answers.innerHTML = '';
+
+        perguntaAtual.alternativas.forEach((alternativa, index) => {
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'answer-btn';
+          button.textContent = alternativa;
+          button.setAttribute('data-index', String(index));
+
+          button.addEventListener('click', () => {
+            selectedIndex = index;
+
+            document.querySelectorAll('.answer-btn').forEach((el) => {
+              el.classList.toggle(
+                'selected',
+                Number(el.dataset.index) === selectedIndex
+              );
+            });
+
+            confirmBtn.disabled = false;
+          });
+
+          answers.appendChild(button);
+        });
+
+        updateProgress();
+      }
+
+      function confirmarResposta() {
+        if (selectedIndex === null) return;
+
+        const perguntaAtual = perguntas[currentIndex];
+        const respostaCorreta = perguntaAtual.resposta_correta;
+        const buttons = document.querySelectorAll('.answer-btn');
+
+        buttons.forEach((button) => {
+          const index = Number(button.dataset.index);
+
+          button.disabled = true;
+
+          if (index === respostaCorreta) {
+            button.classList.add('correct');
+          }
+
+          if (index === selectedIndex && index !== respostaCorreta) {
+            button.classList.add('wrong');
+          }
+        });
+
+        if (selectedIndex === respostaCorreta) {
+          acertos += 1;
+
+          const ganho = 10;
+          let dadosAtuais = {};
+
+          try {
+            dadosAtuais = JSON.parse(
+              localStorage.getItem('profileData') || '{}'
+            );
+          } catch (error) {
+            dadosAtuais = {};
+          }
+
+          const xpAtual = Number(dadosAtuais.xpTotal || 0);
+          const proximoXp = xpAtual + ganho;
+
+          localStorage.setItem('profileData', JSON.stringify({
+            nome: dadosAtuais.nome || 'Aluno Teste',
+            tag: dadosAtuais.tag || '#A12',
+            xpTotal: proximoXp,
+            nivel:
+              proximoXp >= 3000 ? 'Lenda' :
+              proximoXp >= 1500 ? 'Mestre' :
+              proximoXp >= 1000 ? 'SÃ¡bio' :
+              proximoXp >= 500 ? 'Aventureiro' :
+              'Iniciante',
+            conquistas: dadosAtuais.conquistas || '0 / 0',
+            mascote: dadosAtuais.mascote || 'ðŸ¾',
+            style: dadosAtuais.style || 'Manto Azul',
+            accessory: dadosAtuais.accessory || 'Ã“culos',
+            mood: dadosAtuais.mood || 'Feliz',
+            theme: 'Ativo'
+          }));
+        }
+
+        confirmBtn.textContent =
+          currentIndex === perguntas.length - 1
+            ? 'Ver resultado'
+            : 'PrÃ³xima';
+
+        confirmBtn.disabled = false;
+
+        confirmBtn.onclick = () => {
+          currentIndex += 1;
+
+          if (currentIndex < perguntas.length) {
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        };
+      }
+
+      function finishQuiz() {
+        setScreen('result');
+
+        const total = perguntas.length;
+        const porcentagem = total > 0
+          ? Math.round((acertos / total) * 100)
+          : 0;
+
+        scoreValue.textContent = `${acertos}/${total}`;
+
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDescription = document.getElementById('resultDescription');
+
+        if (porcentagem < 40) {
+          resultTitle.textContent = 'Vamos por partes!';
+          resultDescription.textContent =
+            'Ainda hÃ¡ conteÃºdo para revisar. NÃ£o desanime! Retome os estudos e tente novamente.';
+        } else if (porcentagem < 70) {
+          resultTitle.textContent = 'VocÃª estÃ¡ evoluindo!';
+          resultDescription.textContent =
+            'VocÃª jÃ¡ avanÃ§ou em alguns pontos. Continue praticando para melhorar ainda mais.';
+        } else if (porcentagem < 90) {
+          resultTitle.textContent = 'Muito bem!';
+          resultDescription.textContent =
+            'VocÃª demonstrou um bom domÃ­nio do conteÃºdo. Continue assim!';
+        } else {
+          resultTitle.textContent = 'IncrÃ­vel!';
+          resultDescription.textContent =
+            'Excelente desempenho! VocÃª demonstrou um Ã³timo domÃ­nio dessa matÃ©ria.';
+        }
+
+        if (resultadoSalvo) return;
+
+        try {
+          const chave = 'knowzyQuizResults';
+          const resultados = JSON.parse(
+            localStorage.getItem(chave) || '[]'
+          );
+
+          resultados.unshift({
+            materia: 'Biologia',
+            acertos: acertos,
+            total: total,
+            porcentagem: porcentagem,
+            data: new Date().toISOString()
+          });
+
+          localStorage.setItem(
+            chave,
+            JSON.stringify(resultados.slice(0, 50))
+          );
+
+          resultadoSalvo = true;
+
+        } catch (error) {
+          console.error('Erro ao salvar resultado:', error);
+        }
+      }
+
+      function restartQuiz() {
+        currentIndex = 0;
+        selectedIndex = null;
+        acertos = 0;
+        resultadoSalvo = false;
+
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = confirmarResposta;
+
+        setScreen('quiz');
+        renderQuestion();
+      }
+
+      async function buscarPerguntas() {
+        try {
+          const response = await fetch(firebaseUrl);
+
+          if (!response.ok) {
+            throw new Error('Erro ao carregar perguntas');
+          }
+
+          const dados = await response.json();
+
+          const perguntasNormalizadas = Object.values(dados || {})
+            .map(normalizarPergunta);
+
+          perguntas = perguntasNormalizadas.length
+            ? perguntasNormalizadas
+            : fallbackQuestions.map(normalizarPergunta);
+
+        } catch (error) {
+          console.warn(
+            'NÃ£o foi possÃ­vel buscar no Firebase. Usando perguntas de demonstraÃ§Ã£o.',
+            error
+          );
+
+          perguntas = fallbackQuestions.map(normalizarPergunta);
+        }
+
+        materiaTitle.textContent = 'Biologia';
+        renderQuestion();
+      }
+
+      confirmBtn.onclick = confirmarResposta;
+
+      buscarPerguntas();
+    </script>
+
+
+==============================
+ARQUIVO: .\views\geografia.ejs
+==============================
+
+<script>
+      const firebaseUrl = 'https://knowzypi-default-rtdb.firebaseio.com/materias/geografia/perguntas.json';
+
+      const fallbackQuestions = [
+        {
+          id: 'q1',
+          enunciado: 'Qual Ã© o maior oceano do planeta?',
+          alternativas: ['AtlÃ¢ntico', 'Ãndico', 'PacÃ­fico', 'Ãrtico'],
+          resposta_correta: 2
+        },
+        {
+          id: 'q2',
+          enunciado: 'Qual paÃ­s Ã© conhecido como o paÃ­s do Sol nascente?',
+          alternativas: ['China', 'JapÃ£o', 'Coreia do Sul', 'TailÃ¢ndia'],
+          resposta_correta: 1
+        },
+        {
+          id: 'q3',
+          enunciado: 'Qual Ã© a capital do Brasil?',
+          alternativas: ['Rio de Janeiro', 'BrasÃ­lia', 'SÃ£o Paulo', 'Salvador'],
+          resposta_correta: 1
+        }
+      ];
+
+      const quizScreen = document.getElementById('quizScreen');
+      const resultScreen = document.getElementById('resultScreen');
+      const questionText = document.getElementById('questionText');
+      const answers = document.getElementById('answers');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const progressText = document.getElementById('progressText');
+      const progressFill = document.getElementById('progressFill');
+      const scoreValue = document.getElementById('scoreValue');
+      const materiaTitle = document.getElementById('materiaTitle');
+
+      let perguntas = [];
+      let currentIndex = 0;
+      let selectedIndex = null;
+      let acertos = 0;
+      let resultadoSalvo = false;
+
+      function normalizarPergunta(item, index) {
+        const respostaCorreta =
+          typeof item.resposta_correta === 'number'
+            ? item.resposta_correta
+            : Number(item.respostaCorreta ?? 0);
+
+        return {
+          id: item.id || `q${index + 1}`,
+          enunciado: item.enunciado || 'Pergunta sem enunciado.',
+          alternativas: Array.isArray(item.alternativas)
+            ? item.alternativas
+            : [],
+          resposta_correta: Number.isInteger(respostaCorreta)
+            ? respostaCorreta
+            : 0
+        };
+      }
+
+      function setScreen(screen) {
+        quizScreen.classList.toggle('hidden', screen !== 'quiz');
+        resultScreen.classList.toggle('hidden', screen !== 'result');
+      }
+
+      function updateProgress() {
+        const total = perguntas.length || 1;
+        const atual = currentIndex + 1;
+
+        progressText.textContent = `Pergunta ${atual} de ${total}`;
+        progressFill.style.width = `${(atual / total) * 100}%`;
+      }
+
+      function renderQuestion() {
+        const perguntaAtual = perguntas[currentIndex];
+
+        if (!perguntaAtual) {
+          finishQuiz();
+          return;
+        }
+
+        selectedIndex = null;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = confirmarResposta;
+
+        questionText.textContent = perguntaAtual.enunciado;
+        answers.innerHTML = '';
+
+        perguntaAtual.alternativas.forEach((alternativa, index) => {
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'answer-btn';
+          button.textContent = alternativa;
+          button.setAttribute('data-index', String(index));
+
+          button.addEventListener('click', () => {
+            selectedIndex = index;
+
+            document.querySelectorAll('.answer-btn').forEach((el) => {
+              el.classList.toggle(
+                'selected',
+                Number(el.dataset.index) === selectedIndex
+              );
+            });
+
+            confirmBtn.disabled = false;
+          });
+
+          answers.appendChild(button);
+        });
+
+        updateProgress();
+      }
+
+      function confirmarResposta() {
+        if (selectedIndex === null) return;
+
+        const perguntaAtual = perguntas[currentIndex];
+        const respostaCorreta = perguntaAtual.resposta_correta;
+        const buttons = document.querySelectorAll('.answer-btn');
+
+        buttons.forEach((button) => {
+          const index = Number(button.dataset.index);
+
+          button.disabled = true;
+
+          if (index === respostaCorreta) {
+            button.classList.add('correct');
+          }
+
+          if (index === selectedIndex && index !== respostaCorreta) {
+            button.classList.add('wrong');
+          }
+        });
+
+        if (selectedIndex === respostaCorreta) {
+          acertos += 1;
+
+          const ganho = 10;
+          let dadosAtuais = {};
+
+          try {
+            dadosAtuais = JSON.parse(
+              localStorage.getItem('profileData') || '{}'
+            );
+          } catch (error) {
+            dadosAtuais = {};
+          }
+
+          const xpAtual = Number(dadosAtuais.xpTotal || 0);
+          const proximoXp = xpAtual + ganho;
+
+          localStorage.setItem('profileData', JSON.stringify({
+            nome: dadosAtuais.nome || 'Aluno Teste',
+            tag: dadosAtuais.tag || '#A12',
+            xpTotal: proximoXp,
+            nivel:
+              proximoXp >= 3000 ? 'Lenda' :
+              proximoXp >= 1500 ? 'Mestre' :
+              proximoXp >= 1000 ? 'SÃ¡bio' :
+              proximoXp >= 500 ? 'Aventureiro' :
+              'Iniciante',
+            conquistas: dadosAtuais.conquistas || '0 / 0',
+            mascote: dadosAtuais.mascote || 'ðŸ¾',
+            style: dadosAtuais.style || 'Manto Azul',
+            accessory: dadosAtuais.accessory || 'Ã“culos',
+            mood: dadosAtuais.mood || 'Feliz',
+            theme: 'Ativo'
+          }));
+        }
+
+        confirmBtn.textContent =
+          currentIndex === perguntas.length - 1
+            ? 'Ver resultado'
+            : 'PrÃ³xima';
+
+        confirmBtn.disabled = false;
+
+        confirmBtn.onclick = () => {
+          currentIndex += 1;
+
+          if (currentIndex < perguntas.length) {
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        };
+      }
+
+      function finishQuiz() {
+        setScreen('result');
+
+        const total = perguntas.length;
+        const porcentagem = total > 0
+          ? Math.round((acertos / total) * 100)
+          : 0;
+
+        scoreValue.textContent = `${acertos}/${total}`;
+
+        const resultTitle = document.getElementById('resultTitle');
+        const resultDescription = document.getElementById('resultDescription');
+
+        if (porcentagem < 40) {
+          resultTitle.textContent = 'Vamos por partes!';
+          resultDescription.textContent =
+            'Ainda hÃ¡ conteÃºdo para revisar. NÃ£o desanime! Retome os estudos e tente novamente.';
+        } else if (porcentagem < 70) {
+          resultTitle.textContent = 'VocÃª estÃ¡ evoluindo!';
+          resultDescription.textContent =
+            'VocÃª jÃ¡ avanÃ§ou em alguns pontos. Continue praticando para melhorar ainda mais.';
+        } else if (porcentagem < 90) {
+          resultTitle.textContent = 'Muito bem!';
+          resultDescription.textContent =
+            'VocÃª demonstrou um bom domÃ­nio do conteÃºdo. Continue assim!';
+        } else {
+          resultTitle.textContent = 'IncrÃ­vel!';
+          resultDescription.textContent =
+            'Excelente desempenho! VocÃª demonstrou um Ã³timo domÃ­nio dessa matÃ©ria.';
+        }
+
+        if (resultadoSalvo) return;
+
+        try {
+          const chave = 'knowzyQuizResults';
+          const resultados = JSON.parse(
+            localStorage.getItem(chave) || '[]'
+          );
+
+          resultados.unshift({
+            materia: 'Geografia',
+            acertos: acertos,
+            total: total,
+            porcentagem: porcentagem,
+            data: new Date().toISOString()
+          });
+
+          localStorage.setItem(
+            chave,
+            JSON.stringify(resultados.slice(0, 50))
+          );
+
+          resultadoSalvo = true;
+
+        } catch (error) {
+          console.error('Erro ao salvar resultado:', error);
+        }
+      }
+
+      function restartQuiz() {
+        currentIndex = 0;
+        selectedIndex = null;
+        acertos = 0;
+        resultadoSalvo = false;
+
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.onclick = confirmarResposta;
+
+        setScreen('quiz');
+        renderQuestion();
+      }
+
+      async function buscarPerguntas() {
+        try {
+          const response = await fetch(firebaseUrl);
+
+          if (!response.ok) {
+            throw new Error('Erro ao carregar perguntas');
+          }
+
+          const dados = await response.json();
+
+          const perguntasNormalizadas = Object.values(dados || {})
+            .map(normalizarPergunta);
+
+          perguntas = perguntasNormalizadas.length
+            ? perguntasNormalizadas
+            : fallbackQuestions.map(normalizarPergunta);
+
+        } catch (error) {
+          console.warn(
+            'NÃ£o foi possÃ­vel buscar no Firebase. Usando perguntas de demonstraÃ§Ã£o.',
+            error
+          );
+
+          perguntas = fallbackQuestions.map(normalizarPergunta);
+        }
+
+        materiaTitle.textContent = 'Geografia';
+        renderQuestion();
+      }
+
+      confirmBtn.onclick = confirmarResposta;
+
+      buscarPerguntas();
+    </script>
+
+
+==============================
+ARQUIVO: .\views\historia.ejs
+==============================
+
+<script>
+      const firebaseUrl =
+        'https://knowzypi-default-rtdb.firebaseio.com/materias/historia/perguntas.json';
+
+      const fallbackQuestions = [
+        {
+          id: 'q1',
+          enunciado: 'Quem foi o primeiro presidente do Brasil?',
+          alternativas: [
+            'GetÃºlio Vargas',
+            'Deodoro da Fonseca',
+            'Dom Pedro II',
+            'Juscelino Kubitschek'
+          ],
+          resposta_correta: 1
+        },
+        {
+          id: 'q2',
+          enunciado: 'Em que ano o Brasil foi descoberto pelos portugueses?',
+          alternativas: [
+            '1498',
+            '1500',
+            '1502',
+            '1492'
+          ],
+          resposta_correta: 1
+        },
+        {
+          id: 'q3',
+          enunciado: 'Qual evento marcou o inÃ­cio da RepÃºblica no Brasil?',
+          alternativas: [
+            'ProclamaÃ§Ã£o da IndependÃªncia',
+            'Golpe de 1964',
+            'ProclamaÃ§Ã£o da RepÃºblica',
+            'Copa de 1950'
+          ],
+          resposta_correta: 2
+        }
+      ];
+
+      const quizScreen = document.getElementById('quizScreen');
+      const resultScreen = document.getElementById('resultScreen');
+      const questionText = document.getElementById('questionText');
+      const answers = document.getElementById('answers');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const progressText = document.getElementById('progressText');
+      const progressFill = document.getElementById('progressFill');
+      const scoreValue = document.getElementById('scoreValue');
+      const materiaTitle = document.getElementById('materiaTitle');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultDescription = document.getElementById('resultDescription');
+
+      let perguntas = [];
+      let currentIndex = 0;
+      let selectedIndex = null;
+      let acertos = 0;
+      let resultadoSalvo = false;
+
+      function normalizarPergunta(item, index) {
+        const respostaCorreta =
+          typeof item.resposta_correta === 'number'
+            ? item.resposta_correta
+            : Number(item.respostaCorreta ?? 0);
+
+        return {
+          id: item.id || `q${index + 1}`,
+          enunciado: item.enunciado || 'Pergunta sem enunciado.',
+          alternativas: Array.isArray(item.alternativas)
+            ? item.alternativas
+            : [],
+          resposta_correta: Number.isInteger(respostaCorreta)
+            ? respostaCorreta
+            : 0
+        };
+      }
+
+      function setScreen(screen) {
+        quizScreen.classList.toggle('hidden', screen !== 'quiz');
+        resultScreen.classList.toggle('hidden', screen !== 'result');
+      }
+
+      function updateProgress() {
+        const total = perguntas.length || 1;
+        const atual = currentIndex + 1;
+
+        progressText.textContent = `Pergunta ${atual} de ${total}`;
+        progressFill.style.width = `${(atual / total) * 100}%`;
+      }
+
+      function renderQuestion() {
+        const perguntaAtual = perguntas[currentIndex];
+
+        if (!perguntaAtual) {
+          finishQuiz();
+          return;
+        }
+
+        selectedIndex = null;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Confirmar';
+        questionText.textContent = perguntaAtual.enunciado;
+        answers.innerHTML = '';
+
+        perguntaAtual.alternativas.forEach((alternativa, index) => {
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'answer-btn';
+          button.textContent = alternativa;
+          button.setAttribute('data-index', String(index));
+
+          button.addEventListener('click', () => {
+            selectedIndex = index;
+
+            document.querySelectorAll('.answer-btn').forEach((el) => {
+              el.classList.toggle(
+                'selected',
+                Number(el.dataset.index) === selectedIndex
+              );
+            });
+
+            confirmBtn.disabled = false;
+          });
+
+          answers.appendChild(button);
+        });
+
+        updateProgress();
+      }
+
+      function confirmarResposta() {
+        if (selectedIndex === null) return;
+
+        const perguntaAtual = perguntas[currentIndex];
+        const respostaCorreta = perguntaAtual.resposta_correta;
+        const buttons = document.querySelectorAll('.answer-btn');
+
+        buttons.forEach((button) => {
+          const index = Number(button.dataset.index);
+
+          button.disabled = true;
+
+          if (index === respostaCorreta) {
+            button.classList.add('correct');
+          }
+
+          if (index === selectedIndex && index !== respostaCorreta) {
+            button.classList.add('wrong');
+          }
+        });
+
+        if (selectedIndex === respostaCorreta) {
+          acertos += 1;
+          adicionarXP();
+        }
+
+        confirmBtn.textContent =
+          currentIndex === perguntas.length - 1
+            ? 'Ver resultado'
+            : 'PrÃ³xima';
+
+        confirmBtn.disabled = false;
+
+        confirmBtn.onclick = () => {
+          currentIndex += 1;
+
+          if (currentIndex < perguntas.length) {
+            confirmBtn.textContent = 'Confirmar';
+            confirmBtn.onclick = confirmarResposta;
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        };
+      }
+
+      function adicionarXP() {
+        try {
+          const dadosAtuais = JSON.parse(
+            localStorage.getItem('profileData') || '{}'
+          );
+
+          const ganho = 10;
+          const xpAtual = Number(dadosAtuais.xpTotal || 0);
+          const proximoXp = xpAtual + ganho;
+
+          localStorage.setItem(
+            'profileData',
+            JSON.stringify({
+              nome: dadosAtuais.nome || 'Aluno Teste',
+              tag: dadosAtuais.tag || '#A12',
+              xpTotal: proximoXp,
+
+              nivel:
+                proximoXp >= 3000
+                  ? 'Lenda'
+                  : proximoXp >= 1500
+                    ? 'Mestre'
+                    : proximoXp >= 1000
+                      ? 'SÃ¡bio'
+                      : proximoXp >= 500
+                        ? 'Aventureiro'
+                        : 'Iniciante',
+
+              conquistas: dadosAtuais.conquistas || '0 / 0',
+              mascote: dadosAtuais.mascote || 'ðŸ¾',
+              style: dadosAtuais.style || 'Manto Azul',
+              accessory: dadosAtuais.accessory || 'Ã“culos',
+              mood: dadosAtuais.mood || 'Feliz',
+              theme: 'Ativo'
+            })
+          );
+        } catch (error) {
+          console.error('Erro ao atualizar XP:', error);
+        }
+      }
+
+      function salvarResultado() {
+        if (resultadoSalvo) return;
+
+        resultadoSalvo = true;
+
+        try {
+          const porcentagem = perguntas.length
+            ? Math.round((acertos / perguntas.length) * 100)
+            : 0;
+
+          const resultado = {
+            materia: 'HistÃ³ria',
+            acertos: acertos,
+            total: perguntas.length,
+            porcentagem: porcentagem,
+            data: new Date().toISOString()
+          };
+
+          const resultadosAnteriores = JSON.parse(
+            localStorage.getItem('knowzyQuizResults') || '[]'
+          );
+
+          const resultados = Array.isArray(resultadosAnteriores)
+            ? resultadosAnteriores
+            : [];
+
+          resultados.push(resultado);
+
+          localStorage.setItem(
+            'knowzyQuizResults',
+            JSON.stringify(resultados.slice(-50))
+          );
+        } catch (error) {
+          console.error('Erro ao salvar resultado:', error);
+        }
+      }
+
+      function finishQuiz() {
+        setScreen('result');
+
+        const total = perguntas.length;
+        const porcentagem = total
+          ? Math.round((acertos / total) * 100)
+          : 0;
+
+        scoreValue.textContent = `${acertos}/${total}`;
+
+        if (porcentagem < 40) {
+          resultTitle.textContent = 'Vamos por partes!';
+          resultDescription.textContent =
+            'NÃ£o desanime! Revise os conteÃºdos de HistÃ³ria e tente novamente. Cada tentativa ajuda vocÃª a aprender.';
+        } else if (porcentagem < 70) {
+          resultTitle.textContent = 'VocÃª estÃ¡ evoluindo!';
+          resultDescription.textContent =
+            'VocÃª jÃ¡ acertou vÃ¡rias questÃµes! Continue estudando para aprender ainda mais sobre HistÃ³ria.';
+        } else if (porcentagem < 90) {
+          resultTitle.textContent = 'Muito bem!';
+          resultDescription.textContent =
+            'VocÃª mandou bem no quiz! Continue praticando para fortalecer seus conhecimentos.';
+        } else {
+          resultTitle.textContent = 'IncrÃ­vel!';
+          resultDescription.textContent =
+            'VocÃª foi muito bem! Seu conhecimento de HistÃ³ria estÃ¡ avanÃ§ando. Continue assim!';
+        }
+
+        salvarResultado();
+      }
+
+      function restartQuiz() {
+        currentIndex = 0;
+        selectedIndex = null;
+        acertos = 0;
+        resultadoSalvo = false;
+
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.disabled = true;
+        confirmBtn.onclick = confirmarResposta;
+
+        setScreen('quiz');
+        renderQuestion();
+      }
+
+      async function buscarPerguntas() {
+        try {
+          const response = await fetch(firebaseUrl);
+
+          if (!response.ok) {
+            throw new Error('Erro ao carregar perguntas');
+          }
+
+          const dados = await response.json();
+
+          const perguntasNormalizadas = Object.values(dados || {})
+            .map(normalizarPergunta);
+
+          perguntas = perguntasNormalizadas.length
+            ? perguntasNormalizadas
+            : fallbackQuestions.map(normalizarPergunta);
+        } catch (error) {
+          console.error('Usando perguntas locais de HistÃ³ria:', error);
+          perguntas = fallbackQuestions.map(normalizarPergunta);
+        }
+
+        materiaTitle.textContent = 'HistÃ³ria';
+        renderQuestion();
+      }
+
+      confirmBtn.onclick = confirmarResposta;
+
+      buscarPerguntas();
+    </script>
+
+
+==============================
+ARQUIVO: .\views\matematica.ejs
+==============================
+
+<script>
+      const firebaseUrl =
+        'https://knowzypi-default-rtdb.firebaseio.com/materias/matematica/perguntas.json';
+
+      const fallbackQuestions = [
+        {
+          id: 'q1',
+          enunciado: 'Quanto Ã© 7 Ã— 8?',
+          alternativas: ['42', '48', '56', '64'],
+          resposta_correta: 2
+        },
+        {
+          id: 'q2',
+          enunciado: 'Qual Ã© o valor de 15 + 27?',
+          alternativas: ['32', '38', '42', '40'],
+          resposta_correta: 2
+        },
+        {
+          id: 'q3',
+          enunciado: 'Qual Ã© a raiz quadrada de 81?',
+          alternativas: ['7', '8', '9', '10'],
+          resposta_correta: 2
+        }
+      ];
+
+      const quizScreen = document.getElementById('quizScreen');
+      const resultScreen = document.getElementById('resultScreen');
+      const questionText = document.getElementById('questionText');
+      const answers = document.getElementById('answers');
+      const confirmBtn = document.getElementById('confirmBtn');
+      const progressText = document.getElementById('progressText');
+      const progressFill = document.getElementById('progressFill');
+      const scoreValue = document.getElementById('scoreValue');
+      const materiaTitle = document.getElementById('materiaTitle');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultDescription = document.getElementById('resultDescription');
+
+      let perguntas = [];
+      let currentIndex = 0;
+      let selectedIndex = null;
+      let acertos = 0;
+      let resultadoSalvo = false;
+
+      function normalizarPergunta(item, index) {
+        const respostaCorreta =
+          typeof item.resposta_correta === 'number'
+            ? item.resposta_correta
+            : Number(item.respostaCorreta ?? 0);
+
+        return {
+          id: item.id || `q${index + 1}`,
+          enunciado: item.enunciado || 'Pergunta sem enunciado.',
+          alternativas: Array.isArray(item.alternativas)
+            ? item.alternativas
+            : [],
+          resposta_correta: Number.isInteger(respostaCorreta)
+            ? respostaCorreta
+            : 0
+        };
+      }
+
+      function setScreen(screen) {
+        quizScreen.classList.toggle('hidden', screen !== 'quiz');
+        resultScreen.classList.toggle('hidden', screen !== 'result');
+      }
+
+      function updateProgress() {
+        const total = perguntas.length || 1;
+        const atual = currentIndex + 1;
+
+        progressText.textContent = `Pergunta ${atual} de ${total}`;
+        progressFill.style.width = `${(atual / total) * 100}%`;
+      }
+
+      function renderQuestion() {
+        const perguntaAtual = perguntas[currentIndex];
+
+        if (!perguntaAtual) {
+          finishQuiz();
+          return;
+        }
+
+        selectedIndex = null;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Confirmar';
+        questionText.textContent = perguntaAtual.enunciado;
+        answers.innerHTML = '';
+
+        perguntaAtual.alternativas.forEach((alternativa, index) => {
+          const button = document.createElement('button');
+
+          button.type = 'button';
+          button.className = 'answer-btn';
+          button.textContent = alternativa;
+          button.setAttribute('data-index', String(index));
+
+          button.addEventListener('click', () => {
+            selectedIndex = index;
+
+            document.querySelectorAll('.answer-btn').forEach((el) => {
+              el.classList.toggle(
+                'selected',
+                Number(el.dataset.index) === selectedIndex
+              );
+            });
+
+            confirmBtn.disabled = false;
+          });
+
+          answers.appendChild(button);
+        });
+
+        updateProgress();
+      }
+
+      function adicionarXP() {
+        try {
+          const dadosAtuais = JSON.parse(
+            localStorage.getItem('profileData') || '{}'
+          );
+
+          const ganho = 10;
+          const xpAtual = Number(dadosAtuais.xpTotal || 0);
+          const proximoXp = xpAtual + ganho;
+
+          const dadosAtualizados = {
+            nome: dadosAtuais.nome || 'Aluno Teste',
+            tag: dadosAtuais.tag || '#A12',
+            xpTotal: proximoXp,
+
+            nivel:
+              proximoXp >= 3000
+                ? 'Lenda'
+                : proximoXp >= 1500
+                  ? 'Mestre'
+                  : proximoXp >= 1000
+                    ? 'SÃ¡bio'
+                    : proximoXp >= 500
+                      ? 'Aventureiro'
+                      : 'Iniciante',
+
+            conquistas: dadosAtuais.conquistas || '0 / 0',
+            mascote: dadosAtuais.mascote || 'ðŸ¾',
+            style: dadosAtuais.style || 'Manto Azul',
+            accessory: dadosAtuais.accessory || 'Ã“culos',
+            mood: dadosAtuais.mood || 'Feliz',
+            theme: 'Ativo'
+          };
+
+          localStorage.setItem(
+            'profileData',
+            JSON.stringify(dadosAtualizados)
+          );
+        } catch (error) {
+          console.error('Erro ao atualizar XP:', error);
+        }
+      }
+
+      function confirmarResposta() {
+        if (selectedIndex === null) return;
+
+        const perguntaAtual = perguntas[currentIndex];
+        const respostaCorreta = perguntaAtual.resposta_correta;
+        const buttons = document.querySelectorAll('.answer-btn');
+
+        buttons.forEach((button) => {
+          const index = Number(button.dataset.index);
+
+          button.disabled = true;
+
+          if (index === respostaCorreta) {
+            button.classList.add('correct');
+          }
+
+          if (index === selectedIndex && index !== respostaCorreta) {
+            button.classList.add('wrong');
+          }
+        });
+
+        if (selectedIndex === respostaCorreta) {
+          acertos += 1;
+          adicionarXP();
+        }
+
+        confirmBtn.textContent =
+          currentIndex === perguntas.length - 1
+            ? 'Ver resultado'
+            : 'PrÃ³xima';
+
+        confirmBtn.disabled = false;
+
+        confirmBtn.onclick = () => {
+          currentIndex += 1;
+
+          if (currentIndex < perguntas.length) {
+            confirmBtn.textContent = 'Confirmar';
+            confirmBtn.onclick = confirmarResposta;
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        };
+      }
+
+      function salvarResultado() {
+        if (resultadoSalvo) return;
+
+        resultadoSalvo = true;
+
+        try {
+          const porcentagem = perguntas.length
+            ? Math.round((acertos / perguntas.length) * 100)
+            : 0;
+
+          const resultado = {
+            materia: 'MatemÃ¡tica',
+            acertos: acertos,
+            total: perguntas.length,
+            porcentagem: porcentagem,
+            data: new Date().toISOString()
+          };
+
+          const resultadosAnteriores = JSON.parse(
+            localStorage.getItem('knowzyQuizResults') || '[]'
+          );
+
+          const resultados = Array.isArray(resultadosAnteriores)
+            ? resultadosAnteriores
+            : [];
+
+          resultados.push(resultado);
+
+          localStorage.setItem(
+            'knowzyQuizResults',
+            JSON.stringify(resultados.slice(-50))
+          );
+        } catch (error) {
+          console.error('Erro ao salvar resultado:', error);
+        }
+      }
+
+      function finishQuiz() {
+        setScreen('result');
+
+        const total = perguntas.length;
+        const porcentagem = total
+          ? Math.round((acertos / total) * 100)
+          : 0;
+
+        scoreValue.textContent = `${acertos}/${total}`;
+
+        if (porcentagem < 40) {
+          resultTitle.textContent = 'Vamos por partes!';
+          resultDescription.textContent =
+            'NÃ£o desanime! Revise os conteÃºdos de MatemÃ¡tica e tente novamente. Cada tentativa ajuda vocÃª a aprender.';
+        } else if (porcentagem < 70) {
+          resultTitle.textContent = 'VocÃª estÃ¡ evoluindo!';
+          resultDescription.textContent =
+            'VocÃª jÃ¡ acertou vÃ¡rias questÃµes! Continue praticando para aprender ainda mais MatemÃ¡tica.';
+        } else if (porcentagem < 90) {
+          resultTitle.textContent = 'Muito bem!';
+          resultDescription.textContent =
+            'VocÃª mandou bem no quiz! Continue praticando para fortalecer seus conhecimentos.';
+        } else {
+          resultTitle.textContent = 'IncrÃ­vel!';
+          resultDescription.textContent =
+            'VocÃª foi muito bem! Seu conhecimento de MatemÃ¡tica estÃ¡ avanÃ§ando. Continue assim!';
+        }
+
+        salvarResultado();
+      }
+
+      function restartQuiz() {
+        currentIndex = 0;
+        selectedIndex = null;
+        acertos = 0;
+        resultadoSalvo = false;
+
+        confirmBtn.textContent = 'Confirmar';
+        confirmBtn.disabled = true;
+        confirmBtn.onclick = confirmarResposta;
+
+        setScreen('quiz');
+        renderQuestion();
+      }
+
+      async function buscarPerguntas() {
+        try {
+          const response = await fetch(firebaseUrl);
+
+          if (!response.ok) {
+            throw new Error('Erro ao carregar perguntas');
+          }
+
+          const dados = await response.json();
+
+          const perguntasNormalizadas = Object.values(dados || {})
+            .map(normalizarPergunta);
+
+          perguntas = perguntasNormalizadas.length
+            ? perguntasNormalizadas
+            : fallbackQuestions.map(normalizarPergunta);
+        } catch (error) {
+          console.error('Usando perguntas locais de MatemÃ¡tica:', error);
+          perguntas = fallbackQuestions.map(normalizarPergunta);
+        }
+
+        materiaTitle.textContent = 'MatemÃ¡tica';
+        renderQuestion();
+      }
+
+      confirmBtn.onclick = confirmarResposta;
+
+      buscarPerguntas();
+    </script>
+
+
+==============================
+ARQUIVO: .\views\portugues.ejs
+==============================
+
+<script>
+    const firebaseUrl =
+      'https://knowzypi-default-rtdb.firebaseio.com/materias/portugues/perguntas.json';
+
+    const fallbackQuestions = [
+      {
+        id: 'q1',
+        enunciado: 'Qual palavra estÃ¡ corretamente grafada?',
+        alternativas: [
+          'Acessorio',
+          'AcessÃ³rio',
+          'Acessorio',
+          'AcessÃ³ro'
+        ],
+        resposta_correta: 1
+      },
+      {
+        id: 'q2',
+        enunciado: 'Qual frase estÃ¡ correta?',
+        alternativas: [
+          'Eu fui ao mercado.',
+          'Eu fui no mercado.',
+          'Eu fui a mercado.',
+          'Eu fui em mercado.'
+        ],
+        resposta_correta: 0
+      },
+      {
+        id: 'q3',
+        enunciado: 'Qual opÃ§Ã£o apresenta somente verbos no passado?',
+        alternativas: [
+          'Corri, falei, cheguei',
+          'Corro, falo, chego',
+          'Correr, falar, chegar',
+          'Corra, fale, chegue'
+        ],
+        resposta_correta: 0
+      }
+    ];
+
+    const quizScreen = document.getElementById('quizScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const questionText = document.getElementById('questionText');
+    const answers = document.getElementById('answers');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const scoreValue = document.getElementById('scoreValue');
+    const percentageValue = document.getElementById('percentageValue');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultDescription = document.getElementById('resultDescription');
+    const materiaTitle = document.getElementById('materiaTitle');
+    const feedback = document.getElementById('feedback');
+
+    let perguntas = [];
+    let currentIndex = 0;
+    let selectedIndex = null;
+    let acertos = 0;
+    let resultadoSalvo = false;
+
+    function normalizarPergunta(item, index) {
+      const respostaCorreta =
+        typeof item.resposta_correta === 'number'
+          ? item.resposta_correta
+          : Number(item.respostaCorreta ?? 0);
+
+      return {
+        id: item.id || `q${index + 1}`,
+        enunciado: item.enunciado || 'Pergunta sem enunciado.',
+        alternativas: Array.isArray(item.alternativas)
+          ? item.alternativas
+          : [],
+        resposta_correta: Number.isInteger(respostaCorreta)
+          ? respostaCorreta
+          : 0
+      };
+    }
+
+    function setScreen(screen) {
+      quizScreen.classList.toggle('hidden', screen !== 'quiz');
+      resultScreen.classList.toggle('hidden', screen !== 'result');
+    }
+
+    function updateProgress() {
+      const total = perguntas.length || 1;
+      const atual = Math.min(currentIndex + 1, total);
+      const porcentagem = (currentIndex / total) * 100;
+
+      progressText.textContent = `Pergunta ${atual} de ${total}`;
+      progressPercent.textContent = `${Math.round(porcentagem)}%`;
+      progressFill.style.width = `${porcentagem}%`;
+    }
+
+    function renderQuestion() {
+      const perguntaAtual = perguntas[currentIndex];
+
+      if (!perguntaAtual) {
+        finishQuiz();
+        return;
+      }
+
+      selectedIndex = null;
+
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Confirmar resposta';
+      confirmBtn.onclick = confirmarResposta;
+
+      feedback.textContent = '';
+      feedback.className = 'feedback';
+
+      questionText.textContent = perguntaAtual.enunciado;
+      answers.innerHTML = '';
+
+      perguntaAtual.alternativas.forEach((alternativa, index) => {
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.className = 'answer-btn';
+        button.textContent = alternativa;
+        button.dataset.index = String(index);
+
+        button.addEventListener('click', () => {
+          selectedIndex = index;
+
+          document.querySelectorAll('.answer-btn').forEach((el) => {
+            el.classList.toggle(
+              'selected',
+              Number(el.dataset.index) === selectedIndex
+            );
+          });
+
+          confirmBtn.disabled = false;
+        });
+
+        answers.appendChild(button);
+      });
+
+      updateProgress();
+    }
+
+    function confirmarResposta() {
+      if (selectedIndex === null) return;
+
+      const perguntaAtual = perguntas[currentIndex];
+      const respostaCorreta = perguntaAtual.resposta_correta;
+
+      const buttons = document.querySelectorAll('.answer-btn');
+
+      buttons.forEach((button) => {
+        const index = Number(button.dataset.index);
+
+        button.disabled = true;
+
+        if (index === respostaCorreta) {
+          button.classList.add('correct');
+        }
+
+        if (index === selectedIndex && index !== respostaCorreta) {
+          button.classList.add('wrong');
+        }
+      });
+
+      if (selectedIndex === respostaCorreta) {
+        acertos += 1;
+        feedback.textContent = 'Resposta correta! +10 XP âœ¦';
+        feedback.className = 'feedback correct';
+
+        adicionarXP(10);
+      } else {
+        feedback.textContent = 'NÃ£o foi dessa vez! Continue tentando âœ¦';
+        feedback.className = 'feedback wrong';
+      }
+
+      confirmBtn.textContent =
+        currentIndex === perguntas.length - 1
+          ? 'Ver resultado'
+          : 'PrÃ³xima pergunta';
+
+      confirmBtn.disabled = false;
+
+      confirmBtn.onclick = () => {
+        currentIndex += 1;
+
+        if (currentIndex < perguntas.length) {
+          renderQuestion();
+        } else {
+          finishQuiz();
+        }
+      };
+    }
+
+    function adicionarXP(ganho) {
+      try {
+        const profileData = JSON.parse(
+          localStorage.getItem('profileData') || '{}'
+        );
+
+        const xpAtual = Number(profileData.xpTotal || 0);
+        const proximoXp = xpAtual + ganho;
+
+        const dados = {
+          ...profileData,
+          nome: profileData.nome || 'Aluno Teste',
+          tag: profileData.tag || '#A12',
+          xpTotal: proximoXp,
+          nivel:
+            proximoXp >= 3000 ? 'Lenda' :
+            proximoXp >= 1500 ? 'Mestre' :
+            proximoXp >= 1000 ? 'SÃ¡bio' :
+            proximoXp >= 500 ? 'Aventureiro' :
+            'Iniciante',
+          conquistas: profileData.conquistas || '0 / 0',
+          mascote: profileData.mascote || 'ðŸ¾',
+          style: profileData.style || 'Manto Azul',
+          accessory: profileData.accessory || 'Ã“culos',
+          mood: profileData.mood || 'Feliz',
+          theme: profileData.theme || 'Ativo'
+        };
+
+        localStorage.setItem('profileData', JSON.stringify(dados));
+      } catch (error) {
+        console.error('NÃ£o foi possÃ­vel atualizar o XP:', error);
+      }
+    }
+
+    function salvarResultado() {
+      if (resultadoSalvo) return;
+
+      resultadoSalvo = true;
+
+      const total = perguntas.length;
+      const porcentagem = total > 0
+        ? Math.round((acertos / total) * 100)
+        : 0;
+
+      const resultado = {
+        materia: 'PortuguÃªs',
+        acertos: acertos,
+        total: total,
+        porcentagem: porcentagem,
+        data: new Date().toISOString()
+      };
+
+      try {
+        const resultadosSalvos = JSON.parse(
+          localStorage.getItem('knowzyQuizResults') || '[]'
+        );
+
+        const lista = Array.isArray(resultadosSalvos)
+          ? resultadosSalvos
+          : [];
+
+        lista.push(resultado);
+
+        localStorage.setItem(
+          'knowzyQuizResults',
+          JSON.stringify(lista.slice(-50))
+        );
+      } catch (error) {
+        console.error('NÃ£o foi possÃ­vel salvar o resultado:', error);
+      }
+    }
+
+    function finishQuiz() {
+      const total = perguntas.length;
+      const porcentagem = total > 0
+        ? Math.round((acertos / total) * 100)
+        : 0;
+
+      setScreen('result');
+
+      scoreValue.textContent = `${acertos}/${total}`;
+      percentageValue.textContent = `${porcentagem}%`;
+
+      if (porcentagem === 100) {
+        resultTitle.textContent = 'Perfeito! âœ¦';
+        resultDescription.textContent =
+          'VocÃª acertou todas as perguntas! Seu conhecimento de PortuguÃªs estÃ¡ incrÃ­vel.';
+      } else if (porcentagem >= 70) {
+        resultTitle.textContent = 'Mandou muito!';
+        resultDescription.textContent =
+          'VocÃª teve um Ã³timo resultado! Continue praticando para dominar ainda mais o conteÃºdo.';
+      } else if (porcentagem >= 40) {
+        resultTitle.textContent = 'Muito bem!';
+        resultDescription.textContent =
+          'VocÃª estÃ¡ no caminho certo! Revise algumas questÃµes e tente novamente para melhorar seu resultado.';
+      } else {
+        resultTitle.textContent = 'Continue tentando!';
+        resultDescription.textContent =
+          'Cada tentativa ajuda vocÃª a aprender. Revise o conteÃºdo e jogue novamente para praticar.';
+      }
+
+      progressText.textContent = 'Quiz concluÃ­do';
+      progressPercent.textContent = '100%';
+      progressFill.style.width = '100%';
+
+      salvarResultado();
+    }
+
+    function restartQuiz() {
+      currentIndex = 0;
+      selectedIndex = null;
+      acertos = 0;
+      resultadoSalvo = false;
+
+      setScreen('quiz');
+
+      confirmBtn.textContent = 'Confirmar resposta';
+      confirmBtn.disabled = true;
+      confirmBtn.onclick = confirmarResposta;
+
+      renderQuestion();
+    }
+
+    async function buscarPerguntas() {
+      try {
+        const response = await fetch(firebaseUrl);
+
+        if (!response.ok) {
+          throw new Error('Erro ao carregar perguntas');
+        }
+
+        const dados = await response.json();
+
+        const perguntasNormalizadas = Object.values(dados || {})
+          .map(normalizarPergunta);
+
+        perguntas = perguntasNormalizadas.length
+          ? perguntasNormalizadas
+          : fallbackQuestions.map(normalizarPergunta);
+
+      } catch (error) {
+        console.warn(
+          'NÃ£o foi possÃ­vel carregar as perguntas do Firebase. Usando perguntas locais.'
+        );
+
+        perguntas = fallbackQuestions.map(normalizarPergunta);
+      }
+
+      materiaTitle.textContent = 'PortuguÃªs';
+
+      renderQuestion();
+    }
+
+    confirmBtn.onclick = confirmarResposta;
+
+    buscarPerguntas();
+  </script>
+
+
+==============================
+ARQUIVO: .\src\routes\quizRoutes.js
+==============================
+
+
+
+==============================
+ARQUIVO: .\src\controllers\quizController.js
+==============================
+
+const quizModel = require('../models/perguntas');
+const userModel = require('../models/user');
+
+const iniciarQuiz = async (req, res) => {
+  try {
+    const { materiaId } = req.params;
+    const perguntas = await quizModel.buscarPerguntasPorMateria(materiaId);
+
+    if (!perguntas || perguntas.length === 0) {
+      return res.status(404).json({ erro: 'Nenhuma pergunta encontrada.' });
+    }
+
+    res.status(200).json({ materia: materiaId, perguntas });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ erro: 'Erro ao iniciar o quiz.' });
+  }
+};
+
+const responderPergunta = async (req, res) => {
+  try {
+    const { perguntaId, resposta } = req.body;
+
+    if (!perguntaId || resposta === undefined) {
+      return res.status(400).json({ erro: 'Pergunta e resposta sÃ£o obrigatÃ³rias.' });
+    }
+
+    const resultado = await quizModel.verificarResposta(perguntaId, resposta);
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ erro: 'Erro ao verificar resposta.' });
+  }
+};
+
+const finalizarQuiz = async (req, res) => {
+  try {
+    const {
+      usuarioId,
+      materiaId,
+      respostas,
+      totalQuizzes,
+      materiasExploradas,
+      ultimaPontuacao
+    } = req.body;
+
+    if (!usuarioId || !materiaId || !respostas) {
+      return res.status(400).json({ erro: 'Dados do resultado incompletos.' });
+    }
+
+    const resultado = await quizModel.calcularResultado(usuarioId, materiaId, respostas);
+    const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0, {
+      totalQuizzes,
+      materiasExploradas,
+      ultimaPontuacao
+    });
+
+    res.status(200).json({
+      ...resultado,
+      usuario: usuarioComXp,
+      xpGanho: resultado.xpGanho || 0
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ erro: 'Erro ao finalizar o quiz.' });
+  }
+};
+
+module.exports = {
+  iniciarQuiz,
+  responderPergunta,
+  finalizarQuiz
+};
+
+
+==============================
+ARQUIVO: .\src\models\user.js
+==============================
+
+
+const bcrypt = require('bcrypt');
+const { db } = require('../config/firebase');
+
+const validarEmail = (email) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    String(email || '').trim()
+  );
+
+const validarSenha = (senha) => {
+  if (typeof senha !== 'string') return false;
+
+  return (
+    senha.length >= 8 &&
+    /[A-Za-z]/.test(senha) &&
+    /\d/.test(senha) &&
+    /[^A-Za-z\d]/.test(senha)
+  );
+};
+
+const normalizarConquistas = (conquistas = []) => {
+  if (Array.isArray(conquistas)) {
+    return [...new Set(
+      conquistas
+        .filter(Boolean)
+        .map((item) => String(item).trim())
+        .filter(Boolean)
+    )];
+  }
+
+  // Compatibilidade com registros antigos em formato de objeto.
+  if (conquistas && typeof conquistas === 'object') {
+    return Object.entries(conquistas)
+      .filter(([, valor]) =>
+        valor === true || valor?.concluida === true
+      )
+      .map(([id]) => id);
+  }
+
+  return [];
+};
+
+const normalizarMateriasExploradas = (materias = []) => {
+  if (!Array.isArray(materias)) return [];
+
+  return [...new Set(
+    materias.filter(Boolean).map(String)
+  )];
+};
+
+const calcularConquistasDoUsuario = ({
+  xp = 0,
+  conquistas = [],
+  totalQuizzes = 0,
+  materiasExploradas = [],
+  ultimaPontuacao = 0
+} = {}) => {
+  const xpTotal = Number(xp) || 0;
+  const lista = normalizarConquistas(conquistas);
+  const countQuizzes = Number(totalQuizzes) || 0;
+  const materias = normalizarMateriasExploradas(
+    materiasExploradas
+  );
+  const score = Number(ultimaPontuacao) || 0;
+
+  if (xpTotal >= 25) lista.push('primeiro_login');
+  if (countQuizzes >= 50) lista.push('cinquenta_quizzes');
+  if (materias.length >= 5) lista.push('explorar_materias');
+  if (countQuizzes >= 5) lista.push('cinco_quizzes');
+  if (score >= 100) lista.push('licao_perfeita');
+
+  return {
+    xp: xpTotal,
+    totalQuizzes: countQuizzes,
+    materiasExploradas: materias,
+    ultimaPontuacao: score,
+    conquistas: normalizarConquistas(lista)
+  };
+};
+
+const normalizarUsuario = (usuario = {}) => ({
+  ...usuario,
+  id: usuario.id,
+  nome: usuario.nome || usuario.perfil?.nome || 'UsuÃ¡rio',
+  email: usuario.email || '',
+  xp: Number(usuario.xp ?? usuario.perfil?.xpTotal ?? 0),
+  totalQuizzes: Number(usuario.totalQuizzes || 0),
+  materiasExploradas: normalizarMateriasExploradas(
+    usuario.materiasExploradas
+  ),
+  ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
+  conquistas: normalizarConquistas(usuario.conquistas),
+  perfil: {
+    ...(usuario.perfil || {}),
+    nome: usuario.perfil?.nome || usuario.nome || 'UsuÃ¡rio',
+    xpTotal: Number(
+      usuario.perfil?.xpTotal ?? usuario.xp ?? 0
+    ),
+    nivelAtual: usuario.perfil?.nivelAtual || 'Iniciante'
+  },
+  mascote: usuario.mascote || {
+    roupa: 'casaco_roto',
+    acessorio: 'fone_ouvido',
+    expressao: 'piscada',
+    efeito: 'galaxia',
+    cor: 'roxo'
+  },
+  favoritos: usuario.favoritos || {}
+});
+
+const buscarPerfil = async (id) => {
+  if (!id) return null;
+
+  const snapshot = await db.ref(`usuarios/${id}`).once('value');
+  const usuario = snapshot.val();
+
+  if (!usuario) return null;
+
+  return normalizarUsuario({ id, ...usuario });
+};
+
+const atualizarPerfil = async (id, dados = {}) => {
+  if (!id || !dados || typeof dados !== 'object') {
+    throw new Error('UsuÃ¡rio ou dados invÃ¡lidos.');
+  }
+
+  const usuarioAtual = await buscarPerfil(id);
+
+  if (!usuarioAtual) return null;
+
+  const atualizacao = { ...dados };
+
+  // MantÃ©m nome e XP sincronizados com o perfil.
+  if (dados.nome !== undefined || dados.xp !== undefined) {
+    atualizacao.perfil = {
+      ...usuarioAtual.perfil,
+      ...(dados.perfil || {}),
+      ...(dados.nome !== undefined
+        ? { nome: dados.nome }
+        : {}),
+      ...(dados.xp !== undefined
+        ? { xpTotal: Number(dados.xp) }
+        : {})
+    };
+  }
+
+  if (dados.conquistas !== undefined) {
+    atualizacao.conquistas = normalizarConquistas(
+      dados.conquistas
+    );
+  }
+
+  await db.ref(`usuarios/${id}`).update(atualizacao);
+
+  return buscarPerfil(id);
+};
+
+const buscarConquistas = async (id) => {
+  const snapshot = await db
+    .ref(`usuarios/${id}/conquistas`)
+    .once('value');
+
+  return normalizarConquistas(snapshot.val());
+};
+
+const listarUsuarios = async () => {
+  const snapshot = await db.ref('usuarios').once('value');
+  const usuarios = snapshot.val() || {};
+
+  return Object.entries(usuarios).map(([id, usuario]) =>
+    normalizarUsuario({ id, ...usuario })
+  );
+};
+
+const buscarPorEmail = async (email) => {
+  const emailNormalizado = String(email || '')
+    .trim()
+    .toLowerCase();
+
+  if (!emailNormalizado) return null;
+
+  const usuarios = await listarUsuarios();
+
+  return usuarios.find(
+    (usuario) =>
+      String(usuario.email || '').trim().toLowerCase() ===
+      emailNormalizado
+  ) || null;
+};
+
+const criarUsuario = async ({ nome, email, senha }) => {
+  const nomeValido = String(nome || '').trim();
+  const emailValido = String(email || '').trim().toLowerCase();
+
+  if (!nomeValido) {
+    throw new Error('O nome completo Ã© obrigatÃ³rio.');
+  }
+
+  if (!validarEmail(emailValido)) {
+    throw new Error('Informe um e-mail vÃ¡lido.');
+  }
+
+  if (!validarSenha(senha)) {
+    throw new Error(
+      'A senha deve ter pelo menos 8 caracteres, incluindo letras, nÃºmeros e sÃ­mbolos.'
+    );
+  }
+
+  const usuarioExistente = await buscarPorEmail(emailValido);
+
+  if (usuarioExistente) {
+    throw new Error('Este e-mail jÃ¡ estÃ¡ registrado.');
+  }
+
+  const senhaHash = await bcrypt.hash(senha, 12);
+
+  const ref = db.ref('usuarios').push();
+  const id = ref.key;
+
+  const usuario = {
+    nome: nomeValido,
+    email: emailValido,
+    senha: senhaHash,
+
+    xp: 0,
+    totalQuizzes: 0,
+    materiasExploradas: [],
+    ultimaPontuacao: 0,
+    conquistas: [],
+
+    perfil: {
+      nome: nomeValido,
+      tag: `usuario_${id.slice(-6)}`,
+      nivelAtual: 'Iniciante',
+      xpTotal: 0
+    },
+
+    mascote: {
+      roupa: 'casaco_roto',
+      acessorio: 'fone_ouvido',
+      expressao: 'piscada',
+      efeito: 'galaxia',
+      cor: 'roxo'
+    },
+
+    favoritos: {},
+
+    progressoConquistas: {}
+  };
+
+  await ref.set(usuario);
+
+  return normalizarUsuario({ id, ...usuario });
+};
+
+const atualizarXpUsuario = async (
+  id,
+  xpAdicional = 0,
+  progressoExtra = {}
+) => {
+  const usuarioAtual = await buscarPerfil(id);
+
+  if (!usuarioAtual) return null;
+
+  const xpAtual = Number(usuarioAtual.xp || 0);
+  const proximoXp = Math.max(
+    0,
+    xpAtual + Number(xpAdicional || 0)
+  );
+
+  const progresso = calcularConquistasDoUsuario({
+    xp: proximoXp,
+    conquistas: usuarioAtual.conquistas,
+    totalQuizzes:
+      progressoExtra.totalQuizzes ??
+      usuarioAtual.totalQuizzes,
+    materiasExploradas:
+      progressoExtra.materiasExploradas ??
+      usuarioAtual.materiasExploradas,
+    ultimaPontuacao:
+      progressoExtra.ultimaPontuacao ??
+      usuarioAtual.ultimaPontuacao
+  });
+
+  const nivelAtual =
+    proximoXp >= 3000 ? 'Lenda' :
+    proximoXp >= 1500 ? 'Mestre' :
+    proximoXp >= 1000 ? 'SÃ¡bio' :
+    proximoXp >= 500 ? 'Aventureiro' :
+    'Iniciante';
+
+  await atualizarPerfil(id, {
+    xp: progresso.xp,
+    totalQuizzes: progresso.totalQuizzes,
+    materiasExploradas: progresso.materiasExploradas,
+    ultimaPontuacao: progresso.ultimaPontuacao,
+    conquistas: progresso.conquistas,
+    perfil: {
+      ...usuarioAtual.perfil,
+      xpTotal: progresso.xp,
+      nivelAtual
+    }
+  });
+
+  return buscarPerfil(id);
+};
+
+const verificarCredenciais = async ({ email, senha }) => {
+  const usuario = await buscarPorEmail(email);
+
+  if (!usuario || !usuario.senha) return null;
+
+  // Aceita somente senhas armazenadas com bcrypt.
+  const senhaCorreta = await bcrypt.compare(
+    String(senha || ''),
+    usuario.senha
+  );
+
+  if (!senhaCorreta) return null;
+
+  const atualizado = aplicarPremioLogin(usuario);
+
+  await atualizarPerfil(usuario.id, {
+    xp: atualizado.xp,
+    totalQuizzes: atualizado.totalQuizzes,
+    materiasExploradas: atualizado.materiasExploradas,
+    ultimaPontuacao: atualizado.ultimaPontuacao,
+    conquistas: atualizado.conquistas
+  });
+
+  return buscarPerfil(usuario.id);
+};
+
+const aplicarPremioLogin = (usuario = {}) => {
+  return {
+    ...usuario,
+    ...calcularConquistasDoUsuario(usuario)
+  };
+};
+
+module.exports = {
+  buscarPerfil,
+  atualizarPerfil,
+  buscarConquistas,
+  buscarPorEmail,
+  listarUsuarios,
+  criarUsuario,
+  verificarCredenciais,
+  atualizarXpUsuario,
+  normalizarUsuario,
+  calcularConquistasDoUsuario,
+  aplicarPremioLogin
+};
+
+
+
+==============================
+ARQUIVO: .\src\middlewares\authMiddleware.js
+==============================
+
+const isSafeInternalRedirect = (value) => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  const target = value.trim();
+
+  if (!target || target.startsWith('//') || /^([a-z]+:)?\/\//i.test(target) || /^javascript:/i.test(target) || /^data:/i.test(target)) {
+    return false;
+  }
+
+  return target.startsWith('/');
+};
+
+const isApiRequest = (req) => {
+  const acceptHeader = String(req.headers.accept || '');
+  return req.path.startsWith('/api') || acceptHeader.includes('application/json') || req.headers['x-requested-with'] === 'XMLHttpRequest';
+};
+
+const isHtmlRequest = (req) => !isApiRequest(req) && Boolean(req.accepts('html'));
+
+const normalizeRedirectTarget = (req) => {
+  const target = req.originalUrl || req.url || '/home';
+
+  if (!target || target === '/login' || target.startsWith('/login?')) {
+    return '/home';
+  }
+
+  return isSafeInternalRedirect(target) ? target : '/home';
+};
+
+const requireAuth = (req, res, next) => {
+  if (req.session && req.session.user) {
+    return next();
+  }
+
+  const redirectTarget = normalizeRedirectTarget(req);
+  if (req.session) {
+    req.session.returnTo = redirectTarget;
+  }
+
+  if (isApiRequest(req)) {
+    return res.status(401).json({
+      erro: 'AutenticaÃ§Ã£o necessÃ¡ria. FaÃ§a login para continuar.'
+    });
+  }
+
+  if (isHtmlRequest(req)) {
+    return res.redirect(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
+  }
+
+  return res.status(401).json({
+    erro: 'AutenticaÃ§Ã£o necessÃ¡ria. FaÃ§a login para continuar.'
+  });
+};
+
+const requireGuest = (req, res, next) => {
+  if (req.session && req.session.user) {
+    const redirectTarget = req.session.returnTo || '/home';
+    delete req.session.returnTo;
+    return res.redirect(redirectTarget);
+  }
+
+  next();
+};
+
+const requireOwnership = (paramName = 'id') => (req, res, next) => {
+  const usuarioLogado = req.session && req.session.user;
+
+  if (!usuarioLogado) {
+    return requireAuth(req, res, next);
+  }
+
+  const idSolicitado = String(req.params[paramName] || '');
+  const idUsuarioLogado = String(usuarioLogado.id || '');
+
+  if (!idSolicitado || idUsuarioLogado === idSolicitado) {
+    return next();
+  }
+
+  return res.status(403).json({
+    erro: 'VocÃª nÃ£o tem permissÃ£o para acessar este recurso.'
+  });
+};
+
+module.exports = {
+  requireAuth,
+  requireGuest,
+  requireOwnership
+};
+
+
+
+==============================
+ARQUIVO: .\public\conquistas\script.js
+==============================
+
+const DEFAULT_CATALOG = {
+  primeiro_login: {
+    titulo: 'Primeiro Login',
+    descricao: 'Acesse o sistema pela primeira vez.',
+    meta: 1,
+    xpRecompensa: 25,
+    icone: 'ðŸš€'
+  },
+  cinco_quizzes: {
+    titulo: 'Cinco Quizzes',
+    descricao: 'Responda 5 quizzes com sucesso.',
+    meta: 5,
+    xpRecompensa: 100,
+    icone: 'ðŸŽ¯'
+  },
+  explorar_materias: {
+    titulo: 'Explorador',
+    descricao: 'Explore pelo menos 5 matÃ©rias.',
+    meta: 5,
+    xpRecompensa: 200,
+    icone: 'ðŸ§­'
+  },
+  cinquenta_quizzes: {
+    titulo: 'Mestre dos Quizzes',
+    descricao: 'Complete 50 quizzes.',
+    meta: 50,
+    xpRecompensa: 500,
+    icone: 'ðŸ†'
+  },
+  licao_perfeita: {
+    titulo: 'LiÃ§Ã£o Perfeita',
+    descricao: 'Alcance 100 pontos em uma liÃ§Ã£o.',
+    meta: 1,
+    xpRecompensa: 50,
+    icone: 'âœ¨'
+  }
+};
+
+const FALLBACK_PROFILE = {
+  nome: 'UsuÃ¡rio',
+  tag: '#0000',
+  xpTotal: 0,
+  id: null
+};
+
+const FALLBACK_MASCOTE = {
+  roupa: 'casaco_roto',
+  acessorio: 'fone_ouvido',
+  expressao: 'piscada',
+  efeito: 'galaxia',
+  cor: 'roxo'
+};
+
+// LÃª o usuÃ¡rio conectado.
+const readStoredUser = () => {
+  try {
+    const currentUser = JSON.parse(
+      localStorage.getItem('currentUser') || 'null'
+    );
+
+    if (currentUser && currentUser.id) {
+      return currentUser;
+    }
+  } catch (error) {
+    console.warn('NÃ£o foi possÃ­vel ler currentUser.', error);
+  }
+
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem('profileData') || 'null'
+    );
+
+    const currentUserId = localStorage.getItem('currentUserId');
+
+    if (
+      saved &&
+      saved.id &&
+      (!currentUserId || String(saved.id) === String(currentUserId))
+    ) {
+      return saved;
+    }
+  } catch (error) {
+    console.warn('NÃ£o foi possÃ­vel ler profileData.', error);
+  }
+
+  return null;
+};
+
+// LÃª o perfil salvo localmente, mesmo sem conexÃ£o com a API.
+const readStoredProfile = () => {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem('profileData') || 'null'
+    );
+
+    if (!saved || typeof saved !== 'object') {
+      return null;
+    }
+
+    const currentUserId = localStorage.getItem('currentUserId');
+
+    // Evita utilizar o perfil de outra conta.
+    if (
+      saved.id &&
+      currentUserId &&
+      String(saved.id) !== String(currentUserId)
+    ) {
+      return null;
+    }
+
+    return saved;
+  } catch (error) {
+    console.warn('NÃ£o foi possÃ­vel recuperar o perfil local.', error);
+    return null;
+  }
+};
+
+const getCurrentUserId = () => {
+  const user = readStoredUser();
+
+  if (user && user.id) {
+    return String(user.id);
+  }
+
+  const storedId = localStorage.getItem('currentUserId');
+
+  return storedId ? String(storedId) : null;
+};
+
+const userNameEl = document.getElementById('userName');
+const userTagEl = document.getElementById('userTag');
+const xpTotalEl = document.getElementById('xpTotal');
+const levelNameEl = document.getElementById('levelName');
+const nextLevelNameEl = document.getElementById('nextLevelName');
+const xpRangeEl = document.getElementById('xpRange');
+const nextLevelTextEl = document.getElementById('nextLevelText');
+const questsListEl = document.getElementById('questsList');
+const counterTextEl = document.getElementById('counterText');
+const mascotVisualEl = document.getElementById('mascotVisual');
+const backButton = document.getElementById('backButton');
+const profileTrigger = document.getElementById('profileTrigger');
+
+const petStages = [
+  {
+    key: 'iniciante',
+    name: 'Iniciante',
+    file: 'iniciante.png',
+    min: 0,
+    max: 499,
+    next: 'Aventureiro'
+  },
+  {
+    key: 'aventureiro',
+    name: 'Aventureiro',
+    file: 'aventureiro.png',
+    min: 500,
+    max: 999,
+    next: 'SÃ¡bio'
+  },
+  {
+    key: 'sabio',
+    name: 'SÃ¡bio',
+    file: 'sÃ¡bio.png',
+    min: 1000,
+    max: 1499,
+    next: 'Mestre'
+  },
+  {
+    key: 'mestre',
+    name: 'Mestre',
+    file: 'mestre.png',
+    min: 1500,
+    max: 2999,
+    next: 'Lenda'
+  },
+  {
+    key: 'lenda',
+    name: 'Lenda',
+    file: 'lenda.png',
+    min: 3000,
+    max: Number.POSITIVE_INFINITY,
+    next: 'MÃ¡ximo'
+  }
+];
+
+const resolvePetStage = (xp = 0) => {
+  const safeXp = Math.max(0, Number(xp) || 0);
+
+  return petStages.find(
+    (stage) => safeXp >= stage.min && safeXp <= stage.max
+  ) || petStages[0];
+};
+
+const getLevelInfo = (xp) => {
+  const stage = resolvePetStage(xp);
+
+  const range = stage.max === Number.POSITIVE_INFINITY
+    ? `${stage.min.toLocaleString('pt-BR')} XP+`
+    : `${stage.min.toLocaleString('pt-BR')} - ${stage.max.toLocaleString('pt-BR')} XP`;
+
+  return {
+    name: stage.name,
+    range,
+    next: stage.next,
+    file: stage.file
+  };
+};
+
+const getPetImagePath = (fileName) => {
+  const safeName = String(fileName || '').trim();
+
+  return safeName
+    ? `/imagens/${safeName}`
+    : '/imagens/iniciante.png';
+};
+
+const setMascot = (mascote, xp = 0) => {
+  if (!mascotVisualEl) return;
+
+  const pet = resolvePetStage(xp);
+
+  mascotVisualEl.innerHTML = `
+    <img
+      src="${getPetImagePath(pet.file)}"
+      alt="${pet.name}"
+      class="pet-image"
+    />
+  `;
+};
+
+// Salva o perfil atualizado no navegador.
+const persistProfileData = (perfil = {}, mascote = {}) => {
+  const xp = Math.max(
+    0,
+    Number(perfil.xpTotal ?? perfil.xp ?? 0)
+  );
+
+  const level = getLevelInfo(xp);
+
+  const nextData = {
+    ...(readStoredProfile() || {}),
+    id: perfil.id || getCurrentUserId(),
+    nome: perfil.nome || FALLBACK_PROFILE.nome,
+    tag: perfil.tag || FALLBACK_PROFILE.tag,
+    xpTotal: xp,
+    nivel: level.name,
+    conquistas: counterTextEl?.textContent || '0 / 0',
+    mascote: level.name,
+    style: mascote?.roupa || FALLBACK_MASCOTE.roupa,
+    accessory: mascote?.acessorio || FALLBACK_MASCOTE.acessorio,
+    mood: mascote?.expressao || FALLBACK_MASCOTE.expressao
+  };
+
+  try {
+    localStorage.setItem(
+      'profileData',
+      JSON.stringify(nextData)
+    );
+  } catch (error) {
+    console.warn('NÃ£o foi possÃ­vel salvar o perfil local.', error);
+  }
+};
+
+const normalizeQuest = (quest = {}) => ({
+  titulo: quest.titulo || 'Conquista',
+  descricao:
+    quest.descricao || 'Continue avanÃ§ando para desbloquear esta conquista.',
+  meta: Number.isFinite(Number(quest.meta))
+    ? Number(quest.meta)
+    : 1,
+  xpRecompensa: Number.isFinite(Number(quest.xpRecompensa))
+    ? Number(quest.xpRecompensa)
+    : 0,
+  icone:
+    typeof quest.icone === 'string' && quest.icone.trim()
+      ? quest.icone
+      : 'ðŸ…'
+});
+
+const renderQuestIcon = (icon) => {
+  const value = String(icon || '').trim();
+
+  if (!value) {
+    return '<i class="fa-solid fa-star"></i>';
+  }
+
+  if (
+    /^[\p{Extended_Pictographic}\p{Emoji_Presentation}]$/u.test(value) ||
+    /[\u{1F300}-\u{1FAFF}]/u.test(value)
+  ) {
+    return value;
+  }
+
+  if (value.includes('<i') || value.includes('fa-')) {
+    return value.includes('<i')
+      ? value
+      : `<i class="${value}"></i>`;
+  }
+
+  return `<i class="fa-solid ${value}"></i>`;
+};
+
+const toProgressMap = (ids = []) => {
+  const unlocked = new Set(
+    Array.isArray(ids)
+      ? ids.filter(Boolean).map((item) => String(item).trim())
+      : []
+  );
+
+  return Object.entries(DEFAULT_CATALOG).reduce(
+    (accumulator, [id, quest]) => {
+      accumulator[id] = {
+        progressoAtual: unlocked.has(id)
+          ? Number(quest.meta || 1)
+          : 0,
+        concluida: unlocked.has(id)
+      };
+
+      return accumulator;
+    },
+    {}
+  );
+};
+
+const renderQuests = (catalog, progressMap) => {
+  if (!questsListEl) return;
+
+  const entries = Object.entries(catalog || DEFAULT_CATALOG);
+
+  const completedCount = entries.filter(
+    ([id]) => Boolean(progressMap?.[id]?.concluida)
+  ).length;
+
+  const total = entries.length;
+
+  if (counterTextEl) {
+    counterTextEl.textContent = `${completedCount} / ${total}`;
+  }
+
+  questsListEl.innerHTML = entries.map(([id, rawQuest]) => {
+    const quest = normalizeQuest(rawQuest);
+
+    const userQuest = progressMap?.[id] || {
+      progressoAtual: 0,
+      concluida: false
+    };
+
+    const progressValue = Number(userQuest.progressoAtual || 0);
+    const safeMeta = Math.max(1, Number(quest.meta || 1));
+    const progress = Math.min(progressValue, safeMeta);
+    const percent = Math.min(100, (progress / safeMeta) * 100);
+
+    const isComplete = Boolean(userQuest.concluida);
+    const isInProgress = !isComplete && progress > 0;
+
+    const actionLabel = isComplete
+      ? 'ConcluÃ­da'
+      : isInProgress
+        ? 'Continuar'
+        : 'Bloqueado';
+
+    const actionClass = isComplete
+      ? 'completed'
+      : isInProgress
+        ? 'in-progress'
+        : 'locked';
+
+    const buttonIcon = isComplete
+      ? 'âœ“'
+      : isInProgress
+        ? 'â†’'
+        : 'ðŸ”’';
+
+    const progressText = isComplete
+      ? `${safeMeta}/${safeMeta}`
+      : `${progress}/${safeMeta}`;
+
+    return `
+      <article class="quest-card">
+        <div class="quest-icon" aria-hidden="true">
+          ${renderQuestIcon(quest.icone)}
+        </div>
+
+        <div class="quest-info">
+          <div class="quest-title-row">
+            <h4>${quest.titulo}</h4>
+            <span class="quest-reward">
+              +${quest.xpRecompensa} XP
+            </span>
+          </div>
+
+          <p>${quest.descricao}</p>
+
+          <div class="progress-track" aria-label="Progresso da conquista">
+            <span
+              class="progress-bar"
+              style="width: ${percent}%"
+            ></span>
+          </div>
+
+          <div class="progress-meta">
+            <span>${progressText}</span>
+            <span>${Math.round(percent)}%</span>
+          </div>
+        </div>
+
+        <button
+          class="quest-action ${actionClass}"
+          type="button"
+          aria-label="${actionLabel}"
+        >
+          ${buttonIcon} ${actionLabel}
+        </button>
+      </article>
+    `;
+  }).join('');
+};
+
+const renderProfile = ({
+  perfil = {},
+  mascote = {},
+  conquistas = [],
+  catalog = DEFAULT_CATALOG
+}) => {
+  const safePerfil = {
+    ...FALLBACK_PROFILE,
+    ...perfil,
+    nome: perfil.nome || FALLBACK_PROFILE.nome,
+    tag: perfil.tag || FALLBACK_PROFILE.tag,
+    xpTotal: Math.max(
+      0,
+      Number(perfil.xpTotal ?? perfil.xp ?? 0)
+    )
+  };
+
+  const xp = safePerfil.xpTotal;
+  const level = getLevelInfo(xp);
+  const nextLevel = level.next;
+
+  if (userNameEl) {
+    userNameEl.textContent = safePerfil.nome;
+  }
+
+  if (userTagEl) {
+    userTagEl.textContent = safePerfil.tag;
+  }
+
+  if (xpTotalEl) {
+    xpTotalEl.textContent = `${xp} XP`;
+  }
+
+  if (levelNameEl) {
+    levelNameEl.textContent = level.name;
+  }
+
+  if (nextLevelNameEl) {
+    nextLevelNameEl.textContent =
+      nextLevel === 'MÃ¡ximo'
+        ? 'NÃ­vel mÃ¡ximo'
+        : nextLevel;
+  }
+
+  if (xpRangeEl) {
+    xpRangeEl.textContent = level.range;
+  }
+
+  if (nextLevelTextEl) {
+    nextLevelTextEl.textContent =
+      nextLevel === 'MÃ¡ximo'
+        ? 'NÃ­vel mÃ¡ximo alcanÃ§ado'
+        : `PrÃ³ximo nÃ­vel: ${nextLevel}`;
+  }
+
+  setMascot(mascote || FALLBACK_MASCOTE, xp);
+
+  renderQuests(
+    catalog,
+    toProgressMap(conquistas || [])
+  );
+
+  persistProfileData(
+    safePerfil,
+    mascote || FALLBACK_MASCOTE
+  );
+};
+
+// Carrega primeiro o perfil local para a tela nunca comeÃ§ar zerada.
+const loadUserAchievements = async () => {
+  const id = getCurrentUserId();
+  const storedUser = readStoredUser() || {};
+  const storedProfile = readStoredProfile() || {};
+
+  const localXp = Math.max(
+    0,
+    Number(
+      storedProfile.xpTotal ??
+      storedProfile.xp ??
+      storedUser.xpTotal ??
+      storedUser.xp ??
+      0
+    )
+  );
+
+  const localProfile = {
+    ...FALLBACK_PROFILE,
+    ...storedUser,
+    ...storedProfile,
+    id: id || storedProfile.id || null,
+    nome:
+      storedProfile.nome ||
+      storedUser.nome ||
+      FALLBACK_PROFILE.nome,
+    tag:
+      storedProfile.tag ||
+      storedUser.tag ||
+      FALLBACK_PROFILE.tag,
+    xpTotal: localXp
+  };
+
+  const localMascote = {
+    ...FALLBACK_MASCOTE,
+    ...(storedProfile.mascote && typeof storedProfile.mascote === 'object'
+      ? storedProfile.mascote
+      : {})
+  };
+
+  const localConquistas = Array.isArray(storedProfile.conquistas)
+    ? storedProfile.conquistas
+    : [];
+
+  // Exibe os dados locais imediatamente.
+  renderProfile({
+    perfil: localProfile,
+    mascote: localMascote,
+    conquistas: localConquistas,
+    catalog: DEFAULT_CATALOG
+  });
+
+  // Sem usuÃ¡rio conectado, mantÃ©m o perfil local.
+  if (!id) {
+    return;
+  }
+
+  try {
+    const [perfilResponse, conquistasResponse] = await Promise.all([
+      fetch(`/users/${encodeURIComponent(id)}`, {
+        credentials: 'same-origin'
+      }),
+      fetch(`/users/${encodeURIComponent(id)}/conquistas`, {
+        credentials: 'same-origin'
+      })
+    ]);
+
+    if (!perfilResponse.ok && !conquistasResponse.ok) {
+      throw new Error('NÃ£o foi possÃ­vel carregar os dados do usuÃ¡rio.');
+    }
+
+    const perfilData = perfilResponse.ok
+      ? await perfilResponse.json()
+      : null;
+
+    const conquistasData = conquistasResponse.ok
+      ? await conquistasResponse.json()
+      : null;
+
+    const perfilServidor = perfilData?.usuario || perfilData || {};
+
+    const xpServidor = Number(
+      perfilServidor.xp ??
+      perfilServidor.perfil?.xpTotal ??
+      perfilServidor.xpTotal ??
+      0
+    );
+
+    // MantÃ©m o maior valor enquanto a sincronizaÃ§Ã£o local ainda
+    // nÃ£o estiver implementada, evitando esconder XP jÃ¡ exibido
+    // no navegador.
+    const xpFinal = Math.max(
+      localXp,
+      Number.isFinite(xpServidor) ? xpServidor : 0
+    );
+
+    const perfilAtualizado = {
+      ...localProfile,
+      ...perfilServidor,
+      id,
+      nome:
+        perfilServidor.nome ||
+        perfilServidor.perfil?.nome ||
+        localProfile.nome,
+      tag:
+        perfilServidor.tag ||
+        localProfile.tag,
+      xpTotal: xpFinal
+    };
+
+    const conquistasFinais = Array.isArray(conquistasData)
+      ? conquistasData
+      : localConquistas;
+
+    renderProfile({
+      perfil: perfilAtualizado,
+      mascote: perfilServidor.mascote || localMascote,
+      conquistas: conquistasFinais,
+      catalog: DEFAULT_CATALOG
+    });
+
+  } catch (error) {
+    console.warn(
+      'NÃ£o foi possÃ­vel sincronizar com a API. Mantendo os dados locais.',
+      error
+    );
+
+    // NÃ£o zera o XP se a API estiver indisponÃ­vel.
+    renderProfile({
+      perfil: localProfile,
+      mascote: localMascote,
+      conquistas: localConquistas,
+      catalog: DEFAULT_CATALOG
+    });
+  }
+};
+
+const openProfilePage = () => {
+  window.location.href = '/perfil';
+};
+
+profileTrigger?.addEventListener('click', openProfilePage);
+
+backButton?.addEventListener('click', () => {
+  window.history.back();
+});
+
+loadUserAchievements();
+
+
+
+==============================
+ARQUIVO: .\public\perfil\script.js
+==============================
+
+const defaults = {
+  nome: 'Aluno Teste',
+  tag: '#A12',
+  xpTotal: 780,
+  nivel: 'Iniciante',
+  conquistas: '1 / 5',
+  mascote: 'ðŸ¾',
+  style: 'Manto Azul',
+  accessory: 'Ã“culos',
+  mood: 'Feliz'
+};
+
+const profileName = document.getElementById('profileName');
+const profileTag = document.getElementById('profileTag');
+const profileXp = document.getElementById('profileXp');
+const profileLevel = document.getElementById('profileLevel');
+const profileWins = document.getElementById('profileWins');
+const profileMascot = document.getElementById('profileMascot');
+const profileStyle = document.getElementById('profileStyle');
+const profileAccessory = document.getElementById('profileAccessory');
+const profileMood = document.getElementById('profileMood');
+const profileAvatar = document.getElementById('profileAvatar');
+const backButton = document.getElementById('backToConquistas');
+
+const savedData = JSON.parse(localStorage.getItem('profileData') || 'null') || defaults;
+
+profileName.textContent = savedData.nome || defaults.nome;
+profileTag.textContent = savedData.tag || defaults.tag;
+profileXp.textContent = `${savedData.xpTotal || defaults.xpTotal} XP`;
+profileLevel.textContent = savedData.nivel || defaults.nivel;
+profileWins.textContent = savedData.conquistas || defaults.conquistas;
+profileMascot.textContent = savedData.mascote || defaults.mascote;
+profileStyle.textContent = savedData.style || defaults.style;
+profileAccessory.textContent = savedData.accessory || defaults.accessory;
+profileMood.textContent = savedData.mood || defaults.mood;
+profileAvatar.textContent = (savedData.nome || defaults.nome).charAt(0).toUpperCase();
+
+backButton?.addEventListener('click', () => {
+  window.location.href = '/conquistas';
+});
+
+
+==============================
+OUTRAS REFERÊNCIAS A XP E PROGRESSO
+==============================
+
+  src\controllers\authController.js:80:            email: usuario.email,
+  src\controllers\authController.js:81:            xp: Number(usuario.xp || 0),
+> src\controllers\authController.js:82:            conquistas: usuario.conquistas || [],
+  src\controllers\authController.js:83:            foto: ''
+  src\controllers\authController.js:84:        };
+  src\controllers\authController.js:85:
+  src\controllers\authController.js:100:                    email: usuario.email,
+  src\controllers\authController.js:101:                    xp: Number(usuario.xp || 0),
+> src\controllers\authController.js:102:                    conquistas: usuario.conquistas || []
+  src\controllers\authController.js:103:                },
+  src\controllers\authController.js:104:                redirectTo
+  src\controllers\authController.js:105:            });
+  src\controllers\authController.js:135:            email: usuario.email,
+  src\controllers\authController.js:136:            xp: Number(usuario.xp || 0),
+> src\controllers\authController.js:137:            conquistas: usuario.conquistas || [],
+  src\controllers\authController.js:138:            foto: ''
+  src\controllers\authController.js:139:        };
+  src\controllers\authController.js:140:
+  src\controllers\authController.js:155:                    email: usuario.email,
+  src\controllers\authController.js:156:                    xp: Number(usuario.xp || 0),
+> src\controllers\authController.js:157:                    conquistas: usuario.conquistas || []
+  src\controllers\authController.js:158:                },
+  src\controllers\authController.js:159:                redirectTo
+  src\controllers\authController.js:160:            });
+  src\controllers\homeController.js:31:  },
+  src\controllers\homeController.js:32:
+> src\controllers\homeController.js:33:  conquistas: (req, res) => {
+  src\controllers\homeController.js:34:    const usuario = req.session && req.session.user ? req.session.user : { nome: 'Usuário' };
+  src\controllers\homeController.js:35:
+  src\controllers\homeController.js:36:    res.render('home', {
+> src\controllers\homeController.js:37:      titulo: 'Minhas Conquistas',
+  src\controllers\homeController.js:38:      usuario
+  src\controllers\homeController.js:39:    });
+  src\controllers\homeController.js:40:  },
+  src\controllers\quizController.js:40:      materiaId,
+  src\controllers\quizController.js:41:      respostas,
+> src\controllers\quizController.js:42:      totalQuizzes,
+  src\controllers\quizController.js:43:      materiasExploradas,
+  src\controllers\quizController.js:44:      ultimaPontuacao
+  src\controllers\quizController.js:45:    } = req.body;
+  src\controllers\quizController.js:50:
+  src\controllers\quizController.js:51:    const resultado = await quizModel.calcularResultado(usuarioId, materiaId, respostas);
+> src\controllers\quizController.js:52:    const usuarioComXp = await userModel.atualizarXpUsuario(usuarioId, resultado.xpGanho || 0, {
+> src\controllers\quizController.js:53:      totalQuizzes,
+  src\controllers\quizController.js:54:      materiasExploradas,
+  src\controllers\quizController.js:55:      ultimaPontuacao
+  src\controllers\quizController.js:56:    });
+  src\controllers\userController.js:142:};
+  src\controllers\userController.js:143:
+> src\controllers\userController.js:144:const buscarConquistas = async (req, res) => {
+  src\controllers\userController.js:145:  try {
+  src\controllers\userController.js:146:    const { id } = req.params;
+  src\controllers\userController.js:147:
+  src\controllers\userController.js:157:
+  src\controllers\userController.js:158:    return res.status(200).json(
+> src\controllers\userController.js:159:      usuario.conquistas || []
+  src\controllers\userController.js:160:    );
+  src\controllers\userController.js:161:
+  src\controllers\userController.js:162:  } catch (error) {
+> src\controllers\userController.js:163:    console.error('Erro ao buscar conquistas:', error);
+  src\controllers\userController.js:164:
+  src\controllers\userController.js:165:    return res.status(500).json({
+> src\controllers\userController.js:166:      erro: 'Erro ao buscar conquistas.'
+  src\controllers\userController.js:167:    });
+  src\controllers\userController.js:168:  }
+  src\controllers\userController.js:169:};
+  src\controllers\userController.js:172:  buscarPerfil,
+  src\controllers\userController.js:173:  atualizarPerfil,
+> src\controllers\userController.js:174:  buscarConquistas
+  src\controllers\userController.js:175:};
+  src\models\user.js:19:};
+  src\models\user.js:20:
+> src\models\user.js:21:const normalizarConquistas = (conquistas = []) => {
+> src\models\user.js:22:  if (Array.isArray(conquistas)) {
+  src\models\user.js:23:    return [...new Set(
+> src\models\user.js:24:      conquistas
+  src\models\user.js:25:        .filter(Boolean)
+  src\models\user.js:26:        .map((item) => String(item).trim())
+  src\models\user.js:27:        .filter(Boolean)
+  src\models\user.js:30:
+  src\models\user.js:31:  // Compatibilidade com registros antigos em formato de objeto.
+> src\models\user.js:32:  if (conquistas && typeof conquistas === 'object') {
+> src\models\user.js:33:    return Object.entries(conquistas)
+  src\models\user.js:34:      .filter(([, valor]) =>
+  src\models\user.js:35:        valor === true || valor?.concluida === true
+  src\models\user.js:36:      )
+  src\models\user.js:49:};
+  src\models\user.js:50:
+> src\models\user.js:51:const calcularConquistasDoUsuario = ({
+  src\models\user.js:52:  xp = 0,
+> src\models\user.js:53:  conquistas = [],
+> src\models\user.js:54:  totalQuizzes = 0,
+  src\models\user.js:55:  materiasExploradas = [],
+  src\models\user.js:56:  ultimaPontuacao = 0
+  src\models\user.js:57:} = {}) => {
+> src\models\user.js:58:  const xpTotal = Number(xp) || 0;
+> src\models\user.js:59:  const lista = normalizarConquistas(conquistas);
+> src\models\user.js:60:  const countQuizzes = Number(totalQuizzes) || 0;
+  src\models\user.js:61:  const materias = normalizarMateriasExploradas(
+  src\models\user.js:62:    materiasExploradas
+  src\models\user.js:63:  );
+  src\models\user.js:64:  const score = Number(ultimaPontuacao) || 0;
+  src\models\user.js:65:
+> src\models\user.js:66:  if (xpTotal >= 25) lista.push('primeiro_login');
+  src\models\user.js:67:  if (countQuizzes >= 50) lista.push('cinquenta_quizzes');
+  src\models\user.js:68:  if (materias.length >= 5) lista.push('explorar_materias');
+  src\models\user.js:69:  if (countQuizzes >= 5) lista.push('cinco_quizzes');
+  src\models\user.js:71:
+  src\models\user.js:72:  return {
+> src\models\user.js:73:    xp: xpTotal,
+> src\models\user.js:74:    totalQuizzes: countQuizzes,
+  src\models\user.js:75:    materiasExploradas: materias,
+  src\models\user.js:76:    ultimaPontuacao: score,
+> src\models\user.js:77:    conquistas: normalizarConquistas(lista)
+  src\models\user.js:78:  };
+  src\models\user.js:79:};
+  src\models\user.js:80:
+  src\models\user.js:84:  nome: usuario.nome || usuario.perfil?.nome || 'Usuário',
+  src\models\user.js:85:  email: usuario.email || '',
+> src\models\user.js:86:  xp: Number(usuario.xp ?? usuario.perfil?.xpTotal ?? 0),
+> src\models\user.js:87:  totalQuizzes: Number(usuario.totalQuizzes || 0),
+  src\models\user.js:88:  materiasExploradas: normalizarMateriasExploradas(
+  src\models\user.js:89:    usuario.materiasExploradas
+  src\models\user.js:90:  ),
+  src\models\user.js:91:  ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
+> src\models\user.js:92:  conquistas: normalizarConquistas(usuario.conquistas),
+  src\models\user.js:93:  perfil: {
+  src\models\user.js:94:    ...(usuario.perfil || {}),
+  src\models\user.js:95:    nome: usuario.perfil?.nome || usuario.nome || 'Usuário',
+> src\models\user.js:96:    xpTotal: Number(
+> src\models\user.js:97:      usuario.perfil?.xpTotal ?? usuario.xp ?? 0
+  src\models\user.js:98:    ),
+  src\models\user.js:99:    nivelAtual: usuario.perfil?.nivelAtual || 'Iniciante'
+  src\models\user.js:100:  },
+  src\models\user.js:140:        : {}),
+  src\models\user.js:141:      ...(dados.xp !== undefined
+> src\models\user.js:142:        ? { xpTotal: Number(dados.xp) }
+  src\models\user.js:143:        : {})
+  src\models\user.js:144:    };
+  src\models\user.js:145:  }
+  src\models\user.js:146:
+> src\models\user.js:147:  if (dados.conquistas !== undefined) {
+> src\models\user.js:148:    atualizacao.conquistas = normalizarConquistas(
+> src\models\user.js:149:      dados.conquistas
+  src\models\user.js:150:    );
+  src\models\user.js:151:  }
+  src\models\user.js:152:
+  src\models\user.js:156:};
+  src\models\user.js:157:
+> src\models\user.js:158:const buscarConquistas = async (id) => {
+  src\models\user.js:159:  const snapshot = await db
+> src\models\user.js:160:    .ref(`usuarios/${id}/conquistas`)
+  src\models\user.js:161:    .once('value');
+  src\models\user.js:162:
+> src\models\user.js:163:  return normalizarConquistas(snapshot.val());
+  src\models\user.js:164:};
+  src\models\user.js:165:
+  src\models\user.js:166:const listarUsuarios = async () => {
+  src\models\user.js:224:
+  src\models\user.js:225:    xp: 0,
+> src\models\user.js:226:    totalQuizzes: 0,
+  src\models\user.js:227:    materiasExploradas: [],
+  src\models\user.js:228:    ultimaPontuacao: 0,
+> src\models\user.js:229:    conquistas: [],
+  src\models\user.js:230:
+  src\models\user.js:231:    perfil: {
+  src\models\user.js:232:      nome: nomeValido,
+  src\models\user.js:233:      tag: `usuario_${id.slice(-6)}`,
+  src\models\user.js:234:      nivelAtual: 'Iniciante',
+> src\models\user.js:235:      xpTotal: 0
+  src\models\user.js:236:    },
+  src\models\user.js:237:
+  src\models\user.js:238:    mascote: {
+  src\models\user.js:246:    favoritos: {},
+  src\models\user.js:247:
+> src\models\user.js:248:    progressoConquistas: {}
+  src\models\user.js:249:  };
+  src\models\user.js:250:
+  src\models\user.js:251:  await ref.set(usuario);
+  src\models\user.js:254:};
+  src\models\user.js:255:
+> src\models\user.js:256:const atualizarXpUsuario = async (
+  src\models\user.js:257:  id,
+  src\models\user.js:258:  xpAdicional = 0,
+  src\models\user.js:259:  progressoExtra = {}
+  src\models\user.js:269:  );
+  src\models\user.js:270:
+> src\models\user.js:271:  const progresso = calcularConquistasDoUsuario({
+  src\models\user.js:272:    xp: proximoXp,
+> src\models\user.js:273:    conquistas: usuarioAtual.conquistas,
+> src\models\user.js:274:    totalQuizzes:
+> src\models\user.js:275:      progressoExtra.totalQuizzes ??
+> src\models\user.js:276:      usuarioAtual.totalQuizzes,
+  src\models\user.js:277:    materiasExploradas:
+  src\models\user.js:278:      progressoExtra.materiasExploradas ??
+  src\models\user.js:279:      usuarioAtual.materiasExploradas,
+  src\models\user.js:292:  await atualizarPerfil(id, {
+  src\models\user.js:293:    xp: progresso.xp,
+> src\models\user.js:294:    totalQuizzes: progresso.totalQuizzes,
+  src\models\user.js:295:    materiasExploradas: progresso.materiasExploradas,
+  src\models\user.js:296:    ultimaPontuacao: progresso.ultimaPontuacao,
+> src\models\user.js:297:    conquistas: progresso.conquistas,
+  src\models\user.js:298:    perfil: {
+  src\models\user.js:299:      ...usuarioAtual.perfil,
+> src\models\user.js:300:      xpTotal: progresso.xp,
+  src\models\user.js:301:      nivelAtual
+  src\models\user.js:302:    }
+  src\models\user.js:303:  });
+  src\models\user.js:323:  await atualizarPerfil(usuario.id, {
+  src\models\user.js:324:    xp: atualizado.xp,
+> src\models\user.js:325:    totalQuizzes: atualizado.totalQuizzes,
+  src\models\user.js:326:    materiasExploradas: atualizado.materiasExploradas,
+  src\models\user.js:327:    ultimaPontuacao: atualizado.ultimaPontuacao,
+> src\models\user.js:328:    conquistas: atualizado.conquistas
+  src\models\user.js:329:  });
+  src\models\user.js:330:
+  src\models\user.js:331:  return buscarPerfil(usuario.id);
+  src\models\user.js:335:  return {
+  src\models\user.js:336:    ...usuario,
+> src\models\user.js:337:    ...calcularConquistasDoUsuario(usuario)
+  src\models\user.js:338:  };
+  src\models\user.js:339:};
+  src\models\user.js:340:
+  src\models\user.js:342:  buscarPerfil,
+  src\models\user.js:343:  atualizarPerfil,
+> src\models\user.js:344:  buscarConquistas,
+  src\models\user.js:345:  buscarPorEmail,
+  src\models\user.js:346:  listarUsuarios,
+  src\models\user.js:347:  criarUsuario,
+  src\models\user.js:348:  verificarCredenciais,
+> src\models\user.js:349:  atualizarXpUsuario,
+  src\models\user.js:350:  normalizarUsuario,
+> src\models\user.js:351:  calcularConquistasDoUsuario,
+  src\models\user.js:352:  aplicarPremioLogin
+  src\models\user.js:353:};
+  src\routes\userRoutes.js:10:router.get('/:id', requireOwnership('id'), userController.buscarPerfil);
+  src\routes\userRoutes.js:11:router.put('/:id', requireOwnership('id'), userController.atualizarPerfil);
+> src\routes\userRoutes.js:12:router.get('/:id/conquistas', requireOwnership('id'), userController.buscarConquistas);
+  src\routes\userRoutes.js:13:
+  src\routes\userRoutes.js:14:module.exports = router;
+  public\conquistas\script.js:40:  nome: 'Usuário',
+  public\conquistas\script.js:41:  tag: '#0000',
+> public\conquistas\script.js:42:  xpTotal: 0,
+  public\conquistas\script.js:43:  id: null
+  public\conquistas\script.js:44:};
+  public\conquistas\script.js:45:
+  public\conquistas\script.js:56:  try {
+  public\conquistas\script.js:57:    const currentUser = JSON.parse(
+> public\conquistas\script.js:58:      localStorage.getItem('currentUser') || 'null'
+  public\conquistas\script.js:59:    );
+  public\conquistas\script.js:60:
+  public\conquistas\script.js:61:    if (currentUser && currentUser.id) {
+  public\conquistas\script.js:68:  try {
+  public\conquistas\script.js:69:    const saved = JSON.parse(
+> public\conquistas\script.js:70:      localStorage.getItem('profileData') || 'null'
+  public\conquistas\script.js:71:    );
+  public\conquistas\script.js:72:
+> public\conquistas\script.js:73:    const currentUserId = localStorage.getItem('currentUserId');
+  public\conquistas\script.js:74:
+  public\conquistas\script.js:75:    if (
+  public\conquistas\script.js:76:      saved &&
+  public\conquistas\script.js:81:    }
+  public\conquistas\script.js:82:  } catch (error) {
+> public\conquistas\script.js:83:    console.warn('Não foi possível ler profileData.', error);
+  public\conquistas\script.js:84:  }
+  public\conquistas\script.js:85:
+  public\conquistas\script.js:86:  return null;
+  public\conquistas\script.js:91:  try {
+  public\conquistas\script.js:92:    const saved = JSON.parse(
+> public\conquistas\script.js:93:      localStorage.getItem('profileData') || 'null'
+  public\conquistas\script.js:94:    );
+  public\conquistas\script.js:95:
+  public\conquistas\script.js:96:    if (!saved || typeof saved !== 'object') {
+  public\conquistas\script.js:98:    }
+  public\conquistas\script.js:99:
+> public\conquistas\script.js:100:    const currentUserId = localStorage.getItem('currentUserId');
+  public\conquistas\script.js:101:
+  public\conquistas\script.js:102:    // Evita utilizar o perfil de outra conta.
+  public\conquistas\script.js:103:    if (
+  public\conquistas\script.js:123:  }
+  public\conquistas\script.js:124:
+> public\conquistas\script.js:125:  const storedId = localStorage.getItem('currentUserId');
+  public\conquistas\script.js:126:
+  public\conquistas\script.js:127:  return storedId ? String(storedId) : null;
+  public\conquistas\script.js:128:};
+  public\conquistas\script.js:130:const userNameEl = document.getElementById('userName');
+  public\conquistas\script.js:131:const userTagEl = document.getElementById('userTag');
+> public\conquistas\script.js:132:const xpTotalEl = document.getElementById('xpTotal');
+  public\conquistas\script.js:133:const levelNameEl = document.getElementById('levelName');
+  public\conquistas\script.js:134:const nextLevelNameEl = document.getElementById('nextLevelName');
+  public\conquistas\script.js:135:const xpRangeEl = document.getElementById('xpRange');
+  public\conquistas\script.js:230:
+  public\conquistas\script.js:231:// Salva o perfil atualizado no navegador.
+> public\conquistas\script.js:232:const persistProfileData = (perfil = {}, mascote = {}) => {
+  public\conquistas\script.js:233:  const xp = Math.max(
+  public\conquistas\script.js:234:    0,
+> public\conquistas\script.js:235:    Number(perfil.xpTotal ?? perfil.xp ?? 0)
+  public\conquistas\script.js:236:  );
+  public\conquistas\script.js:237:
+  public\conquistas\script.js:238:  const level = getLevelInfo(xp);
+  public\conquistas\script.js:243:    nome: perfil.nome || FALLBACK_PROFILE.nome,
+  public\conquistas\script.js:244:    tag: perfil.tag || FALLBACK_PROFILE.tag,
+> public\conquistas\script.js:245:    xpTotal: xp,
+  public\conquistas\script.js:246:    nivel: level.name,
+> public\conquistas\script.js:247:    conquistas: counterTextEl?.textContent || '0 / 0',
+  public\conquistas\script.js:248:    mascote: level.name,
+  public\conquistas\script.js:249:    style: mascote?.roupa || FALLBACK_MASCOTE.roupa,
+  public\conquistas\script.js:250:    accessory: mascote?.acessorio || FALLBACK_MASCOTE.acessorio,
+  public\conquistas\script.js:253:
+  public\conquistas\script.js:254:  try {
+> public\conquistas\script.js:255:    localStorage.setItem(
+> public\conquistas\script.js:256:      'profileData',
+  public\conquistas\script.js:257:      JSON.stringify(nextData)
+  public\conquistas\script.js:258:    );
+  public\conquistas\script.js:259:  } catch (error) {
+  public\conquistas\script.js:420:  perfil = {},
+  public\conquistas\script.js:421:  mascote = {},
+> public\conquistas\script.js:422:  conquistas = [],
+  public\conquistas\script.js:423:  catalog = DEFAULT_CATALOG
+  public\conquistas\script.js:424:}) => {
+  public\conquistas\script.js:425:  const safePerfil = {
+  public\conquistas\script.js:428:    nome: perfil.nome || FALLBACK_PROFILE.nome,
+  public\conquistas\script.js:429:    tag: perfil.tag || FALLBACK_PROFILE.tag,
+> public\conquistas\script.js:430:    xpTotal: Math.max(
+  public\conquistas\script.js:431:      0,
+> public\conquistas\script.js:432:      Number(perfil.xpTotal ?? perfil.xp ?? 0)
+  public\conquistas\script.js:433:    )
+  public\conquistas\script.js:434:  };
+  public\conquistas\script.js:435:
+> public\conquistas\script.js:436:  const xp = safePerfil.xpTotal;
+  public\conquistas\script.js:437:  const level = getLevelInfo(xp);
+  public\conquistas\script.js:438:  const nextLevel = level.next;
+  public\conquistas\script.js:439:
+  public\conquistas\script.js:446:  }
+  public\conquistas\script.js:447:
+> public\conquistas\script.js:448:  if (xpTotalEl) {
+> public\conquistas\script.js:449:    xpTotalEl.textContent = `${xp} XP`;
+  public\conquistas\script.js:450:  }
+  public\conquistas\script.js:451:
+  public\conquistas\script.js:452:  if (levelNameEl) {
+  public\conquistas\script.js:476:  renderQuests(
+  public\conquistas\script.js:477:    catalog,
+> public\conquistas\script.js:478:    toProgressMap(conquistas || [])
+  public\conquistas\script.js:479:  );
+  public\conquistas\script.js:480:
+> public\conquistas\script.js:481:  persistProfileData(
+  public\conquistas\script.js:482:    safePerfil,
+  public\conquistas\script.js:483:    mascote || FALLBACK_MASCOTE
+  public\conquistas\script.js:484:  );
+  public\conquistas\script.js:494:    0,
+  public\conquistas\script.js:495:    Number(
+> public\conquistas\script.js:496:      storedProfile.xpTotal ??
+  public\conquistas\script.js:497:      storedProfile.xp ??
+> public\conquistas\script.js:498:      storedUser.xpTotal ??
+  public\conquistas\script.js:499:      storedUser.xp ??
+  public\conquistas\script.js:500:      0
+  public\conquistas\script.js:501:    )
+  public\conquistas\script.js:515:      storedUser.tag ||
+  public\conquistas\script.js:516:      FALLBACK_PROFILE.tag,
+> public\conquistas\script.js:517:    xpTotal: localXp
+  public\conquistas\script.js:518:  };
+  public\conquistas\script.js:519:
+  public\conquistas\script.js:520:  const localMascote = {
+  public\conquistas\script.js:525:  };
+  public\conquistas\script.js:526:
+> public\conquistas\script.js:527:  const localConquistas = Array.isArray(storedProfile.conquistas)
+> public\conquistas\script.js:528:    ? storedProfile.conquistas
+  public\conquistas\script.js:529:    : [];
+  public\conquistas\script.js:530:
+  public\conquistas\script.js:531:  // Exibe os dados locais imediatamente.
+  public\conquistas\script.js:533:    perfil: localProfile,
+  public\conquistas\script.js:534:    mascote: localMascote,
+> public\conquistas\script.js:535:    conquistas: localConquistas,
+  public\conquistas\script.js:536:    catalog: DEFAULT_CATALOG
+  public\conquistas\script.js:537:  });
+  public\conquistas\script.js:538:
+  public\conquistas\script.js:543:
+  public\conquistas\script.js:544:  try {
+> public\conquistas\script.js:545:    const [perfilResponse, conquistasResponse] = await Promise.all([
+  public\conquistas\script.js:546:      fetch(`/users/${encodeURIComponent(id)}`, {
+  public\conquistas\script.js:547:        credentials: 'same-origin'
+  public\conquistas\script.js:548:      }),
+> public\conquistas\script.js:549:      fetch(`/users/${encodeURIComponent(id)}/conquistas`, {
+  public\conquistas\script.js:550:        credentials: 'same-origin'
+  public\conquistas\script.js:551:      })
+  public\conquistas\script.js:552:    ]);
+  public\conquistas\script.js:553:
+> public\conquistas\script.js:554:    if (!perfilResponse.ok && !conquistasResponse.ok) {
+  public\conquistas\script.js:555:      throw new Error('Não foi possível carregar os dados do usuário.');
+  public\conquistas\script.js:556:    }
+  public\conquistas\script.js:557:
+  public\conquistas\script.js:560:      : null;
+  public\conquistas\script.js:561:
+> public\conquistas\script.js:562:    const conquistasData = conquistasResponse.ok
+> public\conquistas\script.js:563:      ? await conquistasResponse.json()
+  public\conquistas\script.js:564:      : null;
+  public\conquistas\script.js:565:
+  public\conquistas\script.js:566:    const perfilServidor = perfilData?.usuario || perfilData || {};
+  public\conquistas\script.js:568:    const xpServidor = Number(
+  public\conquistas\script.js:569:      perfilServidor.xp ??
+> public\conquistas\script.js:570:      perfilServidor.perfil?.xpTotal ??
+> public\conquistas\script.js:571:      perfilServidor.xpTotal ??
+  public\conquistas\script.js:572:      0
+  public\conquistas\script.js:573:    );
+  public\conquistas\script.js:574:
+  public\conquistas\script.js:592:        perfilServidor.tag ||
+  public\conquistas\script.js:593:        localProfile.tag,
+> public\conquistas\script.js:594:      xpTotal: xpFinal
+  public\conquistas\script.js:595:    };
+  public\conquistas\script.js:596:
+> public\conquistas\script.js:597:    const conquistasFinais = Array.isArray(conquistasData)
+> public\conquistas\script.js:598:      ? conquistasData
+> public\conquistas\script.js:599:      : localConquistas;
+  public\conquistas\script.js:600:
+  public\conquistas\script.js:601:    renderProfile({
+  public\conquistas\script.js:602:      perfil: perfilAtualizado,
+  public\conquistas\script.js:603:      mascote: perfilServidor.mascote || localMascote,
+> public\conquistas\script.js:604:      conquistas: conquistasFinais,
+  public\conquistas\script.js:605:      catalog: DEFAULT_CATALOG
+  public\conquistas\script.js:606:    });
+  public\conquistas\script.js:607:
+  public\conquistas\script.js:616:      perfil: localProfile,
+  public\conquistas\script.js:617:      mascote: localMascote,
+> public\conquistas\script.js:618:      conquistas: localConquistas,
+  public\conquistas\script.js:619:      catalog: DEFAULT_CATALOG
+  public\conquistas\script.js:620:    });
+  public\conquistas\script.js:621:  }
+  public\perfil\script.js:2:  nome: 'Aluno Teste',
+  public\perfil\script.js:3:  tag: '#A12',
+> public\perfil\script.js:4:  xpTotal: 780,
+  public\perfil\script.js:5:  nivel: 'Iniciante',
+> public\perfil\script.js:6:  conquistas: '1 / 5',
+  public\perfil\script.js:7:  mascote: '🐾',
+  public\perfil\script.js:8:  style: 'Manto Azul',
+  public\perfil\script.js:9:  accessory: 'Óculos',
+  public\perfil\script.js:21:const profileMood = document.getElementById('profileMood');
+  public\perfil\script.js:22:const profileAvatar = document.getElementById('profileAvatar');
+> public\perfil\script.js:23:const backButton = document.getElementById('backToConquistas');
+  public\perfil\script.js:24:
+> public\perfil\script.js:25:const savedData = JSON.parse(localStorage.getItem('profileData') || 'null') || defaults;
+  public\perfil\script.js:26:
+  public\perfil\script.js:27:profileName.textContent = savedData.nome || defaults.nome;
+  public\perfil\script.js:28:profileTag.textContent = savedData.tag || defaults.tag;
+> public\perfil\script.js:29:profileXp.textContent = `${savedData.xpTotal || defaults.xpTotal} XP`;
+  public\perfil\script.js:30:profileLevel.textContent = savedData.nivel || defaults.nivel;
+> public\perfil\script.js:31:profileWins.textContent = savedData.conquistas || defaults.conquistas;
+  public\perfil\script.js:32:profileMascot.textContent = savedData.mascote || defaults.mascote;
+  public\perfil\script.js:33:profileStyle.textContent = savedData.style || defaults.style;
+  public\perfil\script.js:34:profileAccessory.textContent = savedData.accessory || defaults.accessory;
+  public\perfil\script.js:37:
+  public\perfil\script.js:38:backButton?.addEventListener('click', () => {
+> public\perfil\script.js:39:  window.location.href = '/conquistas';
+  public\perfil\script.js:40:});
+
+
+

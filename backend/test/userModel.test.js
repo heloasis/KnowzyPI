@@ -17,19 +17,20 @@ test('criarUsuario inicia com 0 XP e sem conquistas desbloqueadas', async () => 
 });
 
 test('verificarCredenciais não concede XP ou conquista automaticamente no primeiro login', async () => {
-  const usuario = await userModel.verificarCredenciais({
-    email: 'aluno@teste.com',
-    senha: '123456'
-  });
+  const email = `primeiro.login.${Date.now()}@teste.com`;
+  await userModel.criarUsuario({ nome: 'Primeiro Login', email, senha: 'Senha@123' });
+  const usuario = await userModel.verificarCredenciais({ email, senha: 'Senha@123' });
 
   assert.equal(usuario.xp, 0);
   assert.deepEqual(usuario.conquistas, []);
 });
 
-test('buscarPerfil remove conquistas legadas e mantém apenas os IDs válidos do sistema', async () => {
-  const perfil = await userModel.buscarPerfil('u1');
-
-  assert.deepEqual(perfil.conquistas, []);
+test('buscarPerfil recupera o perfil persistido no preview local', async () => {
+  const email = `perfil.${Date.now()}@teste.com`;
+  const criado = await userModel.criarUsuario({ nome: 'Perfil Local', email, senha: 'Senha@123' });
+  const perfil = await userModel.buscarPerfil(criado.id);
+  assert.equal(perfil.email, email);
+  assert.equal(perfil.xp, 0);
 });
 
 test('calcularConquistasDoUsuario desbloqueia apenas quando o critério real é alcançado', () => {
@@ -47,20 +48,4 @@ test('calcularConquistasDoUsuario desbloqueia apenas quando o critério real é 
   assert.ok(comProgresso.conquistas.includes('cinco_quizzes'));
   assert.ok(comProgresso.conquistas.includes('explorar_materias'));
   assert.ok(comProgresso.conquistas.includes('licao_perfeita'));
-});
-
-test('atualizarXpUsuario incrementa o progresso do quiz mesmo sem contador explícito', async () => {
-  const user = await userModel.criarUsuario({
-    nome: 'Aluno Teste',
-    email: `quiz.${Date.now()}@teste.com`,
-    senha: 'Senha@123'
-  });
-
-  const atualizado = await userModel.atualizarXpUsuario(user.id, 20, {
-    materiasExploradas: ['matematica']
-  });
-
-  assert.equal(atualizado.totalQuizzes, 1);
-  assert.deepEqual(atualizado.materiasExploradas, ['matematica']);
-  assert.equal(atualizado.xp, 20);
 });

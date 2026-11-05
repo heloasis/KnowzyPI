@@ -1,0 +1,122 @@
+﻿{
+    "p1":  {
+               "alternativas":  [
+                                    "1822",
+                                    "1888",
+                                    "1889",
+                                    "1930"
+                                ],
+               "enunciado":  "Em que ano ocorreu a Proclamação da República no Brasil?",
+               "resposta_correta":  2
+           },
+    "p10":  {
+                "alternativas":  [
+                                     "São Paulo e Rio de Janeiro",
+                                     "São Paulo e Minas Gerais",
+                                     "Minas Gerais e Rio Grande do Sul",
+                                     "Bahia e Pernambuco"
+                                 ],
+                "enunciado":  "A política do \u0027Café com Leite\u0027 na República Velha brasileira envolvia quais estados?",
+                "resposta_correta":  1
+            },
+    "p11":  {
+                "alternativas":  [
+                                     "Benito Mussolini",
+                                     "Adolf Hitler",
+                                     "Joseph Stalin",
+                                     "Winston Churchill"
+                                 ],
+                "enunciado":  "Quem era o líder da Alemanha nazista durante a Segunda Guerra Mundial?",
+                "resposta_correta":  1
+            },
+    "p12":  {
+                "alternativas":  [
+                                     "EUA e Reino Unido",
+                                     "Alemanha e URSS",
+                                     "EUA e União Soviética (URSS)",
+                                     "China e Japão"
+                                 ],
+                "enunciado":  "A Guerra Fria foi uma disputa ideológica e geopolítica entre quais superpotências?",
+                "resposta_correta":  2
+            },
+    "p2":  {
+               "alternativas":  [
+                                    "Getúlio Vargas",
+                                    "Marechal Deodoro da Fonseca",
+                                    "Dom Pedro II",
+                                    "Juscelino Kubitschek"
+                                ],
+               "enunciado":  "Quem foi o primeiro presidente do Brasil?",
+               "resposta_correta":  1
+           },
+    "p3":  {
+               "alternativas":  [
+                                    "Grécia Antiga",
+                                    "Império Romano",
+                                    "Egito Antigo",
+                                    "Civilização Maya"
+                                ],
+               "enunciado":  "Qual civilização antiga construiu as pirâmides de Gizé?",
+               "resposta_correta":  2
+           },
+    "p4":  {
+               "alternativas":  [
+                                    "A Queda de Constantinopla",
+                                    "A Revolução Francesa",
+                                    "A Primeira Guerra Mundial",
+                                    "O Descobrimento da América"
+                                ],
+               "enunciado":  "O evento que marcou o início da Idade Contemporânea foi:",
+               "resposta_correta":  1
+           },
+    "p5":  {
+               "alternativas":  [
+                                    "Princesa Isabel",
+                                    "Dom Pedro I",
+                                    "Dom Pedro II",
+                                    "Marquês de Pombal"
+                                ],
+               "enunciado":  "A Lei Áurea, que aboliu a escravidão no Brasil, foi assinada por quem em 1888?",
+               "resposta_correta":  0
+           },
+    "p6":  {
+               "alternativas":  [
+                                    "1914-1918",
+                                    "1939-1945",
+                                    "1950-1953",
+                                    "1964-1985"
+                                ],
+               "enunciado":  "Em qual período histórico ocorreu a Segunda Guerra Mundial?",
+               "resposta_correta":  1
+           },
+    "p7":  {
+               "alternativas":  [
+                                    "Capitalismo",
+                                    "Feudalismo",
+                                    "Socialismo",
+                                    "Mercantilismo"
+                                ],
+               "enunciado":  "O regime político e econômico dominante na Europa durante a Idade Média era o:",
+               "resposta_correta":  1
+           },
+    "p8":  {
+               "alternativas":  [
+                                    "Portugal",
+                                    "Inglaterra",
+                                    "Espanha",
+                                    "França"
+                                ],
+               "enunciado":  "Qual país financiou as viagens de Cristóvão Colombo em 1492?",
+               "resposta_correta":  2
+           },
+    "p9":  {
+               "alternativas":  [
+                                    "Espanha e Inglaterra",
+                                    "Portugal e França",
+                                    "Portugal e Espanha",
+                                    "Holanda e Portugal"
+                                ],
+               "enunciado":  "O Tratado de Tordesilhas (1494) dividiu as terras descobertas entre quais países?",
+               "resposta_correta":  2
+           }
+}

@@ -1,0 +1,122 @@
+﻿{
+    "p1":  {
+               "alternativas":  [
+                                    "Cerrado",
+                                    "Mata Atlântica",
+                                    "Amazônia",
+                                    "Caatinga"
+                                ],
+               "enunciado":  "Qual é o maior bioma brasileiro em extensão territorial?",
+               "resposta_correta":  2
+           },
+    "p10":  {
+                "alternativas":  [
+                                     "Salvador",
+                                     "Recife",
+                                     "Palmas",
+                                     "Fortaleza"
+                                 ],
+                "enunciado":  "Qual destas capitais NÃO se localiza na Região Nordeste do Brasil?",
+                "resposta_correta":  2
+            },
+    "p11":  {
+                "alternativas":  [
+                                     "Polo Norte",
+                                     "Linha do Equador (0°)",
+                                     "Meridiano de Greenwich",
+                                     "Polo Sul"
+                                 ],
+                "enunciado":  "O ponto geográfico considerado a menor latitude da Terra é:",
+                "resposta_correta":  1
+            },
+    "p12":  {
+                "alternativas":  [
+                                     "Êxodo rural",
+                                     "Transumância",
+                                     "Metropolização",
+                                     "Nomadismo"
+                                 ],
+                "enunciado":  "O processo de migração de pessoas do campo para as cidades é chamado de:",
+                "resposta_correta":  0
+            },
+    "p2":  {
+               "alternativas":  [
+                                    "Toronto",
+                                    "Vancouver",
+                                    "Montreal",
+                                    "Ottawa"
+                                ],
+               "enunciado":  "Qual é a capital do Canadá?",
+               "resposta_correta":  3
+           },
+    "p3":  {
+               "alternativas":  [
+                                    "Estações do ano",
+                                    "Dias e noites",
+                                    "Eclipses solares",
+                                    "Marés altas"
+                                ],
+               "enunciado":  "O movimento de rotação da Terra é responsável por qual fenômeno?",
+               "resposta_correta":  1
+           },
+    "p4":  {
+               "alternativas":  [
+                                    "Oceano Atlântico",
+                                    "Oceano Índico",
+                                    "Oceano Pacífico",
+                                    "Oceano Ártico"
+                                ],
+               "enunciado":  "Qual é o maior oceano do planeta Terra?",
+               "resposta_correta":  2
+           },
+    "p5":  {
+               "alternativas":  [
+                                    "Trópico de Câncer",
+                                    "Meridiano de Greenwich",
+                                    "Linha do Equador",
+                                    "Trópico de Capricórnio"
+                                ],
+               "enunciado":  "A linha imaginária que divide a Terra em Hemisfério Norte e Hemisfério Sul é:",
+               "resposta_correta":  2
+           },
+    "p6":  {
+               "alternativas":  [
+                                    "Ásia",
+                                    "África",
+                                    "Austrália",
+                                    "América do Sul"
+                                ],
+               "enunciado":  "Em qual continente fica localizado o Deserto do Saara?",
+               "resposta_correta":  1
+           },
+    "p7":  {
+               "alternativas":  [
+                                    "Himalaia",
+                                    "Alpes",
+                                    "Andes",
+                                    "Rochosas"
+                                ],
+               "enunciado":  "Qual é a maior cordilheira de montanhas do mundo em extensão?",
+               "resposta_correta":  2
+           },
+    "p8":  {
+               "alternativas":  [
+                                    "Rio de Janeiro",
+                                    "Minas Gerais",
+                                    "Bahia",
+                                    "São Paulo"
+                                ],
+               "enunciado":  "Qual estado brasileiro possui a maior população?",
+               "resposta_correta":  3
+           },
+    "p9":  {
+               "alternativas":  [
+                                    "Oxigênio",
+                                    "Dióxido de Carbono (CO2)",
+                                    "Nitrogênio",
+                                    "Hélio"
+                                ],
+               "enunciado":  "O fenômeno do aquecimento global está diretamente ligado ao aumento de qual gás na atmosfera?",
+               "resposta_correta":  1
+           }
+}

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,58 +9,176 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { listarMaterias } from '../src/services/materiaService';
+import { useAuth } from '../src/context/AuthContext';
 import type { Materia } from '../src/types/quiz';
 
 const materiaIcons: Record<string, string> = {
   matematica: '📐',
   portugues: '📖',
+  história: '🏛️',
   historia: '🏛️',
   geografia: '🌍',
-  biologia: 'v',
+  biologia: '🧬',
+};
+
+const corrigirTexto = (texto: any): string => {
+  if (typeof texto !== 'string') return '';
+
+  let resultado = texto.normalize('NFC');
+
+  const substituicoes: Record<string, string> = {
+    'MatemÃ¡tica': 'Matemática',
+    'matemÃ¡tica': 'matemática',
+    'PortuguÃªs': 'Português',
+    'português': 'português',
+    'HistÃ³ria': 'História',
+    'histÃ³ria': 'história',
+    'Geografia': 'Geografia',
+    'Biologia': 'Biologia',
+    'Lngua': 'Língua',
+    'comunicao': 'comunicação',
+    'funo': 'função',
+    'sÃ£o': 'são',
+    'so': 'são',
+    'substantivo': 'substantivo',
+    'preposio': 'preposição',
+    'conjuno': 'conjunção',
+    'interjeio': 'interjeição',
+    'Interpretao': 'Interpretação',
+    'interpretao': 'interpretação',
+    'informaes': 'informações',
+    'explcitas': 'explícitas',
+    'implcitas': 'implícitas',
+    'pblico': 'público',
+  };
+
+  Object.entries(substituicoes).forEach(([incorreto, correto]) => {
+    resultado = resultado.split(incorreto).join(correto);
+  });
+
+  return resultado.replace(/\uFFFD/g, '');
 };
 
 export default function MateriasScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+
+  const favoritesKey = `knowzy:favoritos:${user?.id || 'local'}`;
+
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [favoritos, setFavoritos] = useState<Materia[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMaterias = async () => {
+    let ativo = true;
+
+    (async () => {
       try {
-        const data = await listarMaterias();
-        setMaterias(data);
+        const [data, saved] = await Promise.all([
+          listarMaterias(),
+          AsyncStorage.getItem(favoritesKey),
+        ]);
+
+        if (!ativo) return;
+
+        setMaterias(Array.isArray(data) ? data : []);
+
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setFavoritos(Array.isArray(parsed) ? parsed : []);
+        }
       } catch (error) {
         Alert.alert('Erro', 'Não foi possível carregar as matérias.');
       } finally {
-        setLoading(false);
+        if (ativo) setLoading(false);
       }
-    };
+    })();
 
-    fetchMaterias();
-  }, []);
+    return () => {
+      ativo = false;
+    };
+  }, [favoritesKey]);
+
+  const isFavorite = (id: string) =>
+    favoritos.some((item) => String(item.id) === id);
+
+  const toggleFavorite = async (item: Materia) => {
+    const id = String(item.id || item.slug || item.nome);
+
+    const next = isFavorite(id)
+      ? favoritos.filter((fav) => String(fav.id) !== id)
+      : [...favoritos, { ...item, id }];
+
+    setFavoritos(next);
+
+    try {
+      await AsyncStorage.setItem(favoritesKey, JSON.stringify(next));
+    } catch {
+      Alert.alert('Erro', 'Não foi possível salvar os favoritos.');
+    }
+  };
 
   const renderItem = ({ item }: { item: Materia }) => {
-    const slug = item.slug || item.id || item.nome?.toLowerCase();
+    const slug = String(item.slug || item.id || item.nome?.toLowerCase());
+
+    const nomeCorrigido = corrigirTexto(item.nome);
+    const descricaoCorrigida = corrigirTexto(item.descricao);
+
+    const favorito = isFavorite(
+      String(item.id || item.slug || item.nome)
+    );
 
     return (
-      <Link href={{ pathname: '/quiz', params: { materia: slug, nome: item.nome } }} asChild>
-        <TouchableOpacity style={styles.card} activeOpacity={0.85}>
+      <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.cardMain}
+          activeOpacity={0.85}
+          onPress={() =>
+            router.push({
+              pathname: '/estudo/[materia]' as any,
+              params: {
+                materia: slug,
+                nome: nomeCorrigido,
+              },
+            })
+          }
+        >
           <Text style={styles.icon}>
-            {materiaIcons[String(slug).toLowerCase()] || '📘'}
+            {materiaIcons[slug.toLowerCase()] || '📘'}
           </Text>
 
           <View style={styles.textWrap}>
-            <Text style={styles.title}>{item.nome}</Text>
+            <Text style={styles.title}>{nomeCorrigido}</Text>
+
             <Text style={styles.subtitle}>
-              {item.descricao || 'Continue sua jornada'}
+              {descricaoCorrigida || 'Continue sua jornada'}
             </Text>
           </View>
 
           <Text style={styles.arrow}>›</Text>
         </TouchableOpacity>
-      </Link>
+
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={() => toggleFavorite(item)}
+          accessibilityLabel={
+            favorito
+              ? 'Remover dos favoritos'
+              : 'Adicionar aos favoritos'
+          }
+        >
+          <Ionicons
+            name={favorito ? 'heart' : 'heart-outline'}
+            size={22}
+            color="#ff8fcb"
+          />
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -132,10 +249,16 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
-    padding: 16,
+    padding: 12,
     marginBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  cardMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 4,
   },
   icon: {
     fontSize: 28,
@@ -158,6 +281,13 @@ const styles = StyleSheet.create({
     color: '#8C61FF',
     fontSize: 28,
     fontWeight: '700',
+    marginLeft: 8,
+  },
+  favoriteButton: {
+    width: 42,
+    height: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loading: {
     flex: 1,

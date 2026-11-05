@@ -1,6 +1,18 @@
 
 const bcrypt = require('bcrypt');
-const { db } = require('../config/firebase');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const { db, isRealFirebase } = require('../config/firebase');
+
+// Fallback em memória para preview sem credenciais. A persistência no navegador/app
+// continua sendo responsabilidade do LocalStorage/AsyncStorage até a sincronização.
+const progressoLocal = new Map();
+const localPreviewFile = path.join(__dirname, '../../.local-preview-users.json');
+const lerUsuariosLocais = () => { try { return JSON.parse(fs.readFileSync(localPreviewFile, 'utf8')); } catch { return {}; } };
+let usuariosLocais = lerUsuariosLocais();
+const salvarUsuariosLocais = () => { try { fs.writeFileSync(localPreviewFile, JSON.stringify(usuariosLocais, null, 2), { mode: 0o600 }); } catch (error) { console.warn('Não foi possível salvar o perfil local do preview:', error.message); } };
+const { aplicarPontuacao } = require('../services/xpService');
 
 const validarEmail = (email) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
@@ -28,7 +40,6 @@ const normalizarConquistas = (conquistas = []) => {
     )];
   }
 
-  // Compatibilidade com registros antigos em formato de objeto.
   if (conquistas && typeof conquistas === 'object') {
     return Object.entries(conquistas)
       .filter(([, valor]) =>
@@ -110,6 +121,10 @@ const normalizarUsuario = (usuario = {}) => ({
 
 const buscarPerfil = async (id) => {
   if (!id) return null;
+  if (!isRealFirebase) {
+    const local = usuariosLocais[String(id)] || progressoLocal.get(String(id));
+    return local ? normalizarUsuario({ id, ...local }) : null;
+  }
 
   const snapshot = await db.ref(`usuarios/${id}`).once('value');
   const usuario = snapshot.val();
@@ -130,7 +145,6 @@ const atualizarPerfil = async (id, dados = {}) => {
 
   const atualizacao = { ...dados };
 
-  // Mantém nome e XP sincronizados com o perfil.
   if (dados.nome !== undefined || dados.xp !== undefined) {
     atualizacao.perfil = {
       ...usuarioAtual.perfil,
@@ -150,12 +164,17 @@ const atualizarPerfil = async (id, dados = {}) => {
     );
   }
 
+  if (!isRealFirebase) {
+    usuariosLocais[String(id)] = { ...usuarioAtual, ...atualizacao };
+    salvarUsuariosLocais();
+    return buscarPerfil(id);
+  }
   await db.ref(`usuarios/${id}`).update(atualizacao);
-
   return buscarPerfil(id);
 };
 
 const buscarConquistas = async (id) => {
+  if (!isRealFirebase) return (await buscarPerfil(id))?.conquistas || [];
   const snapshot = await db
     .ref(`usuarios/${id}/conquistas`)
     .once('value');
@@ -164,6 +183,7 @@ const buscarConquistas = async (id) => {
 };
 
 const listarUsuarios = async () => {
+  if (!isRealFirebase) return Object.entries(usuariosLocais).map(([id, usuario]) => normalizarUsuario({ id, ...usuario }));
   const snapshot = await db.ref('usuarios').once('value');
   const usuarios = snapshot.val() || {};
 
@@ -214,6 +234,13 @@ const criarUsuario = async ({ nome, email, senha }) => {
 
   const senhaHash = await bcrypt.hash(senha, 12);
 
+  if (!isRealFirebase) {
+    const id = `preview-${crypto.randomUUID()}`;
+    const usuario = { nome: nomeValido, email: emailValido, senha: senhaHash, xp: 0, totalQuizzes: 0, materiasExploradas: [], ultimaPontuacao: 0, conquistas: [], questoesPontuadas: {}, quizzesConcluidos: {}, perfil: { nome: nomeValido, tag: `usuario_${id.slice(-6)}`, nivelAtual: 'Iniciante', xpTotal: 0 }, favoritos: {}, progressoConquistas: {} };
+    usuariosLocais[id] = usuario; salvarUsuariosLocais();
+    return normalizarUsuario({ id, ...usuario });
+  }
+
   const ref = db.ref('usuarios').push();
   const id = ref.key;
 
@@ -227,6 +254,7 @@ const criarUsuario = async ({ nome, email, senha }) => {
     materiasExploradas: [],
     ultimaPontuacao: 0,
     conquistas: [],
+    questoesPontuadas: {},
 
     perfil: {
       nome: nomeValido,
@@ -244,7 +272,6 @@ const criarUsuario = async ({ nome, email, senha }) => {
     },
 
     favoritos: {},
-
     progressoConquistas: {}
   };
 
@@ -268,34 +295,18 @@ const atualizarXpUsuario = async (
     xpAtual + Number(xpAdicional || 0)
   );
 
-  const totalQuizzesAtual = Number(usuarioAtual.totalQuizzes || 0);
-  const totalQuizzesFinal =
-    progressoExtra.totalQuizzes !== undefined
-      ? Number(progressoExtra.totalQuizzes || 0)
-      : totalQuizzesAtual + 1;
-
-  const materiasBase = normalizarMateriasExploradas(usuarioAtual.materiasExploradas);
-  const materiasNovas = normalizarMateriasExploradas(progressoExtra.materiasExploradas);
-  const materiasFinal = normalizarMateriasExploradas([
-    ...materiasBase,
-    ...materiasNovas
-  ]);
-
-  const ultimaPontuacaoAtual = Number(usuarioAtual.ultimaPontuacao || 0);
-  const ultimaPontuacaoFinal =
-    progressoExtra.ultimaPontuacao !== undefined
-      ? Math.max(
-          ultimaPontuacaoAtual,
-          Number(progressoExtra.ultimaPontuacao || 0)
-        )
-      : ultimaPontuacaoAtual;
-
   const progresso = calcularConquistasDoUsuario({
     xp: proximoXp,
     conquistas: usuarioAtual.conquistas,
-    totalQuizzes: totalQuizzesFinal,
-    materiasExploradas: materiasFinal,
-    ultimaPontuacao: ultimaPontuacaoFinal
+    totalQuizzes:
+      progressoExtra.totalQuizzes ??
+      usuarioAtual.totalQuizzes,
+    materiasExploradas:
+      progressoExtra.materiasExploradas ??
+      usuarioAtual.materiasExploradas,
+    ultimaPontuacao:
+      progressoExtra.ultimaPontuacao ??
+      usuarioAtual.ultimaPontuacao
   });
 
   const nivelAtual =
@@ -321,12 +332,52 @@ const atualizarXpUsuario = async (
   return buscarPerfil(id);
 };
 
+// Registra 5 XP por pergunta correta, uma única vez
+// por usuário e por matéria, diretamente no Firebase.
+const registrarXpPorPerguntas = async (
+  id,
+  materiaId,
+  questoesCorretas = [],
+  progressoExtra = {}
+) => {
+  if (!id || !materiaId || !Array.isArray(questoesCorretas)) {
+    throw new Error('Dados inválidos para registrar XP.');
+  }
+
+  const novasQuestoes = [...new Set(questoesCorretas.filter(Boolean).map(String))];
+  const quizKey = String(progressoExtra.quizKey || `${materiaId}:${novasQuestoes.slice().sort().join(',')}`);
+
+  if (!isRealFirebase) {
+    const atual = usuariosLocais[String(id)] || progressoLocal.get(String(id)) || {
+      id, nome: 'Estudante', email: '', xp: 0, totalQuizzes: 0,
+      materiasExploradas: [], conquistas: [], questoesPontuadas: {},
+      quizzesConcluidos: {}, perfil: { xpTotal: 0, nivelAtual: 'Iniciante' }
+    };
+    const aplicado = aplicarPontuacao(atual, materiaId, novasQuestoes, quizKey, progressoExtra.ultimaPontuacao);
+    const usuario = normalizarUsuario({ ...aplicado.usuario, id });
+    progressoLocal.set(String(id), usuario);
+    if (usuariosLocais[String(id)]) { usuariosLocais[String(id)] = usuario; salvarUsuariosLocais(); }
+    return { xpGanho: aplicado.xpGanho, usuario, sincronizado: false };
+  }
+
+  const ref = db.ref(`usuarios/${id}`);
+  let xpGanho = 0;
+  const transacao = await ref.transaction((usuario) => {
+    if (!usuario) return;
+    const aplicado = aplicarPontuacao(usuario, materiaId, novasQuestoes, quizKey, progressoExtra.ultimaPontuacao);
+    xpGanho = aplicado.xpGanho;
+    return aplicado.usuario;
+  });
+  if (!transacao.committed) throw new Error('Não foi possível registrar o XP.');
+  const usuarioAtualizado = normalizarUsuario({ id, ...transacao.snapshot.val() });
+  return { xpGanho, usuario: usuarioAtualizado, sincronizado: true };
+};
+
 const verificarCredenciais = async ({ email, senha }) => {
   const usuario = await buscarPorEmail(email);
 
   if (!usuario || !usuario.senha) return null;
 
-  // Aceita somente senhas armazenadas com bcrypt.
   const senhaCorreta = await bcrypt.compare(
     String(senha || ''),
     usuario.senha
@@ -363,6 +414,7 @@ module.exports = {
   criarUsuario,
   verificarCredenciais,
   atualizarXpUsuario,
+  registrarXpPorPerguntas,
   normalizarUsuario,
   calcularConquistasDoUsuario,
   aplicarPremioLogin

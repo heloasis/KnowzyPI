@@ -1,3 +1,4 @@
+const { createToken } = require('../utils/authToken');
 const userModel = require('../models/user');
 
 const isSafeInternalRedirect = (value) => { if (typeof value !== 'string') { return false; }
@@ -79,23 +80,8 @@ cadastrarUsuario: async (req, res) => {
             nome: usuario.nome,
             email: usuario.email,
             xp: Number(usuario.xp || 0),
-            totalQuizzes: Number(usuario.totalQuizzes || 0),
-            materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
-            ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
             conquistas: usuario.conquistas || [],
-            foto: '',
-            perfil: usuario.perfil || {
-                nome: usuario.nome,
-                xpTotal: Number(usuario.xp || 0),
-                nivelAtual: 'Iniciante'
-            },
-            mascote: usuario.mascote || {
-                roupa: 'casaco_roto',
-                acessorio: 'fone_ouvido',
-                expressao: 'piscada',
-                efeito: 'galaxia',
-                cor: 'roxo'
-            }
+            foto: ''
         };
 
         delete req.session.returnTo;
@@ -114,24 +100,10 @@ cadastrarUsuario: async (req, res) => {
                     nome: usuario.nome,
                     email: usuario.email,
                     xp: Number(usuario.xp || 0),
-                    totalQuizzes: Number(usuario.totalQuizzes || 0),
-                    materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
-                    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
-                    conquistas: usuario.conquistas || [],
-                    perfil: usuario.perfil || {
-                        nome: usuario.nome,
-                        xpTotal: Number(usuario.xp || 0),
-                        nivelAtual: 'Iniciante'
-                    },
-                    mascote: usuario.mascote || {
-                        roupa: 'casaco_roto',
-                        acessorio: 'fone_ouvido',
-                        expressao: 'piscada',
-                        efeito: 'galaxia',
-                        cor: 'roxo'
-                    }
+                    conquistas: usuario.conquistas || []
                 },
-                redirectTo
+                redirectTo,
+                token: createToken(usuario)
             });
         });
 
@@ -164,23 +136,8 @@ loginUsuario: async (req, res) => {
             nome: usuario.nome,
             email: usuario.email,
             xp: Number(usuario.xp || 0),
-            totalQuizzes: Number(usuario.totalQuizzes || 0),
-            materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
-            ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
             conquistas: usuario.conquistas || [],
-            foto: '',
-            perfil: usuario.perfil || {
-                nome: usuario.nome,
-                xpTotal: Number(usuario.xp || 0),
-                nivelAtual: 'Iniciante'
-            },
-            mascote: usuario.mascote || {
-                roupa: 'casaco_roto',
-                acessorio: 'fone_ouvido',
-                expressao: 'piscada',
-                efeito: 'galaxia',
-                cor: 'roxo'
-            }
+            foto: ''
         };
 
         delete req.session.returnTo;
@@ -199,24 +156,10 @@ loginUsuario: async (req, res) => {
                     nome: usuario.nome,
                     email: usuario.email,
                     xp: Number(usuario.xp || 0),
-                    totalQuizzes: Number(usuario.totalQuizzes || 0),
-                    materiasExploradas: Array.isArray(usuario.materiasExploradas) ? usuario.materiasExploradas : [],
-                    ultimaPontuacao: Number(usuario.ultimaPontuacao || 0),
-                    conquistas: usuario.conquistas || [],
-                    perfil: usuario.perfil || {
-                        nome: usuario.nome,
-                        xpTotal: Number(usuario.xp || 0),
-                        nivelAtual: 'Iniciante'
-                    },
-                    mascote: usuario.mascote || {
-                        roupa: 'casaco_roto',
-                        acessorio: 'fone_ouvido',
-                        expressao: 'piscada',
-                        efeito: 'galaxia',
-                        cor: 'roxo'
-                    }
+                    conquistas: usuario.conquistas || []
                 },
-                redirectTo
+                redirectTo,
+                token: createToken(usuario)
             });
         });
 

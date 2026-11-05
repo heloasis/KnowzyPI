@@ -21,6 +21,7 @@ export type CadastroPayload = {
 };
 
 export type AuthResponse = {
+  token?: string;
   mensagem?: string;
   usuario?: Usuario;
   erro?: string;

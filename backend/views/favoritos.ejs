@@ -306,7 +306,8 @@
     </div>
 
     <script>
-        const STORAGE_KEYS = ['favoritos', 'knowzyFavoritos'];
+        const USER_KEY = <%- JSON.stringify(usuario?.id || 'preview') %>;
+        const STORAGE_KEYS = [`knowzy:${USER_KEY}:favoritos`];
 
         const materias = <%- JSON.stringify(materias || []) %>;
 
@@ -377,7 +378,7 @@
                 <div
                     class="materia-card"
                     data-id="${materia.id}"
-                    data-route="/quiz/${materia.slug || materia.id}"
+                    data-route="/materias/${materia.slug || materia.id}"
                 >
                     <div class="materia-main">
 

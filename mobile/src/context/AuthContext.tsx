@@ -4,8 +4,10 @@ import React, {
   useContext,
   useMemo,
   useState,
+  useEffect,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setAuthToken, clearAuthToken } from '../api/api';
 
 import type { Usuario } from '../types/auth';
 
@@ -23,13 +25,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUserState] = useState<Usuario | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Não precisamos carregar dados salvos.
-  const isLoading = false;
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedUser = await AsyncStorage.getItem('knowzy:user');
+        const savedToken = await AsyncStorage.getItem('knowzy:token');
+        if (savedUser) setUserState(JSON.parse(savedUser));
+        if (savedToken) await setAuthToken(savedToken);
+      } catch (error) { console.warn('Não foi possível recuperar a sessão local.', error); }
+      finally { setIsLoading(false); }
+    })();
+  }, []);
 
   const signIn = async (nextUser: Usuario) => {
     try {
-      await AsyncStorage.multiRemove(['favoritos', 'knowzyFavoritos']);
+      await AsyncStorage.setItem('knowzy:user', JSON.stringify(nextUser));
     } catch (error) {
       // Ignora falhas de storage em ambientes restritivos.
     }
@@ -39,7 +51,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut = async () => {
     try {
-      await AsyncStorage.multiRemove(['favoritos', 'knowzyFavoritos']);
+      await AsyncStorage.multiRemove(['knowzy:user', 'knowzy:token']);
+      await clearAuthToken();
     } catch (error) {
       // Ignora falhas de storage em ambientes restritivos.
     }
@@ -49,6 +62,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setUser = async (nextUser: Usuario | null) => {
     setUserState(nextUser);
+    if (nextUser) await AsyncStorage.setItem('knowzy:user', JSON.stringify(nextUser));
+    else await AsyncStorage.removeItem('knowzy:user');
   };
 
   const value = useMemo<AuthContextType>(

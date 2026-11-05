@@ -176,7 +176,15 @@
 
       <div class="info-item">
         <span class="label">Total de XP</span>
-        <span class="value">780 XP</span>
+        <span class="value"><%= Number(usuario.xp || usuario.perfil?.xpTotal || 0) %> XP</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Nível atual</span>
+        <span class="value"><%= usuario.perfil?.nivelAtual || (Number(usuario.xp || 0) >= 3000 ? 'Lenda' : Number(usuario.xp || 0) >= 1500 ? 'Mestre' : Number(usuario.xp || 0) >= 1000 ? 'Sábio' : Number(usuario.xp || 0) >= 500 ? 'Aventureiro' : 'Iniciante') %></span>
+      </div>
+      <div class="info-item">
+        <span class="label">Quizzes concluídos</span>
+        <span class="value"><%= Number(usuario.totalQuizzes || 0) %></span>
       </div>
     </section>
 

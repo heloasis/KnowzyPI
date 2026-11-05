@@ -1,0 +1,164 @@
+{
+  "portugues": {
+    "nome": "Português",
+    "descricao": "Língua, comunicação e literatura",
+    "topicos": [
+      [
+        "classes-gramaticais",
+        "Classes gramaticais",
+        "As classes gramaticais agrupam palavras conforme a função que exercem na língua. As dez classes são: substantivo, artigo, adjetivo, numeral, pronome, verbo, advérbio, preposição, conjunção e interjeição.",
+        "Exemplo: em “A menina estudou bastante”, “menina” é substantivo, “estudou” é verbo e “bastante” é advérbio."
+      ],
+      [
+        "interpretacao",
+        "Interpretação de texto",
+        "Interpretar é construir sentido a partir das informações explícitas e implícitas. Observe o tema, a finalidade, o público, o contexto e as pistas linguísticas. Diferencie fato de opinião e evite conclusões que o texto não permite.",
+        "Dica: releia o trecho relacionado à pergunta e procure evidências antes de escolher uma interpretação."
+      ],
+      [
+        "figuras",
+        "Figuras de linguagem",
+        "Figuras de linguagem criam efeitos expressivos. Metáfora estabelece uma comparação implícita; comparação usa conectivos como “como”; personificação atribui ações humanas a seres não humanos; hipérbole é exagero intencional; ironia expressa sentido diferente do literal.",
+        "Exemplo: “O tempo voa” é uma metáfora que destaca a rapidez da passagem do tempo."
+      ],
+      [
+        "concordancia",
+        "Concordância verbal e nominal",
+        "A concordância verbal ajusta o verbo ao sujeito em pessoa e número. A nominal ajusta artigos, adjetivos, numerais e pronomes ao substantivo em gênero e número.",
+        "Exemplo: “As alunas dedicadas estudam”. O artigo, o adjetivo e o verbo concordam com o sujeito."
+      ],
+      [
+        "pontuacao",
+        "Pontuação",
+        "A pontuação organiza a estrutura do texto e orienta a leitura. A vírgula separa elementos e intercalações, mas não deve separar sujeito e predicado. Ponto final encerra uma declaração; dois-pontos introduzem explicações, enumerações ou falas.",
+        "Exemplo: “Comprei lápis, cadernos e livros.” A vírgula separa itens de uma enumeração."
+      ]
+    ]
+  },
+  "matematica": {
+    "nome": "Matemática",
+    "descricao": "Números, relações e raciocínio lógico",
+    "topicos": [
+      [
+        "fracoes",
+        "Frações",
+        "Uma fração representa partes de um todo ou uma divisão. O numerador indica quantas partes são consideradas e o denominador em quantas partes iguais o todo foi dividido. O denominador não pode ser zero.",
+        "Exemplo: 3/4 representa três partes de um total dividido em quatro partes iguais."
+      ],
+      [
+        "porcentagem",
+        "Porcentagem",
+        "Porcentagem é uma razão com denominador 100. Para calcular x% de um valor, multiplique o valor por x/100. Em aumentos e descontos sucessivos, calcule cada variação sobre o valor atualizado.",
+        "Exemplo: 20% de 150 = 150 × 0,20 = 30."
+      ],
+      [
+        "equacoes",
+        "Equações do 1º grau",
+        "Uma equação é uma igualdade que contém uma incógnita. Para resolver, aplique operações equivalentes nos dois lados até isolar a incógnita. Confira substituindo o resultado na equação original.",
+        "Exemplo: x + 7 = 12; subtraindo 7 dos dois lados, x = 5."
+      ],
+      [
+        "funcoes",
+        "Funções",
+        "Uma função associa cada elemento do domínio a exatamente um elemento do contradomínio. Na função afim f(x)=ax+b, “a” é a taxa de variação e “b” é o valor inicial, isto é, f(0).",
+        "Exemplo: f(x)=2x+3. Para x=4, f(4)=2·4+3=11."
+      ],
+      [
+        "geometria",
+        "Geometria plana",
+        "Perímetro é a medida do contorno; área mede a superfície. Retângulo: A=b·h. Triângulo: A=(b·h)/2. Quadrado: A=l². Use unidades coerentes e diferencie unidades lineares de quadradas.",
+        "Exemplo: retângulo de base 5 cm e altura 3 cm tem área 15 cm²."
+      ]
+    ]
+  },
+  "historia": {
+    "nome": "História",
+    "descricao": "Sociedades, transformações e temporalidades",
+    "topicos": [
+      [
+        "antiga",
+        "História Antiga",
+        "A Antiguidade reúne sociedades complexas que se desenvolveram em diferentes regiões, como Egito, Mesopotâmia, Grécia e Roma. Agricultura, cidades, escrita, comércio e formas variadas de poder marcaram esses processos.",
+        "A escrita cuneiforme, desenvolvida na Mesopotâmia, é um exemplo de registro usado na administração e na vida social."
+      ],
+      [
+        "medieval",
+        "Idade Média",
+        "Convencionalmente situada entre os séculos V e XV na Europa, a Idade Média teve grande diversidade política, econômica e cultural. Feudalismo, cristianismo latino, cidades, comércio e universidades são temas importantes, sem reduzir o período a uma única realidade.",
+        "A partir da Baixa Idade Média, o crescimento urbano e comercial transformou relações sociais e econômicas."
+      ],
+      [
+        "moderna",
+        "Idade Moderna",
+        "Entre os séculos XV e XVIII, processos como expansão marítima europeia, colonização, Renascimento, Reforma, fortalecimento das monarquias e Iluminismo transformaram relações de poder e circulação de ideias.",
+        "O Iluminismo valorizou a razão e influenciou debates políticos sobre direitos e organização do Estado."
+      ],
+      [
+        "brasil",
+        "História do Brasil",
+        "A história brasileira envolve sociedades indígenas anteriores à colonização, colonização portuguesa, escravização, resistência, independência, Império, República e transformações sociais contemporâneas.",
+        "A independência de 1822 não significou o fim imediato da escravidão nem a inclusão política de toda a população."
+      ]
+    ]
+  },
+  "geografia": {
+    "nome": "Geografia",
+    "descricao": "Espaço geográfico, ambiente e sociedade",
+    "topicos": [
+      [
+        "cartografia",
+        "Cartografia",
+        "Cartografia é a área que representa o espaço por meio de mapas, cartas e plantas. Elementos fundamentais incluem título, legenda, escala, orientação e projeção. Toda projeção apresenta algum tipo de distorção.",
+        "A escala 1:100.000 significa que 1 unidade no mapa corresponde a 100.000 unidades no terreno."
+      ],
+      [
+        "clima",
+        "Clima e tempo atmosférico",
+        "Tempo atmosférico descreve condições momentâneas da atmosfera; clima corresponde a padrões observados durante longos períodos. Latitude, altitude, relevo, maritimidade, continentalidade e massas de ar influenciam o clima.",
+        "Uma previsão para amanhã trata do tempo; a caracterização de clima tropical trata de padrões de longo prazo."
+      ],
+      [
+        "biomas",
+        "Biomas brasileiros",
+        "Biomas são grandes conjuntos de ecossistemas com características de clima, vegetação e fauna. O Brasil possui Amazônia, Cerrado, Caatinga, Mata Atlântica, Pantanal e Pampa, cada um com biodiversidade e desafios ambientais próprios.",
+        "O Cerrado apresenta vegetação adaptada a uma estação seca bem marcada e abriga nascentes de importantes bacias."
+      ],
+      [
+        "globalizacao",
+        "Globalização",
+        "Globalização intensifica fluxos de mercadorias, capitais, informações, pessoas e cultura. O processo é desigual: conecta territórios, mas também pode ampliar dependências e desigualdades.",
+        "Uma cadeia produtiva pode envolver projeto em um país, componentes em outros e montagem em outro território."
+      ]
+    ]
+  },
+  "biologia": {
+    "nome": "Biologia",
+    "descricao": "Vida, organismos e relações ecológicas",
+    "topicos": [
+      [
+        "citologia",
+        "Citologia",
+        "Citologia estuda as células, unidades estruturais e funcionais dos seres vivos. A membrana plasmática delimita a célula e participa do controle das trocas; o citoplasma abriga estruturas celulares; o material genético contém informações hereditárias.",
+        "Células procarióticas não possuem núcleo delimitado por membrana; eucarióticas possuem núcleo organizado."
+      ],
+      [
+        "genetica",
+        "Genética",
+        "Genética estuda a hereditariedade e a variação. Genes são segmentos de DNA associados a características; alelos são versões de um gene. Genótipo corresponde à constituição genética e fenótipo às características observáveis resultantes da interação entre genes e ambiente.",
+        "Em um cruzamento Aa × Aa, cada progenitor pode formar gametas A ou a."
+      ],
+      [
+        "ecologia",
+        "Ecologia",
+        "Ecologia investiga as relações entre organismos e ambiente. Indivíduo, população, comunidade, ecossistema e biosfera são níveis de organização. Cadeias e teias alimentares representam transferência de matéria e energia.",
+        "Produtores, como plantas, formam a base de muitas cadeias alimentares ao converter energia luminosa em energia química."
+      ],
+      [
+        "evolucao",
+        "Evolução",
+        "Evolução biológica é a mudança das características hereditárias das populações ao longo das gerações. Mutação e recombinação geram variação; seleção natural, deriva genética e fluxo gênico influenciam frequências de variantes.",
+        "A seleção natural depende de variações hereditárias e diferenças no sucesso reprodutivo em determinado ambiente."
+      ]
+    ]
+  }
+}

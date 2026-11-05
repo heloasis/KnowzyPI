@@ -1,27 +1,39 @@
+
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from 'expo-router';
-import Button from '../src/components/Button';
-import Input from '../src/components/Input';
+
 import { cadastroApi } from '../src/services/authService';
 
-const validarEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+const validarEmail = (value: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 const validarSenha = (value: string) => {
-  return value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value) && /[^A-Za-z\d]/.test(value);
+  return (
+    value.length >= 8 &&
+    /[A-Za-z]/.test(value) &&
+    /\d/.test(value) &&
+    /[^A-Za-z\d]/.test(value)
+  );
 };
 
 export default function CadastroScreen() {
   const router = useRouter();
+
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -29,7 +41,10 @@ export default function CadastroScreen() {
 
   const handleCadastro = async () => {
     if (!nome.trim() || !email.trim() || !senha.trim()) {
-      Alert.alert('Campos obrigatórios', 'Preencha nome, e-mail e senha para continuar.');
+      Alert.alert(
+        'Campos obrigatórios',
+        'Preencha nome, e-mail e senha para continuar.'
+      );
       return;
     }
 
@@ -48,26 +63,60 @@ export default function CadastroScreen() {
 
     setLoading(true);
 
-    const result = await cadastroApi({
-      nome: nome.trim(),
-      email: email.trim().toLowerCase(),
-      senha,
-    });
+    try {
+      const result = await cadastroApi({
+        nome: nome.trim(),
+        email: email.trim().toLowerCase(),
+        senha,
+      });
 
-    if (result.erro) {
-      Alert.alert('Erro no cadastro', result.erro);
+      if (result.erro) {
+        Alert.alert('Erro no cadastro', result.erro);
+        return;
+      }
+
+      Alert.alert(
+        'Sucesso',
+        result.mensagem || 'Cadastro concluído com sucesso!',
+        [
+          {
+            text: 'Continuar',
+            onPress: () => router.replace('/login'),
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert(
+        'Erro no cadastro',
+        'Não foi possível realizar o cadastro. Tente novamente.'
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setLoading(false);
-    Alert.alert('Sucesso', result.mensagem || 'Cadastro concluído com sucesso!');
-    router.replace('/login');
   };
 
   return (
     <View style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
+
+      <LinearGradient
+        colors={['#10083d', '#06052b', '#04031f']}
+        locations={[0, 0.48, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <View pointerEvents="none" style={styles.background}>
+        <View style={styles.arcOne} />
+        <View style={styles.arcTwo} />
+        <View style={styles.arcThree} />
+
+        <View style={[styles.star, styles.starOne]} />
+        <View style={[styles.star, styles.starTwo]} />
+        <View style={[styles.star, styles.starThree]} />
+        <View style={[styles.star, styles.starFour]} />
+        <View style={[styles.star, styles.starFive]} />
+      </View>
+
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -77,47 +126,100 @@ export default function CadastroScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.logoWrap}>
-            <Text style={styles.logo}>Knowzy</Text>
-          </View>
-
           <View style={styles.card}>
-            <Text style={styles.title}>Crie sua conta</Text>
-            <Text style={styles.subtitle}>Acompanhe sua jornada de aprendizado em um só lugar.</Text>
+            <View style={styles.header}>
+              <Image
+                source={require('../assets/images/image.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
 
-            <Input
-              label="Nome completo"
-              value={nome}
-              onChangeText={setNome}
-              placeholder="Digite seu nome completo"
-              autoCapitalize="words"
-            />
+              <Text style={styles.title}>Crie sua conta</Text>
 
-            <Input
-              label="E-mail"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="seuemail@exemplo.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+              <Text style={styles.subtitle}>
+                Acompanhe sua jornada de aprendizado em um só lugar.
+              </Text>
+            </View>
 
-            <Input
-              label="Senha"
-              value={senha}
-              onChangeText={setSenha}
-              placeholder="Crie uma senha segura"
-              secureTextEntry
-            />
+            <View style={styles.form}>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Nome completo</Text>
 
-            <Button title="Cadastrar" onPress={handleCadastro} loading={loading} />
-          </View>
+                <TextInput
+                  style={styles.input}
+                  value={nome}
+                  onChangeText={setNome}
+                  placeholder="Digite seu nome completo"
+                  placeholderTextColor="rgba(223,230,255,0.52)"
+                  autoCapitalize="words"
+                  maxLength={120}
+                />
+              </View>
 
-          <View style={styles.footerRow}>
-            <Text style={styles.footerText}>Já possui uma conta?</Text>
-            <Link href="/login" asChild>
-              <Text style={styles.linkText}>Entrar</Text>
-            </Link>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>E-mail</Text>
+
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="seuemail@exemplo.com"
+                  placeholderTextColor="rgba(223,230,255,0.52)"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  maxLength={150}
+                />
+              </View>
+
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Senha</Text>
+
+                <TextInput
+                  style={styles.input}
+                  value={senha}
+                  onChangeText={setSenha}
+                  placeholder="Crie uma senha segura"
+                  placeholderTextColor="rgba(223,230,255,0.52)"
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+
+                <Text style={styles.helper}>
+                  Use no mínimo 8 caracteres, com letras, números e símbolo.
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={handleCadastro}
+                disabled={loading}
+                style={styles.buttonWrapper}
+              >
+                <LinearGradient
+                  colors={['#b890ef', '#8d7ae1']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.button}
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#050814" />
+                  ) : (
+                    <Text style={styles.buttonText}>Cadastrar</Text>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>
+                Já possui uma conta?
+              </Text>
+
+              <Link href="/login" asChild>
+                <Text style={styles.linkText}>Entrar</Text>
+              </Link>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -128,65 +230,235 @@ export default function CadastroScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#060312',
+    backgroundColor: '#04031f',
   },
+
   container: {
     flex: 1,
-    backgroundColor: '#060312',
   },
+
+  background: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
+  },
+
+  arcOne: {
+    position: 'absolute',
+    width: 1800,
+    height: 1800,
+    borderRadius: 900,
+    borderWidth: 1,
+    borderColor: 'rgba(124,98,255,0.12)',
+    top: -1000,
+    right: -900,
+  },
+
+  arcTwo: {
+    position: 'absolute',
+    width: 2600,
+    height: 2600,
+    borderRadius: 1300,
+    borderWidth: 1,
+    borderColor: 'rgba(124,98,255,0.08)',
+    top: -1450,
+    right: -1300,
+  },
+
+  arcThree: {
+    position: 'absolute',
+    width: 2400,
+    height: 2400,
+    borderRadius: 1200,
+    borderWidth: 1,
+    borderColor: 'rgba(124,98,255,0.07)',
+    bottom: -1400,
+    left: -1700,
+  },
+
+  star: {
+    position: 'absolute',
+    borderRadius: 10,
+    backgroundColor: '#6b6dff',
+    shadowColor: '#6b6dff',
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+
+  starOne: {
+    width: 6,
+    height: 6,
+    left: 120,
+    top: 90,
+  },
+
+  starTwo: {
+    width: 3,
+    height: 3,
+    left: 260,
+    top: 140,
+  },
+
+  starThree: {
+    width: 5,
+    height: 5,
+    right: 70,
+    top: 180,
+  },
+
+  starFour: {
+    width: 4,
+    height: 4,
+    right: 90,
+    bottom: 200,
+  },
+
+  starFive: {
+    width: 3,
+    height: 3,
+    left: 100,
+    bottom: 160,
+  },
+
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    paddingHorizontal: 22,
+    paddingHorizontal: 14,
     paddingVertical: 24,
   },
-  logoWrap: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  logo: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
+
   card: {
-    backgroundColor: '#0d0f1f',
-    borderRadius: 24,
+    width: '100%',
+    maxWidth: 440,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(9,12,36,0.88)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 8,
+    borderColor: 'rgba(184,144,239,0.22)',
+    borderRadius: 28,
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 20,
+    shadowColor: '#04031f',
+    shadowOpacity: 0.55,
+    shadowRadius: 30,
+    shadowOffset: {
+      width: 0,
+      height: 20,
+    },
+    elevation: 12,
   },
+
+  header: {
+    alignItems: 'center',
+    marginBottom: 22,
+  },
+
+  logo: {
+    width: 150,
+    height: 75,
+    marginBottom: 10,
+  },
+
   title: {
-    color: '#fff',
+    color: '#f3ecff',
     fontSize: 28,
     fontWeight: '800',
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: 6,
   },
+
   subtitle: {
-    color: '#b7c2ea',
+    color: '#c2aae4',
     fontSize: 14,
-    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 21,
   },
-  footerRow: {
+
+  form: {
+    gap: 14,
+  },
+
+  formGroup: {
+    gap: 8,
+  },
+
+  label: {
+    color: '#dfe6ff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'rgba(184,144,239,0.28)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: '#f4f2ff',
+    fontSize: 16,
+  },
+
+  helper: {
+    color: '#a8c4ff',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 2,
+  },
+
+  buttonWrapper: {
+    width: '100%',
+    marginTop: 4,
+    borderRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#8f70e6',
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 8,
+  },
+
+  button: {
+    width: '100%',
+    minHeight: 48,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+  },
+
+  buttonText: {
+    color: '#050814',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    flexWrap: 'wrap',
     marginTop: 20,
+    gap: 5,
   },
+
   footerText: {
-    color: '#dfe8ff',
+    color: '#d7c8ff',
     fontSize: 14,
-    marginRight: 6,
   },
+
   linkText: {
-    color: '#9c7bff',
-    fontWeight: '700',
+    color: '#b890ef',
     fontSize: 14,
+    fontWeight: '800',
   },
 });

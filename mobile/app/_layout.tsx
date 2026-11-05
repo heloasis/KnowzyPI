@@ -23,6 +23,7 @@ export default function RootLayout() {
           <Stack.Screen name="conquistas" options={{ title: 'Conquistas' }} />
           <Stack.Screen name="materias" options={{ title: 'Matérias' }} />
           <Stack.Screen name="quiz" options={{ title: 'Quiz' }} />
+          <Stack.Screen name="tutor-ia" options={{ title: 'Tutor IA em breve' }} />
         </Stack>
       </SafeAreaProvider>
     </AuthProvider>

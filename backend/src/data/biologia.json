@@ -1,0 +1,122 @@
+﻿{
+    "p1":  {
+               "alternativas":  [
+                                    "Complexo de Golgi",
+                                    "Ribossomo",
+                                    "Mitocôndria",
+                                    "Lisossomo"
+                                ],
+               "enunciado":  "Qual organela celular é responsável pela produção de energia (ATP) via respiração celular?",
+               "resposta_correta":  2
+           },
+    "p10":  {
+                "alternativas":  [
+                                     "Comunidade",
+                                     "População",
+                                     "Ecossistema",
+                                     "Biosfera"
+                                 ],
+                "enunciado":  "O conjunto de organismos da mesma espécie que vivem em uma mesma área geográfica forma uma:",
+                "resposta_correta":  1
+            },
+    "p11":  {
+                "alternativas":  [
+                                     "Fígado",
+                                     "Pâncreas",
+                                     "Rins",
+                                     "Bexiga"
+                                 ],
+                "enunciado":  "Qual o principal órgão do sistema excretor humano encarregado de filtrar o sangue?",
+                "resposta_correta":  2
+            },
+    "p12":  {
+                "alternativas":  [
+                                     "Reino Monera",
+                                     "Reino Protista",
+                                     "Reino Fungi",
+                                     "Reino Plantae"
+                                 ],
+                "enunciado":  "Os fungos pertencem a qual reino biológico?",
+                "resposta_correta":  2
+            },
+    "p2":  {
+               "alternativas":  [
+                                    "Hemoglobina",
+                                    "Clorofila",
+                                    "Melanina",
+                                    "Caroteno"
+                                ],
+               "enunciado":  "Qual pigmento é responsável pela fotossíntese nas plantas e por sua cor verde?",
+               "resposta_correta":  1
+           },
+    "p3":  {
+               "alternativas":  [
+                                    "Heterótrofos",
+                                    "Autótrofos",
+                                    "Decompositores",
+                                    "Consumidores"
+                                ],
+               "enunciado":  "Como são chamados os seres vivos que produzem o próprio alimento?",
+               "resposta_correta":  1
+           },
+    "p4":  {
+               "alternativas":  [
+                                    "Adenina",
+                                    "Citosina",
+                                    "Timina",
+                                    "Uracila"
+                                ],
+               "enunciado":  "Qual das seguintes bases nitrogenadas NÃO está presente no RNA?",
+               "resposta_correta":  2
+           },
+    "p5":  {
+               "alternativas":  [
+                                    "MAMÍFEROS",
+                                    "Répteis",
+                                    "Aves",
+                                    "Anfíbios"
+                                ],
+               "enunciado":  "Qual o grupo de animais vertebrados que possui penas e bico sem dentes?",
+               "resposta_correta":  2
+           },
+    "p6":  {
+               "alternativas":  [
+                                    "Feto",
+                                    "Embrião",
+                                    "Zigoto",
+                                    "Blástula"
+                                ],
+               "enunciado":  "A união do espermatozoide com o óvulo gera uma célula chamada:",
+               "resposta_correta":  2
+           },
+    "p7":  {
+               "alternativas":  [
+                                    "Mitose",
+                                    "Meiose",
+                                    "Fissão binária",
+                                    "Brotamento"
+                                ],
+               "enunciado":  "O processo de divisão celular que gera quatro células-filhas com metade do número de cromossomos é a:",
+               "resposta_correta":  1
+           },
+    "p8":  {
+               "alternativas":  [
+                                    "Veia cava",
+                                    "Artéria aorta",
+                                    "Veia pulmonar",
+                                    "Capilar venoso"
+                                ],
+               "enunciado":  "Qual vaso sanguíneo transporta sangue rico em oxigênio do coração para o corpo?",
+               "resposta_correta":  1
+           },
+    "p9":  {
+               "alternativas":  [
+                                    "Malária",
+                                    "Dengue",
+                                    "Doença de Chagas",
+                                    "Tuberculose"
+                                ],
+               "enunciado":  "Qual doença é causada por um vírus e transmitida pelo mosquito Aedes aegypti?",
+               "resposta_correta":  1
+           }
+}

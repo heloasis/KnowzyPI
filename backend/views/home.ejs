@@ -1,18 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - App Quiz</title>
+  <title>Knowzy | Início</title>
+
   <link rel="stylesheet" href="/css/home.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
   <div class="background">
-    <div class="arc arc1"></div>
-    <div class="arc arc2"></div>
-    <div class="arc arc3"></div>
-
     <span class="star s1"></span>
     <span class="star s2"></span>
     <span class="star s3"></span>
@@ -21,50 +20,362 @@
   </div>
 
   <main class="dashboard-container">
-    <div class="top-logo-wrap">
-      <img src="/imagens/image.png" alt="Logo Knowzy" class="top-logo" />
-    </div>
 
-    <header class="user-card top-bar">
-      <div class="user-info">
-        <div class="avatar">
-          <i class="fa-regular fa-user"></i>
-        </div>
-        <h2>
-          <a href="/perfil" class="welcome-link">Olá, Usuário!</a>
-        </h2>
-      </div>
-      <a href="/perfil" class="icon-btn" aria-label="Perfil">
-        <i class="fa-solid fa-gear"></i>
+    <header class="top-bar">
+      <a href="/home" class="brand">
+        <img src="/imagens/image.png" alt="Logo Knowzy">
+      </a>
+
+      <nav class="top-nav">
+        <a href="/home" class="active">Início</a>
+        <a href="/materias">Matérias</a>
+        <a href="/quiz">Quizzes</a>
+        <a href="/favoritos">Favoritos</a>
+        <a href="/conquistas">Conquistas</a>
+      </nav>
+
+      <a href="/perfil" class="profile-button" aria-label="Meu perfil">
+        <i class="fa-regular fa-user"></i>
       </a>
     </header>
 
-    <section class="menu-grid">
-      
-      <a href="/favoritos" class="menu-card">
-        <div class="card-icon">
-          <i class="fa-regular fa-heart"></i>
+    <!-- BOAS-VINDAS -->
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <span class="eyebrow">
+          <i class="fa-solid fa-sparkles"></i>
+          SEU ESPAÇO DE APRENDIZADO
+        </span>
+
+        <h1>
+          Olá, <%= usuario && usuario.nome ? usuario.nome.split(' ')[0] : 'Estudante' %>!
+          <br>
+          <span>Que tal aprender algo novo hoje?</span>
+        </h1>
+
+        <p>
+          Explore novos conhecimentos, pratique o que aprendeu
+          e transforme cada descoberta em uma conquista.
+        </p>
+
+        <a href="/materias" class="primary-button">
+          Explorar matérias
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="welcome-decoration">
+        <div class="planet planet-one"></div>
+        <div class="planet planet-two"></div>
+        <div class="orbit"></div>
+        <i class="fa-solid fa-star star-icon"></i>
+        <i class="fa-solid fa-sparkles sparkle-icon"></i>
+      </div>
+    </section>
+
+    <!-- CONTINUE DE ONDE PAROU -->
+    <section class="continue-section">
+      <div class="continue-content">
+        <span class="section-label">SUA JORNADA DE APRENDIZADO</span>
+
+        <h2 id="continueTitle">Continue de onde parou!</h2>
+
+        <p id="continueDescription">
+          Sua última matéria acessada aparecerá aqui.
+        </p>
+
+        <a href="/materias" class="secondary-button" id="continueLink">
+          Escolher uma matéria
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="continue-icon">
+        <i class="fa-solid fa-book-open"></i>
+        <i class="fa-solid fa-star"></i>
+      </div>
+    </section>
+
+    <!-- PROGRESSO -->
+    <section class="progress-section">
+      <div class="section-heading">
+        <div>
+          <span class="section-label">ACOMPANHE SUA EVOLUÇÃO</span>
+          <h2>Seu progresso nos estudos</h2>
+          <p>Veja como está seu desempenho nos quizzes.</p>
         </div>
-        <span>Favoritos</span>
+      </div>
+
+      <div class="progress-grid">
+        <article class="progress-card">
+          <div class="progress-card-icon">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <span class="progress-label">Quizzes concluídos</span>
+            <strong id="quizzesCompleted">0</strong>
+          </div>
+        </article>
+
+        <article class="progress-card">
+          <div class="progress-card-icon">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+          <div>
+            <span class="progress-label">Média de acertos</span>
+            <strong id="averageAccuracy">0%</strong>
+          </div>
+        </article>
+
+        <article class="progress-card">
+          <div class="progress-card-icon">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <span class="progress-label">Último resultado</span>
+            <strong id="lastResult">--</strong>
+          </div>
+        </article>
+
+        <article class="progress-card">
+          <div class="progress-card-icon">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <span class="progress-label">XP total · <%= Number(usuario.xp || 0) >= 3000 ? 'Lenda' : Number(usuario.xp || 0) >= 1500 ? 'Mestre' : Number(usuario.xp || 0) >= 1000 ? 'Sábio' : Number(usuario.xp || 0) >= 500 ? 'Aventureiro' : 'Iniciante' %></span>
+            <strong><%= Number(usuario.xp || 0) %> XP</strong>
+          </div>
+        </article>
+      </div>
+
+      <p class="progress-note" id="progressNote">
+        Seus resultados aparecerão aqui depois que você concluir um quiz.
+      </p>
+    </section>
+
+    <!-- ÁREA DE ESTUDOS -->
+    <section class="section-heading">
+      <div>
+        <span class="section-label">EXPLORE O KNOWZY</span>
+        <h2>Seu espaço de estudos</h2>
+        <p>Tudo o que você precisa para aprender em um só lugar.</p>
+      </div>
+    </section>
+
+    <section class="main-grid">
+
+      <a href="/materias" class="feature-card subject-card">
+        <div class="feature-icon">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+
+        <div class="feature-text">
+          <span class="card-tag">DESCUBRA NOVOS CONTEÚDOS</span>
+          <h3>Matérias</h3>
+          <p>Explore diferentes disciplinas e aprenda novos assuntos no seu ritmo.</p>
+        </div>
+
+        <span class="card-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
       </a>
 
-      <a href="/materias" class="menu-card">
-        <div class="card-icon">
-          <i class="fa-solid fa-bullseye"></i>
+      <a href="/quiz" class="feature-card quiz-card">
+        <div class="feature-icon">
+          <i class="fa-solid fa-brain"></i>
         </div>
-        <span>Quiz</span>
+
+        <div class="feature-text">
+          <span class="card-tag">APRENDA E PRATIQUE</span>
+          <h3>Quizzes</h3>
+          <p>Teste seus conhecimentos e descubra o quanto você já aprendeu.</p>
+        </div>
+
+        <span class="card-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
       </a>
 
-      <a href="/conquistas" class="menu-card">
-        <div class="card-icon">
-          <i class="fa-regular fa-star"></i>
+      <a href="/favoritos" class="feature-card favorite-card">
+        <div class="feature-icon">
+          <i class="fa-solid fa-heart"></i>
         </div>
-        <span>Conquistas</span>
+
+        <div class="feature-text">
+          <span class="card-tag">SEU CONTEÚDO</span>
+          <h3>Favoritos</h3>
+          <p>Encontre facilmente os conteúdos que você salvou para estudar depois.</p>
+        </div>
+
+        <span class="card-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
+      </a>
+
+      <a href="/conquistas" class="feature-card achievement-card">
+        <div class="feature-icon">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <div class="feature-text">
+          <span class="card-tag">SUA EVOLUÇÃO</span>
+          <h3>Conquistas</h3>
+          <p>Acompanhe seus pontos, níveis, recompensas e evolução no Knowzy.</p>
+        </div>
+
+        <span class="card-arrow">
+          <i class="fa-solid fa-arrow-right"></i>
+        </span>
       </a>
 
     </section>
 
+    <!-- ASSISTENTE DE IA -->
+    <section class="ai-section">
+      <div class="ai-icon">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+
+      <div class="ai-content">
+        <span class="section-label">NOVIDADE EM BREVE</span>
+
+        <h2>O Tutor IA está chegando!</h2>
+
+        <p>
+          Em breve, você poderá tirar dúvidas e receber explicações e exemplos para apoiar seus estudos.
+        </p>
+      </div>
+
+      <span class="coming-soon">EM BREVE</span>
+    </section>
+
+    <footer class="footer">
+      <span>© Knowzy — Aprender pode ser uma aventura.</span>
+
+      <a href="/perfil">
+        <i class="fa-solid fa-gear"></i>
+        Configurações
+      </a>
+    </footer>
+
   </main>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ACTIVITY_KEY = 'knowzyHomeActivities';
+      const USER_KEY = <%- JSON.stringify(usuario?.id || 'preview') %>;
+      const RESULTS_KEY = `knowzy:${USER_KEY}:quizResults`;
+
+      const continueTitle = document.getElementById('continueTitle');
+      const continueDescription = document.getElementById('continueDescription');
+      const continueLink = document.getElementById('continueLink');
+
+      const quizzesCompleted = document.getElementById('quizzesCompleted');
+      const averageAccuracy = document.getElementById('averageAccuracy');
+      const lastResult = document.getElementById('lastResult');
+      const progressNote = document.getElementById('progressNote');
+
+      function readStorage(key) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key) || '[]');
+          return Array.isArray(data) ? data : [];
+        } catch (error) {
+          console.error(`Erro ao ler ${key}:`, error);
+          return [];
+        }
+      }
+
+      // Recupera a última matéria acessada
+      const activities = readStorage(ACTIVITY_KEY);
+      const lastActivity = activities[0];
+
+      if (lastActivity && lastActivity.name && lastActivity.url) {
+        continueTitle.textContent = lastActivity.name;
+        continueDescription.textContent =
+          'Essa foi a última matéria que você acessou. Continue seus estudos de onde parou!';
+
+        try {
+          const activityUrl = new URL(lastActivity.url, window.location.origin);
+
+          if (activityUrl.origin === window.location.origin) {
+            continueLink.href = activityUrl.pathname + activityUrl.search + activityUrl.hash;
+            continueLink.innerHTML =
+              'Continuar matéria <i class="fa-solid fa-arrow-right"></i>';
+          }
+        } catch (error) {
+          continueLink.href = '/materias';
+        }
+      }
+
+      // Recupera os resultados dos quizzes
+     const results = readStorage(RESULTS_KEY);
+
+const resultadosOrdenados = [...results].sort((a, b) => {
+  return new Date(b.data).getTime() - new Date(a.data).getTime();
+});
+
+document.getElementById('quizzesCompleted').textContent = results.length;
+
+if (resultadosOrdenados.length > 0) {
+  const validResults = resultadosOrdenados.filter(
+    resultado => Number.isFinite(Number(resultado.porcentagem))
+  );
+
+  if (validResults.length > 0) {
+    const media = validResults.reduce(
+      (soma, resultado) => soma + Number(resultado.porcentagem),
+      0
+    ) / validResults.length;
+
+    document.getElementById('averageAccuracy').textContent =
+      `${Math.round(media)}%`;
+  }
+
+  const ultimoResultado = resultadosOrdenados[0];
+
+  document.getElementById('lastResult').textContent =
+    `${ultimoResultado.acertos}/${ultimoResultado.total}`;
+
+  document.getElementById('progressNote').textContent =
+    `Seu último quiz foi de ${ultimoResultado.materia}. Continue estudando!`;
+} else {
+  document.getElementById('lastResult').textContent = '—';
+  document.getElementById('progressNote').textContent =
+    'Complete seu primeiro quiz para acompanhar seu desempenho aqui.';
+}
+      quizzesCompleted.textContent = results.length;
+
+      if (results.length > 0) {
+        const validResults = results.filter(result =>
+          Number.isFinite(Number(result.porcentagem))
+        );
+
+        if (validResults.length > 0) {
+          const totalPercentage = validResults.reduce(
+            (sum, result) => sum + Number(result.porcentagem),
+            0
+          );
+
+          const average = Math.round(totalPercentage / validResults.length);
+          averageAccuracy.textContent = `${average}%`;
+        }
+
+        const latest = results[0];
+
+        if (
+          Number.isFinite(Number(latest.acertos)) &&
+          Number.isFinite(Number(latest.total))
+        ) {
+          lastResult.textContent = `${latest.acertos}/${latest.total}`;
+        }
+
+        progressNote.textContent =
+          'Continue praticando! Seus resultados são atualizados automaticamente a cada quiz concluído.';
+      } else {
+        progressNote.textContent =
+          'Você ainda não concluiu nenhum quiz. Escolha uma matéria e comece a praticar!';
+      }
+    });
+  </script>
 </body>
 </html>

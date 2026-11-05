@@ -1,0 +1,9 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const { isCorrectAnswer } = require('../src/services/answerNormalizer');
+const question = { alternativas: ['Azul', 'Verde', 'Vermelho'] };
+test('aceita resposta correta em camelCase e índice selecionado', () => assert.equal(isCorrectAnswer({ ...question, respostaCorreta: 1 }, '1'), true));
+test('aceita resposta correta em snake_case e texto da alternativa', () => assert.equal(isCorrectAnswer({ ...question, resposta_correta: 2 }, 'Vermelho'), true));
+test('aceita letra da alternativa', () => assert.equal(isCorrectAnswer({ ...question, respostaCorreta: 'B' }, '1'), true));
+test('não aceita resposta incorreta', () => assert.equal(isCorrectAnswer({ ...question, resposta_correta: 1 }, '0'), false));
+test('não aceita questão sem gabarito', () => assert.equal(isCorrectAnswer(question, '1'), false));

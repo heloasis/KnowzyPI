@@ -11,8 +11,50 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../src/context/AuthContext';
+
+const DEFAULT_CATALOG = [
+  {
+    id: 'primeiro_login',
+    titulo: 'Primeiro Login',
+    descricao: 'Acesse o sistema pela primeira vez.',
+    meta: 1,
+    xpRecompensa: 25,
+    icone: '🚀',
+  },
+  {
+    id: 'cinco_quizzes',
+    titulo: 'Cinco Quizzes',
+    descricao: 'Responda 5 quizzes com sucesso.',
+    meta: 5,
+    xpRecompensa: 100,
+    icone: '🎯',
+  },
+  {
+    id: 'explorar_materias',
+    titulo: 'Explorador',
+    descricao: 'Explore pelo menos 5 matérias.',
+    meta: 5,
+    xpRecompensa: 200,
+    icone: '🧭',
+  },
+  {
+    id: 'cinquenta_quizzes',
+    titulo: 'Mestre dos Quizzes',
+    descricao: 'Complete 50 quizzes.',
+    meta: 50,
+    xpRecompensa: 500,
+    icone: '🏆',
+  },
+  {
+    id: 'licao_perfeita',
+    titulo: 'Lição Perfeita',
+    descricao: 'Alcance 100 pontos em uma lição.',
+    meta: 1,
+    xpRecompensa: 50,
+    icone: '✨',
+  },
+];
 
 const petStages = [
   {
@@ -20,6 +62,7 @@ const petStages = [
     name: 'Iniciante',
     min: 0,
     max: 499,
+    next: 'Aventureiro',
     image: require('../assets/mascotes/iniciante.png'),
   },
   {
@@ -27,6 +70,7 @@ const petStages = [
     name: 'Aventureiro',
     min: 500,
     max: 999,
+    next: 'Sábio',
     image: require('../assets/mascotes/aventureiro.png'),
   },
   {
@@ -34,6 +78,7 @@ const petStages = [
     name: 'Sábio',
     min: 1000,
     max: 1499,
+    next: 'Mestre',
     image: require('../assets/mascotes/sabio.png'),
   },
   {
@@ -41,6 +86,7 @@ const petStages = [
     name: 'Mestre',
     min: 1500,
     max: 2999,
+    next: 'Lenda',
     image: require('../assets/mascotes/mestre.png'),
   },
   {
@@ -48,112 +94,43 @@ const petStages = [
     name: 'Lenda',
     min: 3000,
     max: Infinity,
+    next: 'Máximo',
     image: require('../assets/mascotes/lenda.png'),
   },
 ];
 
-const conquistas = [
-  {
-    id: 'primeiro_login',
-    titulo: 'Faça seu primeiro login ou acesse a plataforma',
-    descricao: 'Entre pela primeira vez no app.',
-    meta: 25,
-    xp: 25,
-    icone: 'log-in-outline',
-    cor: '#B34DFF',
-    tipo: 'xp',
-  },
-  {
-    id: 'cinquenta_quizzes',
-    titulo: 'Complete 50 quizzes',
-    descricao: 'Finalize 50 atividades.',
-    meta: 50,
-    xp: 500,
-    icone: 'trophy-outline',
-    cor: '#FFC400',
-    tipo: 'quizzes',
-  },
-  {
-    id: 'explorar_materias',
-    titulo: 'Explore todas as matérias',
-    descricao: 'Acesse todas as matérias disponíveis.',
-    meta: 5,
-    xp: 200,
-    icone: 'compass-outline',
-    cor: '#00D6C0',
-    tipo: 'materias',
-  },
-  {
-    id: 'cinco_quizzes',
-    titulo: 'Complete 5 quizzes',
-    descricao: 'Conclua 5 quizzes.',
-    meta: 5,
-    xp: 100,
-    icone: 'school-outline',
-    cor: '#258BFF',
-    tipo: 'quizzes',
-  },
-  {
-    id: 'licao_perfeita',
-    titulo: 'Faça uma lição perfeita',
-    descricao: 'Alcance 100% de acertos em uma lição.',
-    meta: 100,
-    xp: 50,
-    icone: 'checkmark-done-outline',
-    cor: '#FF8A00',
-    tipo: 'score',
-  },
-];
+const formatNumber = (value: number) =>
+  Number(value || 0).toLocaleString('pt-BR');
 
-const formatXp = (value: number) =>
-  `${Number(value || 0).toLocaleString('pt-BR')} XP`;
+const formatXp = (value: number) => `${formatNumber(value)} XP`;
 
 export default function ConquistasScreen() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const xp = Math.max(0, Number(user?.xp ?? 0) || 0);
-  const totalQuizzes = Number(user?.totalQuizzes ?? 0) || 0;
-  const materiasExploradas = Array.isArray(user?.materiasExploradas) ? user.materiasExploradas : [];
-  const ultimaPontuacao = Number(user?.ultimaPontuacao ?? 0) || 0;
+  // Permite ler campos opcionais sem alterar o tipo original do AuthContext.
+  const userData = user as any;
 
-  const getQuestProgress = (quest: (typeof conquistas)[number]) => {
-    switch (quest.tipo) {
-      case 'xp':
-        return xp;
-      case 'quizzes':
-        return totalQuizzes;
-      case 'materias':
-        return materiasExploradas.length;
-      case 'score':
-        return ultimaPontuacao;
-      default:
-        return 0;
-    }
-  };
+  const xp = Math.max(
+    0,
+    Number(userData?.xp ?? userData?.xpTotal ?? 0) || 0
+  );
 
-  const isUnlocked = (quest: (typeof conquistas)[number]) => {
-    const atual = getQuestProgress(quest);
-    if (quest.tipo === 'score') {
-      return atual >= quest.meta;
-    }
-    if (quest.tipo === 'materias') {
-      return atual >= quest.meta;
-    }
-    return atual >= quest.meta;
-  };
+  const currentUserName =
+    userData?.nome?.trim()?.split(' ')[0] || 'Usuário';
 
-  // Identifica automaticamente o mascote atual
+  const userTag = userData?.tag || '#0001';
+
   const currentIndex = petStages.findIndex(
     (stage) => xp >= stage.min && xp <= stage.max
   );
 
-  const currentStage = petStages[currentIndex] || petStages[0];
+  const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+  const currentStage = petStages[safeIndex];
+  const nextStage = petStages[safeIndex + 1] || null;
 
-  // Identifica o próximo mascote
-  const nextStage = petStages[currentIndex + 1] || null;
+  const nextLevelName = nextStage?.name || 'Máximo';
 
-  // Calcula o progresso para o próximo nível
   const progressPercent = nextStage
     ? Math.min(
         100,
@@ -166,9 +143,25 @@ export default function ConquistasScreen() {
       )
     : 100;
 
+  const unlockedIds: string[] = Array.isArray(userData?.conquistas)
+    ? userData.conquistas
+        .map((item: any) =>
+          typeof item === 'string' ? item : item?.id
+        )
+        .filter(Boolean)
+    : [];
+
+  const getProgress = (quest: (typeof DEFAULT_CATALOG)[number]) => {
+    return unlockedIds.includes(quest.id) ? quest.meta : 0;
+  };
+
+  const completedCount = DEFAULT_CATALOG.filter((quest) =>
+    unlockedIds.includes(quest.id)
+  ).length;
+
   return (
     <View style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#10002D" />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -176,233 +169,198 @@ export default function ConquistasScreen() {
       >
         {/* CABEÇALHO */}
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.menuButton}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-
-          <Text style={styles.title}>Conquistas</Text>
-
-          <View style={styles.headerSpacer} />
-        </View>
-
-        <Text style={styles.subtitle}>
-          Cada conquista é um passo na sua jornada
-        </Text>
-
-        {/* CARD DOS MASCOTES */}
-        <View style={styles.heroCard}>
-          <View style={styles.levelBadge}>
-            <Text style={styles.levelBadgeText}>
-              {nextStage
-                ? 'Seu nível atual'
-                : 'Nível máximo alcançado'}
+          <View style={styles.headerText}>
+            <Text style={styles.eyebrow}>JORNADA</Text>
+            <Text style={styles.title}>Conquistas</Text>
+            <Text style={styles.subtitle}>
+              Cada conquista é um passo na sua jornada
             </Text>
           </View>
 
-          <Text style={styles.petName}>{currentStage.name}</Text>
-
-          <View style={styles.petsContainer}>
-            {/* MASCOTE ATUAL */}
-            <View style={styles.petColumn}>
-              <Image
-                source={currentStage.image as ImageSourcePropType}
-                style={styles.currentPet}
-                resizeMode="contain"
-              />
-
-              <Text style={styles.currentPetXp}>
-                {currentStage.min === 0
-                  ? '0-499 XP'
-                  : `${currentStage.min.toLocaleString('pt-BR')}-${currentStage.max.toLocaleString('pt-BR')} XP`}
+          <TouchableOpacity
+            style={styles.profileMini}
+            activeOpacity={0.8}
+            onPress={() => router.push('/perfil')}
+          >
+            <View style={styles.avatarBadge}>
+              <Text style={styles.avatarLetter}>
+                {currentUserName.charAt(0).toUpperCase()}
               </Text>
             </View>
 
-            {/* SETA */}
-            <View style={styles.arrowContainer}>
-              <Ionicons
-                name="chevron-forward"
-                size={22}
-                color="#C18AFF"
+            <View style={styles.profileInfo}>
+              <Text style={styles.profileName} numberOfLines={1}>
+                {currentUserName}
+              </Text>
+              <Text style={styles.profileTag}>{userTag}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* CARD DO MASCOTE */}
+        <View style={styles.mascotCard}>
+          <View style={styles.mascotCopy}>
+            <Text style={styles.label}>MASCOTE</Text>
+
+            <Text style={styles.levelName}>
+              {currentStage.name}
+            </Text>
+
+            <View style={styles.levelMeta}>
+              <Text style={styles.xpTotal}>
+                {formatXp(xp)}
+              </Text>
+
+              <Text style={styles.metaDivider}>•</Text>
+
+              <Text style={styles.nextLevelText}>
+                {nextStage
+                  ? `Próximo nível: ${nextLevelName}`
+                  : 'Nível máximo alcançado'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.mascotVisualWrap}>
+            <View style={styles.mascotVisual}>
+              <Image
+                source={currentStage.image as ImageSourcePropType}
+                style={styles.petImage}
+                resizeMode="contain"
               />
             </View>
+          </View>
 
-            {/* PRÓXIMO MASCOTE */}
-            <View style={styles.petColumn}>
-              {nextStage ? (
-                <>
-                  <View style={styles.nextPetWrapper}>
-                    <Image
-                      source={nextStage.image as ImageSourcePropType}
-                      style={styles.nextPet}
-                      resizeMode="contain"
-                    />
-                    <View style={styles.questionMark}>
-                      <Text style={styles.questionText}>?</Text>
+          <View style={styles.nextLevelPanel}>
+            <Text style={styles.miniLabel}>PRÓXIMO NÍVEL</Text>
+
+            <Text style={styles.nextLevelName}>
+              {nextStage ? nextStage.name : 'Nível máximo'}
+            </Text>
+
+            <Text style={styles.xpRange}>
+              {nextStage
+                ? formatXp(nextStage.min)
+                : 'Todos desbloqueados'}
+            </Text>
+          </View>
+        </View>
+
+        {/* PAINEL DE CONQUISTAS */}
+        <View style={styles.questsPanel}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Conquistas</Text>
+
+            <View style={styles.viewAllButton}>
+              <Text style={styles.viewAllText}>Ver tudo</Text>
+            </View>
+          </View>
+
+          <View style={styles.questsList}>
+            {DEFAULT_CATALOG.map((quest) => {
+              const progress = getProgress(quest);
+              const safeMeta = Math.max(1, quest.meta);
+
+              const percent = Math.min(
+                100,
+                (progress / safeMeta) * 100
+              );
+
+              const isComplete = unlockedIds.includes(quest.id);
+              const isInProgress = !isComplete && progress > 0;
+
+              return (
+                <View
+                  key={quest.id}
+                  style={styles.questCard}
+                >
+                  <View style={styles.questIcon}>
+                    <Text style={styles.questEmoji}>
+                      {quest.icone}
+                    </Text>
+                  </View>
+
+                  <View style={styles.questInfo}>
+                    <View style={styles.questTitleRow}>
+                      <Text style={styles.questTitle}>
+                        {quest.titulo}
+                      </Text>
+
+                      <Text style={styles.questReward}>
+                        +{quest.xpRecompensa} XP
+                      </Text>
+                    </View>
+
+                    <Text style={styles.questDescription}>
+                      {quest.descricao}
+                    </Text>
+
+                    <View style={styles.progressTrack}>
+                      <View
+                        style={[
+                          styles.progressBar,
+                          { width: `${percent}%` },
+                        ]}
+                      />
+                    </View>
+
+                    <View style={styles.progressMeta}>
+                      <Text style={styles.progressMetaText}>
+                        {isComplete
+                          ? `${safeMeta}/${safeMeta}`
+                          : `${progress}/${safeMeta}`}
+                      </Text>
+
+                      <Text style={styles.progressMetaText}>
+                        {Math.round(percent)}%
+                      </Text>
                     </View>
                   </View>
 
-                  <Text style={styles.nextPetXp}>
-                    {nextStage.min.toLocaleString('pt-BR')}-{nextStage.max === Infinity
-                      ? '∞'
-                      : nextStage.max.toLocaleString('pt-BR')} XP
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Image
-                    source={currentStage.image as ImageSourcePropType}
-                    style={styles.nextPet}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.nextPetXp}>Nível máximo</Text>
-                </>
-              )}
-            </View>
-          </View>
-
-          <Text style={styles.totalXp}>
-            {formatXp(xp)}
-          </Text>
-        </View>
-
-        {/* PROGRESSO DO PET */}
-        <View style={styles.progressBox}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressTitle}>
-              {nextStage
-                ? `Próximo nível: ${nextStage.name}`
-                : 'Você chegou ao topo!'}
-            </Text>
-
-            <Text style={styles.progressPercent}>
-              {Math.floor(progressPercent)}%
-            </Text>
-          </View>
-
-          <View style={styles.progressTrack}>
-            <View
-              style={[
-                styles.progressFill,
-                { width: `${progressPercent}%` },
-              ]}
-            />
-          </View>
-
-          <Text style={styles.progressDescription}>
-            {nextStage
-              ? `${formatXp(xp)} / ${formatXp(nextStage.min)}`
-              : 'Todos os mascotes desbloqueados!'}
-          </Text>
-        </View>
-
-        {/* LISTA DE CONQUISTAS */}
-        <View style={styles.achievementsHeader}>
-          <Text style={styles.sectionTitle}>Suas conquistas</Text>
-          <Text style={styles.sectionSubtitle}>
-            Continue evoluindo!
-          </Text>
-        </View>
-
-        {conquistas.map((item) => {
-          const current = Math.min(getQuestProgress(item), item.meta);
-          const unlocked = isUnlocked(item);
-          const itemProgress = Math.min(
-            100,
-            (current / item.meta) * 100
-          );
-
-          return (
-            <View
-              key={item.titulo}
-              style={[
-                styles.achievementCard,
-                unlocked && styles.achievementUnlocked,
-              ]}
-            >
-              {/* ÍCONE */}
-              <View
-                style={[
-                  styles.iconCircle,
-                  { borderColor: item.cor },
-                ]}
-              >
-                <Ionicons
-                  name={item.icone as any}
-                  size={23}
-                  color={item.cor}
-                />
-              </View>
-
-              {/* INFORMAÇÕES */}
-              <View style={styles.achievementInfo}>
-                <Text style={styles.cardTitle}>
-                  {item.titulo}
-                </Text>
-
-                <Text style={styles.cardDescription}>
-                  {item.descricao}
-                </Text>
-
-                <View style={styles.smallProgressTrack}>
                   <View
                     style={[
-                      styles.smallProgressFill,
-                      {
-                        width: `${itemProgress}%`,
-                        backgroundColor: item.cor,
-                      },
+                      styles.questAction,
+                      isComplete
+                        ? styles.completed
+                        : isInProgress
+                          ? styles.inProgress
+                          : styles.locked,
                     ]}
-                  />
+                  >
+                    <Text style={styles.questActionText}>
+                      {isComplete
+                        ? '✓ Concluída'
+                        : isInProgress
+                          ? '→ Continuar'
+                          : '🔒 Bloqueado'}
+                    </Text>
+                  </View>
                 </View>
+              );
+            })}
+          </View>
+        </View>
 
-                <Text style={styles.cardMeta}>
-                  {unlocked
-                    ? 'Conquista desbloqueada!'
-                    : `${current} / ${item.meta}${item.tipo === 'xp' ? ' XP' : item.tipo === 'score' ? '%' : ''}`}
-                </Text>
-              </View>
+        {/* RODAPÉ */}
+        <View style={styles.statusBar}>
+          <View>
+            <Text style={styles.statusLabel}>
+              Conquistas desbloqueadas
+            </Text>
 
-              {/* STATUS */}
-              <View style={styles.statusContainer}>
-                {unlocked ? (
-                  <Ionicons
-                    name="checkmark-circle"
-                    size={20}
-                    color="#A84DFF"
-                  />
-                ) : (
-                  <Ionicons
-                    name="lock-closed"
-                    size={18}
-                    color="#776A9B"
-                  />
-                )}
+            <Text style={styles.statusCount}>
+              {completedCount} / {DEFAULT_CATALOG.length}
+            </Text>
+          </View>
 
-                <Text
-                  style={[
-                    styles.rewardText,
-                    { color: item.cor },
-                  ]}
-                >
-                  +{item.xp} XP
-                </Text>
-              </View>
-            </View>
-          );
-        })}
-
-        {/* BOTÃO VOLTAR */}
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={() => router.push('/home')}
-        >
-          <Text style={styles.primaryButtonText}>
-            Voltar para home
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.returnButton}
+            activeOpacity={0.8}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.returnButtonText}>Voltar</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -411,306 +369,378 @@ export default function ConquistasScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#09031D',
+    backgroundColor: '#090B1C',
   },
 
   content: {
-    paddingHorizontal: 15,
-    paddingTop: 12,
+    paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 35,
   },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    gap: 15,
+    marginBottom: 20,
   },
 
-  menuButton: {
-    width: 42,
-    height: 42,
-    justifyContent: 'center',
+  headerText: {
+    flex: 1,
+  },
+
+  eyebrow: {
+    color: '#A9B7DC',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 1.5,
+    marginBottom: 5,
   },
 
   title: {
-    color: '#FFFFFF',
-    fontSize: 29,
+    color: '#EEF3FF',
+    fontSize: 34,
     fontWeight: '800',
-  },
-
-  headerSpacer: {
-    width: 42,
-    height: 42,
+    letterSpacing: -1.5,
   },
 
   subtitle: {
-    color: '#D7CBEA',
-    fontSize: 14,
-    marginTop: 2,
-    marginBottom: 12,
-  },
-
-  heroCard: {
-    backgroundColor: '#160B40',
-    borderColor: '#7835DC',
-    borderWidth: 1,
-    borderRadius: 22,
-    paddingHorizontal: 12,
-    paddingTop: 25,
-    paddingBottom: 15,
-    alignItems: 'center',
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-
-  levelBadge: {
-    position: 'absolute',
-    top: 0,
-    backgroundColor: '#792DEB',
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-    paddingHorizontal: 25,
-    paddingVertical: 5,
-  },
-
-  levelBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  petName: {
-    color: '#FFFFFF',
-    fontSize: 25,
-    fontWeight: '800',
-    marginTop: 1,
-    marginBottom: 0,
-  },
-
-  petsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 0,
-  },
-
-  petColumn: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  currentPet: {
-    width: 145,
-    height: 140,
-  },
-
-  nextPetWrapper: {
-    width: 145,
-    height: 140,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  nextPet: {
-    width: 135,
-    height: 135,
-    opacity: 0.55,
-  },
-
-  questionMark: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  questionText: {
-    color: '#FFFFFF',
-    fontSize: 46,
-    fontWeight: '900',
-    textShadowColor: '#6D35FF',
-    textShadowRadius: 12,
-  },
-
-  arrowContainer: {
-    width: 30,
-    height: 30,
-    borderWidth: 1,
-    borderColor: '#A66AFF',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  currentPetXp: {
-    color: '#C58AFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-
-  nextPetXp: {
-    color: '#E7DFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-
-  totalXp: {
-    color: '#B982FF',
+    color: '#A9B7DC',
     fontSize: 13,
-    fontWeight: '700',
     marginTop: 7,
   },
 
-  progressBox: {
-    backgroundColor: '#130A30',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#392064',
-    padding: 13,
-    marginBottom: 18,
-  },
-
-  progressHeader: {
+  profileMini: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    alignSelf: 'flex-start',
+    gap: 11,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 17,
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    minWidth: 145,
+    maxWidth: '100%',
   },
 
-  progressTitle: {
+  avatarBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#8065D9',
+  },
+
+  avatarLetter: {
     color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '800',
+  },
+
+  profileInfo: {
+    flex: 1,
+  },
+
+  profileName: {
+    color: '#EEF3FF',
     fontSize: 13,
     fontWeight: '700',
   },
 
-  progressPercent: {
-    color: '#BD81FF',
+  profileTag: {
+    color: '#A9B7DC',
+    fontSize: 11,
+    marginTop: 3,
+  },
+
+  mascotCard: {
+    backgroundColor: 'rgba(115,92,255,0.13)',
+    borderWidth: 1,
+    borderColor: 'rgba(156,123,255,0.28)',
+    borderRadius: 25,
+    padding: 17,
+    marginBottom: 19,
+    gap: 16,
+  },
+
+  mascotCopy: {
+    alignItems: 'center',
+  },
+
+  label: {
+    color: '#A9B7DC',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    marginBottom: 7,
+  },
+
+  levelName: {
+    color: '#EEF3FF',
+    fontSize: 28,
     fontWeight: '800',
+  },
+
+  levelMeta: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 9,
+  },
+
+  xpTotal: {
+    color: '#A995FF',
     fontSize: 13,
+    fontWeight: '800',
+  },
+
+  metaDivider: {
+    color: '#A9B7DC',
+    fontSize: 13,
+  },
+
+  nextLevelText: {
+    color: '#A9B7DC',
+    fontSize: 11,
+  },
+
+  mascotVisualWrap: {
+    alignItems: 'center',
+  },
+
+  mascotVisual: {
+    width: 145,
+    height: 145,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 30,
+    backgroundColor: 'rgba(156,123,255,0.17)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
+
+  petImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  nextLevelPanel: {
+    backgroundColor: 'rgba(9,14,26,0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 17,
+    padding: 14,
+    alignItems: 'center',
+  },
+
+  miniLabel: {
+    color: '#A9B7DC',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    marginBottom: 7,
+  },
+
+  nextLevelName: {
+    color: '#EEF3FF',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+
+  xpRange: {
+    color: '#A9B7DC',
+    fontSize: 12,
+    marginTop: 6,
+  },
+
+  questsPanel: {
+    backgroundColor: 'rgba(14,19,34,0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 23,
+    padding: 13,
+  },
+
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  sectionTitle: {
+    color: '#EEF3FF',
+    fontSize: 19,
+    fontWeight: '800',
+  },
+
+  viewAllButton: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    paddingVertical: 7,
+    paddingHorizontal: 11,
+  },
+
+  viewAllText: {
+    color: '#EEF3FF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+
+  questsList: {
+    gap: 12,
+  },
+
+  questCard: {
+    backgroundColor: 'rgba(255,255,255,0.025)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 18,
+    padding: 12,
+    gap: 10,
+  },
+
+  questIcon: {
+    width: 45,
+    height: 45,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(156,123,255,0.17)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+  },
+
+  questEmoji: {
+    fontSize: 23,
+  },
+
+  questInfo: {
+    minWidth: 0,
+  },
+
+  questTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+
+  questTitle: {
+    flex: 1,
+    color: '#EEF3FF',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  questReward: {
+    color: '#FFC85D',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+
+  questDescription: {
+    color: '#A9B7DC',
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 6,
+    marginBottom: 10,
   },
 
   progressTrack: {
     height: 9,
-    backgroundColor: '#292044',
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 20,
     overflow: 'hidden',
-  },
-
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#8B3DFF',
-    borderRadius: 20,
-  },
-
-  progressDescription: {
-    color: '#B8A8D7',
-    fontSize: 11,
-    marginTop: 8,
-  },
-
-  achievementsHeader: {
-    marginBottom: 12,
-  },
-
-  sectionTitle: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '800',
-  },
-
-  sectionSubtitle: {
-    color: '#A99BC7',
-    fontSize: 12,
-    marginTop: 3,
-  },
-
-  achievementCard: {
-    backgroundColor: '#100A29',
     borderWidth: 1,
-    borderColor: '#292044',
-    borderRadius: 17,
-    padding: 11,
-    marginBottom: 10,
+    borderColor: 'rgba(255,255,255,0.04)',
+  },
+
+  progressBar: {
+    height: '100%',
+    borderRadius: 20,
+    backgroundColor: '#8065D9',
+  },
+
+  progressMeta: {
     flexDirection: 'row',
-    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 7,
   },
 
-  achievementUnlocked: {
-    borderColor: '#7134C4',
-    backgroundColor: '#190D36',
-  },
-
-  iconCircle: {
-    width: 39,
-    height: 39,
-    borderRadius: 22,
-    borderWidth: 1,
-    backgroundColor: '#1D1240',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-
-  achievementInfo: {
-    flex: 1,
-  },
-
-  cardTitle: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-
-  cardDescription: {
-    color: '#B4A9CF',
+  progressMetaText: {
+    color: '#A9B7DC',
     fontSize: 10,
-    marginTop: 3,
   },
 
-  smallProgressTrack: {
-    height: 5,
-    backgroundColor: '#292044',
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginTop: 9,
+  questAction: {
+    alignSelf: 'flex-start',
+    borderRadius: 11,
+    paddingVertical: 9,
+    paddingHorizontal: 13,
   },
 
-  smallProgressFill: {
-    height: '100%',
-    borderRadius: 10,
+  completed: {
+    backgroundColor: '#7156CF',
   },
 
-  cardMeta: {
-    color: '#B9ACD5',
-    fontSize: 9,
-    marginTop: 5,
+  inProgress: {
+    backgroundColor: '#3F73FF',
   },
 
-  statusContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 7,
-    minWidth: 48,
+  locked: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
 
-  rewardText: {
-    fontSize: 9,
-    fontWeight: '800',
-    marginTop: 5,
-  },
-
-  primaryButton: {
-    backgroundColor: '#7835DC',
-    borderRadius: 15,
-    paddingVertical: 15,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-
-  primaryButtonText: {
+  questActionText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+
+  statusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+    paddingTop: 17,
+    marginTop: 17,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+  },
+
+  statusLabel: {
+    color: '#A9B7DC',
+    fontSize: 11,
+    marginBottom: 5,
+  },
+
+  statusCount: {
+    color: '#EEF3FF',
+    fontSize: 17,
     fontWeight: '800',
+  },
+
+  returnButton: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+
+  returnButtonText: {
+    color: '#EEF3FF',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

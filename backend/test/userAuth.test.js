@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const userModel = require('../src/models/user');
 
 test('userModel.criarUsuario armazena usuário com senha criptografada e email único', async () => {
-  const email = 'novo.usuario@teste.com';
+  const email = `novo.usuario.${Date.now()}@teste.com`;
 
   const usuario = await userModel.criarUsuario({
     nome: 'Novo Usuário',
@@ -27,15 +27,14 @@ test('userModel.criarUsuario armazena usuário com senha criptografada e email �
   );
 });
 
-test('userModel.verificarCredenciais aceita o usuário padrão em memória', async () => {
-  const usuario = await userModel.verificarCredenciais({
-    email: 'aluno@teste.com',
-    senha: '123456'
-  });
+test('userModel.verificarCredenciais aceita uma conta criada no preview local', async () => {
+  const email = `login.${Date.now()}@teste.com`;
+  await userModel.criarUsuario({ nome: 'Aluno de Teste', email, senha: 'Senha@123' });
+  const usuario = await userModel.verificarCredenciais({ email, senha: 'Senha@123' });
 
   assert.ok(usuario);
-  assert.equal(usuario.email, 'aluno@teste.com');
-  assert.equal(usuario.nome, 'Aluno Teste');
+  assert.equal(usuario.email, email);
+  assert.equal(usuario.nome, 'Aluno de Teste');
 });
 
 test('userModel.criarUsuario rejeita dados inválidos', async () => {
