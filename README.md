@@ -24,15 +24,54 @@ Interface intuitiva aonde o usuário pode escolher quizzes separados por matéri
 - Página de perfil
 
 
-## 📂 Estrutura do Projeto
-Explicar como o projeto está organizado (pastas principais).
+📂 Estrutura do Projeto
 
-## ▶️ Como Executar
-Passo a passo para rodar o projeto localmente.
+O projeto Knowzy está organizado em duas pastas principais: backend e mobile.
 
-## 📱 Aplicativo Mobile
-Descrever como testar o aplicativo (Expo, APK, etc.).
+* backend: contém os arquivos responsáveis pelo funcionamento do servidor e pela comunicação com o banco de dados. Possui pastas como public, src, test e views, além de arquivos como server.js e package.json.
+* mobile: contém os arquivos responsáveis pela interface e funcionalidades do aplicativo. Possui pastas como app, assets, components, constants e src, além do arquivo app.json e outros arquivos de configuração.
 
+Na raiz do projeto também estão presentes arquivos como README.md e .gitignore, utilizados para documentação e organização do código.
+
+▶️ Como Executar
+
+Para executar o projeto localmente, é necessário ter o Node.js e o npm instalados no computador.
+
+1. Clonar o repositório:
+
+git clone LINK_DO_REPOSITORIO
+
+2. Acessar a pasta do backend:
+
+cd backend
+npm install
+
+3. Iniciar o servidor:
+
+npm start
+
+Caso o projeto não possua o comando start, utilize o script configurado no package.json.
+
+4. Configurar o aplicativo mobile:
+
+Em outro terminal, acesse a pasta mobile:
+
+cd mobile
+npm install
+
+📱 Aplicativo Mobile
+
+O aplicativo Knowzy foi desenvolvido utilizando React Native, com estrutura de projeto compatível com Expo.
+
+Para testar o aplicativo, é necessário acessar a pasta mobile e executar:
+
+npx expo start
+
+Após iniciar o Expo, será exibido um QR Code no terminal ou navegador. O usuário poderá escaneá-lo utilizando o aplicativo Expo Go no celular para visualizar e testar o Knowzy.
+
+Também é possível executar o aplicativo em um emulador Android ou iOS, desde que o ambiente esteja configurado corretamente.
+
+Assim, é possível testar as funcionalidades e a navegação do aplicativo diretamente no dispositivo móvel.
 ## 👥 Integrantes
 - Kevellin
 - Maria Heloisa
