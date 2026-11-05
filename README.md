@@ -39,7 +39,7 @@ Para executar o projeto localmente, é necessário ter o Node.js e o npm instala
 
 1. Clonar o repositório:
 
-git clone LINK_DO_REPOSITORIO
+git clone https://github.com/heloasis/KnowzyPI.git
 
 2. Acessar a pasta do backend:
 
@@ -85,6 +85,8 @@ Assim, é possível testar as funcionalidades e a navegação do aplicativo dire
 O Knowzy é um aplicativo desenvolvido para facilitar o aprendizado dos estudantes por meio de quizzes interativos. A plataforma permite criar uma conta, escolher matérias, responder perguntas com tempo determinado e acompanhar o desempenho. Também conta com perfil, histórico e favoritos, além de futuras funcionalidades, como conquistas, rankings e estatísticas. Desenvolvido com React Native, Node.js e Firebase, o objetivo do Knowzy é tornar os estudos mais práticos, dinâmicos e eficientes.
 
 ## 📎 Links Importantes
+- https://youtu.be/yxxp8rGxZ64?si=qJJBJ1Pbi_t5Z-rc
 - https://github.com/heloasis/KnowzyPI.git
+- 
 
   
