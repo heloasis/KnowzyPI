@@ -125,4 +125,4 @@ O Knowzy é um aplicativo desenvolvido para facilitar o aprendizado dos estudant
 knowzypi.onrender.com
 https://github.com/heloasis/KnowzyPI.git 
 https://youtu.be/yxxp8rGxZ64?si=qJJBJ1Pbi_t5Z-rc
-
+https://docs.google.com/document/d/1mJSl46fsdVtf1DXcZddHC7DP_q6tYL5u/edit?usp=drivesdk&ouid=105881536435263850654&rtpof=true&sd=true
