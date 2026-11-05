@@ -1,196 +1,217 @@
-
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knowzy | Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowzy | Login</title>
+<link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
+<div class="background">
+<div class="arc arc1"></div>
+<div class="arc arc2"></div>
+<div class="arc arc3"></div>
 
-    <main>
-        <section aria-labelledby="titulo-login">
+    <span class="star s1"></span>
+    <span class="star s2"></span>
+    <span class="star s3"></span>
+    <span class="star s4"></span>
+    <span class="star s5"></span>
+</div>
 
-            <div>
-                <img src="/imagens/image.png" alt="Logo Knowzy">
+<main class="auth-shell">
+    <section class="auth-card" aria-labelledby="titulo-login">
 
-                <h1 id="titulo-login">
-                    Entrar
-                </h1>
+        <div class="auth-header">
+            <img src="/imagens/image.png" alt="Logo Knowzy" class="auth-logo">
 
-                <p>
-                    Continue sua evolução no aprendizado.
-                </p>
+            <h1 id="titulo-login" class="auth-title">
+                Entrar
+            </h1>
+
+            <p class="auth-subtitle">
+                Continue sua evolução no aprendizado.
+            </p>
+        </div>
+
+        <form class="auth-form" id="login-form" novalidate>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="seuemail@exemplo.com"
+                    required
+                >
             </div>
 
-            <form id="login-form" novalidate>
+            <div class="form-group">
+                <label for="senha">Senha</label>
 
-                <div>
-                    <label for="email">E-mail</label>
+                <input
+                    id="senha"
+                    name="senha"
+                    type="password"
+                    placeholder="Digite sua senha"
+                    required
+                >
+            </div>
 
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="seuemail@exemplo.com"
-                        required
-                    >
-                </div>
+            <button
+                type="submit"
+                class="auth-button"
+                id="btn-login"
+            >
+                Entrar
+            </button>
 
-                <div>
-                    <label for="senha">Senha</label>
+            <div
+                id="auth-message"
+                class="auth-message"
+                aria-live="polite"
+            ></div>
 
-                    <input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        placeholder="Digite sua senha"
-                        required
-                    >
-                </div>
+        </form>
 
-                <button type="submit" id="btn-login">
-                    Entrar
-                </button>
+        <p class="auth-link">
+            Ainda não tem conta?
+            <a href="/cadastro">Cadastre-se</a>
+        </p>
 
-                <div
-                    id="auth-message"
-                    aria-live="polite"
-                ></div>
+    </section>
+</main>
 
-            </form>
+<script>
+    const loginForm = document.getElementById('login-form');
+    const messageBox = document.getElementById('auth-message');
+    const loginButton = document.getElementById('btn-login');
 
-            <p>
-                Ainda não tem conta?
-                <a href="/cadastro">Cadastre-se</a>
-            </p>
+    const urlParams = new URLSearchParams(
+        window.location.search
+    );
 
-        </section>
-    </main>
+    const defaultRedirectTo = <%- JSON.stringify(typeof redirectTo !== 'undefined' && redirectTo ? redirectTo : '/home') %>;
 
-    <script>
-        const loginForm = document.getElementById('login-form');
-        const messageBox = document.getElementById('auth-message');
-        const loginButton = document.getElementById('btn-login');
+    const isSafeRedirect = (url) => {
+        return (
+            typeof url === 'string' &&
+            url.startsWith('/') &&
+            !url.startsWith('//') &&
+            !url.includes('\\') &&
+            !/[\u0000-\u001F\u007F]/.test(url)
+        );
+    };
 
-        const urlParams = new URLSearchParams(
-            window.location.search
+    const requestedRedirect = urlParams.get('redirect');
+
+    const returnTo = isSafeRedirect(requestedRedirect)
+        ? requestedRedirect
+        : (
+            isSafeRedirect(defaultRedirectTo)
+                ? defaultRedirectTo
+                : '/home'
         );
 
-        const defaultRedirectTo = <%- JSON.stringify(typeof redirectTo !== 'undefined' && redirectTo ? redirectTo : '/home') %>;
+    const setMessage = (message, type = 'error') => {
+        messageBox.textContent = message;
+        messageBox.className = `auth-message ${type}`;
+    };
 
-        const isSafeRedirect = (url) => {
-            return (
-                typeof url === 'string' &&
-                url.startsWith('/') &&
-                !url.startsWith('//') &&
-                !url.includes('\\') &&
-                !/[\u0000-\u001F\u007F]/.test(url)
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const email = document
+            .getElementById('email')
+            .value
+            .trim();
+
+        const senha = document
+            .getElementById('senha')
+            .value;
+
+        if (!email || !senha) {
+            setMessage(
+                'Preencha e-mail e senha para continuar.',
+                'error'
             );
-        };
+            return;
+        }
 
-        const requestedRedirect = urlParams.get('redirect');
+        loginButton.disabled = true;
+        loginButton.textContent = 'Entrando...';
 
-        const returnTo = isSafeRedirect(requestedRedirect)
-            ? requestedRedirect
-            : (
-                isSafeRedirect(defaultRedirectTo)
-                    ? defaultRedirectTo
-                    : '/home'
-            );
+        try {
 
-        const setMessage = (message, type = 'error') => {
-            messageBox.textContent = message;
-        };
+            const response = await fetch('/login', {
+                method: 'POST',
 
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+                headers: {
+                    'Content-Type': 'application/json'
+                },
 
-            const email = document
-                .getElementById('email')
-                .value
-                .trim();
+                credentials: 'same-origin',
 
-            const senha = document
-                .getElementById('senha')
-                .value;
+                body: JSON.stringify({
+                    email,
+                    senha,
+                    redirectTo: returnTo
+                })
+            });
 
-            if (!email || !senha) {
-                setMessage(
-                    'Preencha e-mail e senha para continuar.'
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.erro || 'Não foi possível entrar.'
                 );
-                return;
             }
 
-            loginButton.disabled = true;
-            loginButton.textContent = 'Entrando...';
+            const nextPage = isSafeRedirect(data.redirectTo)
+                ? data.redirectTo
+                : returnTo;
+
+            setMessage(
+                data.mensagem || 'Login realizado com sucesso!',
+                'success'
+            );
 
             try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        email,
-                        senha,
-                        redirectTo: returnTo
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.erro || 'Não foi possível entrar.'
-                    );
+                if (data && data.usuario) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.usuario));
+                    localStorage.setItem('currentUserId', String(data.usuario.id || ''));
                 }
-
-                const nextPage = isSafeRedirect(data.redirectTo)
-                    ? data.redirectTo
-                    : returnTo;
-
-                setMessage(
-                    data.mensagem || 'Login realizado com sucesso!'
-                );
-
-                try {
-                    if (data && data.usuario) {
-                        localStorage.setItem(
-                            'currentUser',
-                            JSON.stringify(data.usuario)
-                        );
-
-                        localStorage.setItem(
-                            'currentUserId',
-                            String(data.usuario.id || '')
-                        );
-                    }
-
-                    localStorage.removeItem('profileData');
-                    localStorage.removeItem('knowzyFavoritos');
-                    localStorage.removeItem('favoritos');
-
-                } catch (error) {
-                    // Ignora falhas de storage em navegadores restritivos.
-                }
-
-                window.setTimeout(() => {
-                    window.location.href = nextPage;
-                }, 900);
-
+                localStorage.removeItem('profileData');
+                localStorage.removeItem('knowzyFavoritos');
+                localStorage.removeItem('favoritos');
             } catch (error) {
-                setMessage(
-                    error.message || 'Erro ao realizar login.'
-                );
-
-            } finally {
-                loginButton.disabled = false;
-                loginButton.textContent = 'Entrar';
+                // Ignora falhas de storage em navegadores restritivos.
             }
-        });
-    </script>
+
+            // Redireciona após autenticação.
+            window.setTimeout(() => {
+                window.location.href = nextPage;
+            }, 900);
+
+        } catch (error) {
+
+            setMessage(
+                error.message || 'Erro ao realizar login.',
+                'error'
+            );
+
+        } finally {
+
+            loginButton.disabled = false;
+            loginButton.textContent = 'Entrar';
+
+        }
+    });
+</script>
+
 
 </body>
 </html>
